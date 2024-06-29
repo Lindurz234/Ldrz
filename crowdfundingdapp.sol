@@ -1,87 +1,88 @@
-//SPDX-License-Identifier: Unlicense
-pragma solidity ^0.8.0;
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity >=0.7.0 <0.9.0;
 
-import "hardhat/console.sol";
-import './Project.sol';
+contract Crowdfunding {
+    mapping(address=>uint) public contributors;
+    address public manager;
+    uint public  minimum;
+    uint public  deadline;
+    uint public target;
+    uint public raised;
+    uint public numofcontributors;
 
-contract Crowdfunding{
 
-// [X] Anyone can start a funding project .
-// [X] Get All project list
-// [X]  contribute amount
+    struct Request{
+        string description;
+        address payable recepient;
+        uint value;
+        bool completed;
+        uint noofVoters;
+        mapping (address=>bool) voters;
+    }
 
-event ProjectStarted(
-    address projectContractAddress ,
-    address creator,
-    uint256 minContribution,
-    uint256 projectDeadline,
-    uint256 goalAmount,
-    uint256 currentAmount,
-    uint256 noOfContributors,
-    string title,
-    string desc,
-    uint256 currentState
-);
+    mapping (uint=> Request) requests;
+    uint public numofrequests;
 
-event ContributionReceived(
-   address projectAddress,
-   uint256 contributedAmount,
-   address indexed contributor
-);
 
- Project[] private projects;
+    constructor(uint _target, uint _deadline){
+        target=_target;
+        deadline=block.timestamp+_deadline;
+        minimum=100 wei;
+        manager=msg.sender;
+    }
 
-  // @dev Anyone can start a fund rising
- // @return null
 
- function createProject(
-    uint256 minimumContribution,
-    uint256 deadline,
-    uint256 targetContribution,
-    string memory projectTitle,
-    string memory projectDesc
- ) public {
+    modifier onlyManager(){
+        require(msg.sender==manager, "You are not me");
+        _;
+    }
 
-   deadline = deadline;
+    function createRequest(string calldata _description, address payable _recipient, uint _value) public {
+        Request storage newRequest=requests[numofrequests];
+        numofrequests++;
+        newRequest.description=_description;
+        newRequest.recepient=_recipient;
+        newRequest.value=_value;
+        newRequest.completed=false;
+        newRequest.noofVoters=0;
+    }
 
-   Project newProject = new Project(msg.sender,minimumContribution,deadline,targetContribution,projectTitle,projectDesc);
-   projects.push(newProject);
- 
- emit ProjectStarted(
-    address(newProject) ,
-    msg.sender,
-    minimumContribution,
-    deadline,
-    targetContribution,
-    0,
-    0,
-    projectTitle,
-    projectDesc,
-    0
- );
+    function contribution() public payable {
+        require(block.timestamp<deadline,"Deadline has passed");
+        require(msg.value>=minimum,"Minimum required is 100 wei");
 
- }
+        if (contributors[msg.sender]==0){
+            numofcontributors++;
+        }
+        contributors[msg.sender]=msg.value;
+        raised+=msg.value;
+    }
 
- // @dev Get projects list
-// @return array
+    function getBalance() public  view  returns(uint){
+        return address(this).balance;
+    }
 
-function returnAllProjects() external view returns(Project[] memory){
-   return projects;
-}
+    function refund() public {
+        require(block.timestamp>deadline && raised<target, "You are not eligible for refund");
+        require(contributors[msg.sender]>0, "You are not a contributor");
+        payable(msg.sender).transfer(contributors[msg.sender]);
+        contributors[msg.sender]=0;
+    }
 
-// @dev User can contribute
-// @return null
+    function voteRequest(uint _request) public {
+        require(contributors[msg.sender]>0, "You are not a contributor");
+        Request storage thisRequest=requests[_request];
+        require(thisRequest.voters[msg.sender]==false, "You have already voted");
+        thisRequest.voters[msg.sender]=true;
+        thisRequest.noofVoters++;
+    }
 
-function contribute(address _projectAddress) public payable{
-
-   uint256 minContributionAmount = Project(_projectAddress).minimumContribution();
-   Project.State projectState = Project(_projectAddress).state();
-   require(projectState == Project.State.Fundraising,'Invalid state');
-   require(msg.value >= minContributionAmount,'Contribution amount is too low !');
-   // Call function
-   Project(_projectAddress).contribute{value:msg.value}(msg.sender);
-   // Trigger event 
-   emit ContributionReceived(_projectAddress,msg.value,msg.sender);
-}
-
+    function makePayment(uint _request) public onlyManager{
+        require(raised>=target, "Target is not Reached");
+        Request storage thisRequest=requests[_request];
+        require(thisRequest.completed==false, "the request has been completed");
+        require(thisRequest.noofVoters>numofcontributors/2,"Majority does not support that");
+        thisRequest.recepient.transfer(thisRequest.value);
+        thisRequest.completed=true;
+    }
 }
