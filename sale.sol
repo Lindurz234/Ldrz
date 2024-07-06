@@ -442,12 +442,12 @@ library Address {
 }
 
 
-contract Lindurzz is Context, IERC20, IERC20Metadata,Ownable {
+contract Lindurz is Context, IERC20, IERC20Metadata,Ownable {
 
     mapping (address => uint256) private _balances;
     mapping (address => mapping (address => uint256)) private _allowances;
 
-    bool public mintedByDxsale = true;
+    bool public mintedbyLindurz = true;
     uint256 private _totalSupply;
     bool public mintingFinishedPermanent = false;
     string private _name;
