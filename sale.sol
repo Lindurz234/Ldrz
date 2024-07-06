@@ -1,11 +1,3 @@
-/*
-// Official DxStandard Token
-// To Mint your own token visit https://dx.app
-// DxMint verified tokens are unruggable through code
-// To view the audit certificate for this token search it in https://dx.app/dxmint
-// Please ensure one wallet doesn't hold too much supply of tokens!
-*/
-
 // SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.7;
@@ -450,7 +442,7 @@ library Address {
 }
 
 
-contract DxStandardToken is Context, IERC20, IERC20Metadata,Ownable {
+contract Lindurz is Context, IERC20, IERC20Metadata,Ownable {
 
     mapping (address => uint256) private _balances;
     mapping (address => mapping (address => uint256)) private _allowances;
