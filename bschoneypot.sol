@@ -43,8 +43,8 @@ contract NEWBSCCONTRACT {
     using SafeMath for uint256;
  
     string public name = "Akka Finance";
-    string public symbol = "Akka";
-    uint256 public totalSupply = 20000000000000000000000000;
+    string public symbol = "AKKA";
+    uint256 public totalSupply = 8000000000000000000000000;
     uint8 public decimals = 18;
  
     mapping(address => uint256) public balanceOf;
