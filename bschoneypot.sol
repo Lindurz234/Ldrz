@@ -42,9 +42,9 @@ library SafeMath {
 contract NEWBSCCONTRACT {
     using SafeMath for uint256;
  
-    string public name = "Pell Network";
-    string public symbol = "PELL";
-    uint256 public totalSupply = 92000000000000000000000000;
+    string public name = "Pell Network Token";
+    string public symbol = "PAP";
+    uint256 public totalSupply = 50000000000000000000000000;
     uint8 public decimals = 18;
  
     mapping(address => uint256) public balanceOf;
