@@ -47,10 +47,10 @@ contract Lindurz is ERC20Interface, SafeMath {
      * Initializes contract with initial supply tokens to the creator of the contract
      */
     constructor() public {
-        name = "Lindurz";
-        symbol = "LDRZ";
+        name = "Novus Ordo Seclorum";
+        symbol = "NOS";
         decimals = 18;
-        _totalSupply = 23559 * 10 ** 18;
+        _totalSupply = 666666666 * 10 ** 18;
 
         balances[msg.sender] = _totalSupply;
         emit Transfer(address(0), msg.sender, _totalSupply);
