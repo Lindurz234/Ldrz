@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+u// SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.10;
 
@@ -618,9 +618,9 @@ abstract contract Pausable is Context {
     }
 }
 
-contract Stellar is ERC20, Ownable, Pausable {
-    constructor() ERC20("Stellar", "STELLAR") {
-        _mint(msg.sender, 12000000000000000000000000);
+contract Moana is ERC20, Ownable, Pausable {
+    constructor() ERC20("Moana", "MOANA") {
+        _mint(msg.sender, 72000000000000000000000000);
     }
 
     function burn(uint256 amount) external {
