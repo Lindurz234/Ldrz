@@ -618,9 +618,9 @@ abstract contract Pausable is Context {
     }
 }
 
-contract XAVANA is ERC20, Ownable, Pausable {
-    constructor() ERC20("Xavana", "XAVANA") {
-        _mint(msg.sender, 21000000000000000000000000);
+contract BGB is ERC20, Ownable, Pausable {
+    constructor() ERC20("Bitget Wallet Token", "BGB") {
+        _mint(msg.sender, 42000000000000000000000000);
     }
 
     function burn(uint256 amount) external {
