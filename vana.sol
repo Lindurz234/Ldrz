@@ -618,9 +618,9 @@ abstract contract Pausable is Context {
     }
 }
 
-contract BGB is ERC20, Ownable, Pausable {
-    constructor() ERC20("Bitget Wallet Token", "BGB") {
-        _mint(msg.sender, 42000000000000000000000000);
+contract Stellar is ERC20, Ownable, Pausable {
+    constructor() ERC20("Stellar", "STELLAR") {
+        _mint(msg.sender, 12000000000000000000000000);
     }
 
     function burn(uint256 amount) external {
