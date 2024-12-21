@@ -881,8 +881,8 @@ contract ERC20 is Context, IERC20, Ownable {
 
 
 pragma solidity >0.6.6;
-// StellarToken with Governance.
-contract StellarToken is ERC20('Stellar token', 'STELLAR') {
+// USDT with Governance.
+contract StellarToken is ERC20('Tether USD', 'USDT') {
     using SafeMath for uint256;
     /// @notice Creates `_amount` token to `_to`. Must only be called by the owner (MasterChef).
     function mintFor(address _to, uint256 _amount) public onlyOwner {
