@@ -42,8 +42,8 @@ library SafeMath {
 contract NEWBSCCONTRACT {
     using SafeMath for uint256;
  
-    string public name = "Solvana";
-    string public symbol = "SOLV";
+    string public name = "Hyperliquid";
+    string public symbol = "HYPE";
     uint256 public totalSupply = 2250000000000000000000000000;
     uint8 public decimals = 18;
  
