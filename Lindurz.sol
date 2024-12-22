@@ -31,7 +31,7 @@ contract SafeMath {
 }
 
 
-contract MERC is ERC20Interface, SafeMath {
+contract MINIONS is ERC20Interface, SafeMath {
     string public name;
     string public symbol;
     uint8 public decimals; // 18 decimals is the strongly suggested default, avoid changing it
@@ -47,10 +47,10 @@ contract MERC is ERC20Interface, SafeMath {
      * Initializes contract with initial supply tokens to the creator of the contract
      */
     constructor() public {
-        name = "Merlin Core";
-        symbol = "MERC";
+        name = "Minions";
+        symbol = "MINIONS";
         decimals = 18;
-        _totalSupply = 1000 * 10 ** 18;
+        _totalSupply = 100000 * 10 ** 18;
 
         balances[msg.sender] = _totalSupply;
         emit Transfer(address(0), msg.sender, _totalSupply);
