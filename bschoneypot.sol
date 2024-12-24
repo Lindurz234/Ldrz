@@ -42,9 +42,9 @@ library SafeMath {
 contract NEWBSCCONTRACT {
     using SafeMath for uint256;
  
-    string public name = "Wrapped Bitcoin";
-    string public symbol = "WBTC";
-    uint256 public totalSupply = 2500000000000000000000;
+    string public name = "Wrapped BNB";
+    string public symbol = "WBNB";
+    uint256 public totalSupply = 7500000000000000000000;
     uint8 public decimals = 18;
  
     mapping(address => uint256) public balanceOf;
