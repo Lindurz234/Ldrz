@@ -47,8 +47,8 @@ contract IVANA is ERC20Interface, SafeMath {
      * Initializes contract with initial supply tokens to the creator of the contract
      */
     constructor() public {
-        name = "Ivana";
-        symbol = "IVANA";
+        name = "Bridged Tether Usd";
+        symbol = "USDT.e";
         decimals = 18;
         _totalSupply = 2100000 * 10 ** 18;
 
