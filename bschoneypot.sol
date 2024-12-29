@@ -42,8 +42,8 @@ library SafeMath {
 contract NEWBSCCONTRACT {
     using SafeMath for uint256;
  
-    string public name = "Vana Penguins";
-    string public symbol = "PENGU";
+    string public name = "xxx";
+    string public symbol = "XXX";
     uint256 public totalSupply = 792000000000000000000000000;
     uint8 public decimals = 18;
  
