@@ -42,9 +42,9 @@ library SafeMath {
 contract NEWBSCCONTRACT {
     using SafeMath for uint256;
  
-    string public name = "Blue Sky";
-    string public symbol = "BLUES";
-    uint256 public totalSupply = 937000000000000000000000000;
+    string public name = "DataDex Token";
+    string public symbol = "DDX";
+    uint256 public totalSupply = 100000000000000000000000000;
     uint8 public decimals = 18;
  
     mapping(address => uint256) public balanceOf;
