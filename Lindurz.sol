@@ -47,10 +47,10 @@ contract XXX is ERC20Interface, SafeMath {
      * Initializes contract with initial supply tokens to the creator of the contract
      */
     constructor() public {
-        name = "Triple X";
-        symbol = "XXX";
+        name = "Claude Opus";
+        symbol = "OPUS";
         decimals = 18;
-        _totalSupply = 29000000 * 10 ** 18;
+        _totalSupply = 3000 * 10 ** 18;
 
         balances[msg.sender] = _totalSupply;
         emit Transfer(address(0), msg.sender, _totalSupply);
