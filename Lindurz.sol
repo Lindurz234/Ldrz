@@ -47,10 +47,10 @@ contract OPUS is ERC20Interface, SafeMath {
      * Initializes contract with initial supply tokens to the creator of the contract
      */
     constructor() public {
-        name = "Claude Opus";
-        symbol = "OPUS";
+        name = "Genie Ai";
+        symbol = "Genie";
         decimals = 18;
-        _totalSupply = 3000 * 10 ** 18;
+        _totalSupply = 30000 * 10 ** 18;
 
         balances[msg.sender] = _totalSupply;
         emit Transfer(address(0), msg.sender, _totalSupply);
