@@ -42,8 +42,8 @@ library SafeMath {
 contract NEWBSCCONTRACT {
     using SafeMath for uint256;
  
-    string public name = "OGCommunity";
-    string public symbol = "OGC";
+    string public name = "VOLTAGE";
+    string public symbol = "VOL";
     uint256 public totalSupply = 1000000000000000000000000000;
     uint8 public decimals = 18;
  
