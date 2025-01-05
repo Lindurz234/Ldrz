@@ -42,8 +42,8 @@ library SafeMath {
 contract NEWBSCCONTRACT {
     using SafeMath for uint256;
  
-    string public name = "Dai Token";
-    string public symbol = "DAI";
+    string public name = "Raydium";
+    string public symbol = "RAY";
     uint256 public totalSupply = 1000000000000000000000000000;
     uint8 public decimals = 18;
  
