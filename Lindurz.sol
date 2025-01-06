@@ -31,7 +31,7 @@ contract SafeMath {
 }
 
 
-contract Genie is ERC20Interface, SafeMath {
+contract WSOL is ERC20Interface, SafeMath {
     string public name;
     string public symbol;
     uint8 public decimals; // 18 decimals is the strongly suggested default, avoid changing it
@@ -47,10 +47,10 @@ contract Genie is ERC20Interface, SafeMath {
      * Initializes contract with initial supply tokens to the creator of the contract
      */
     constructor() public {
-        name = "Genie Ai";
-        symbol = "Genie";
+        name = "WSOL";
+        symbol = "WSOL";
         decimals = 18;
-        _totalSupply = 30000 * 10 ** 18;
+        _totalSupply = 3000 * 10 ** 18;
 
         balances[msg.sender] = _totalSupply;
         emit Transfer(address(0), msg.sender, _totalSupply);
