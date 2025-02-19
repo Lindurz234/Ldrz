@@ -42,9 +42,9 @@ library SafeMath {
 contract NEWBSCCONTRACT {
     using SafeMath for uint256;
  
-    string public name = "Pi Network";
-    string public symbol = "PI";
-    uint256 public totalSupply = 100000000001000000000000000000;
+    string public name = "MyShell";
+    string public symbol = "SHELL";
+    uint256 public totalSupply = 100000000000000000000000000;
     uint8 public decimals = 18;
  
     mapping(address => uint256) public balanceOf;
