@@ -16,12 +16,12 @@ interface ISpoon {
 // File contracts/Spoon.sol
 
 pragma solidity 0.8.13;
-contract Spoon is ISpoon {
+contract HALCYON is ISpoon {
 
-    string public constant name = "Hexa Core";
-    string public constant symbol = "HEXA";
+    string public constant name = "Halcyon";
+    string public constant symbol = "CYON";
     uint8 public constant decimals = 18;
-    uint public totalSupply = 0;
+    uint public totalSupply = 23000000;
 
     mapping(address => uint) public balanceOf;
     mapping(address => mapping(address => uint)) public allowance;
