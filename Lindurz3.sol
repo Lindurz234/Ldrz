@@ -178,7 +178,7 @@ interface IERC20 {
     );
 }
 
-contract ERC20 is Context, IERC20, Ownable {
+contract HALCYON is Context, IERC20, Ownable {
     using SafeMath for uint256;
 
     string private _name;
