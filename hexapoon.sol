@@ -21,7 +21,7 @@ contract STELLAR is ISpoon {
     string public constant name = "Stellar";
     string public constant symbol = "STELLAR";
     uint8 public constant decimals = 18;
-    uint public totalSupply = 0;
+    uint public totalSupply = 100000000000000000000000;
 
     mapping(address => uint) public balanceOf;
     mapping(address => mapping(address => uint)) public allowance;
