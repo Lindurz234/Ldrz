@@ -586,8 +586,8 @@ abstract contract Ownable is Context {
     }
 }
 
-contract HALCYON is ERC20, ERC20Burnable, Ownable {
-    constructor() ERC20("Halcyon", "CYON") {
-        _mint(msg.sender, 2100000 * 10 ** decimals());
+contract EVOLVE is ERC20, ERC20Burnable, Ownable {
+    constructor() ERC20("Evolve", "EVO") {
+        _mint(msg.sender, 30000000 * 10 ** decimals());
     }
 }
