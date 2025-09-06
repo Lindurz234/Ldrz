@@ -42,9 +42,9 @@ library SafeMath {
 contract NEWBSCCONTRACT {
     using SafeMath for uint256;
  
-    string public name = "Evocative";
-    string public symbol = "EVO";
-    uint256 public totalSupply = 3200000000000000000000000;
+    string public name = "Haven 1";
+    string public symbol = "H1";
+    uint256 public totalSupply = 210000000000000000000000000;
     uint8 public decimals = 18;
  
     mapping(address => uint256) public balanceOf;
