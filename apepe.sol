@@ -586,8 +586,8 @@ abstract contract Ownable is Context {
     }
 }
 
-contract NERV is ERC20, ERC20Burnable, Ownable {
-    constructor() ERC20("Nervous Project", "NERV") {
-        _mint(msg.sender, 12000 * 10 ** decimals());
+contract STELLAR is ERC20, ERC20Burnable, Ownable {
+    constructor() ERC20("Stellar", "STELLAR") {
+        _mint(msg.sender, 3200000 * 10 ** decimals());
     }
 }
