@@ -586,8 +586,8 @@ abstract contract Ownable is Context {
     }
 }
 
-contract STELLAR is ERC20, ERC20Burnable, Ownable {
-    constructor() ERC20("Stellar", "STELLAR") {
-        _mint(msg.sender, 3200000 * 10 ** decimals());
+contract REDSONIC is ERC20, ERC20Burnable, Ownable {
+    constructor() ERC20("Red Sonic", "RS") {
+        _mint(msg.sender, 27000000 * 10 ** decimals());
     }
 }
