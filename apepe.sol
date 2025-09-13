@@ -1,5 +1,5 @@
 /**
- *Submitted for verification at polygonscan.com on 2023-06-07
+ *Submitted for verification at sonicscan.org on 2025-09-13
 */
 
 // SPDX-License-Identifier: MIT
@@ -586,8 +586,8 @@ abstract contract Ownable is Context {
     }
 }
 
-contract REDSONIC is ERC20, ERC20Burnable, Ownable {
-    constructor() ERC20("Red Sonic", "RS") {
-        _mint(msg.sender, 27000000 * 10 ** decimals());
+contract KLAY is ERC20, ERC20Burnable, Ownable {
+    constructor() ERC20("Klay Token", "KLAY") {
+        _mint(msg.sender, 12000000 * 10 ** decimals());
     }
 }
