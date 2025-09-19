@@ -1,5 +1,5 @@
 /**
- *Submitted for verification at sonicscan.org on 2025-09-13
+ *Submitted for verification at sonicscan.org on 2025-09-19
 */
 
 // SPDX-License-Identifier: MIT
@@ -586,8 +586,8 @@ abstract contract Ownable is Context {
     }
 }
 
-contract KLAY is ERC20, ERC20Burnable, Ownable {
-    constructor() ERC20("Klay Token", "KLAY") {
-        _mint(msg.sender, 12000000 * 10 ** decimals());
+contract BABYSONIC is ERC20, ERC20Burnable, Ownable {
+    constructor() ERC20("Baby Sonic", "BYSON") {
+        _mint(msg.sender, 120000000 * 10 ** decimals());
     }
 }
