@@ -587,7 +587,7 @@ abstract contract Ownable is Context {
 }
 
 contract BABYSONIC is ERC20, ERC20Burnable, Ownable {
-    constructor() ERC20("Baby Sonic", "BYSON") {
-        _mint(msg.sender, 120000000 * 10 ** decimals());
+    constructor() ERC20("DataDex", "DTX") {
+        _mint(msg.sender, 23000000 * 10 ** decimals());
     }
 }
