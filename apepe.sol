@@ -1,5 +1,5 @@
 /**
- *Submitted for verification at sonicscan.org on 2025-09-19
+ *Submitted for verification at sonicscan.org on 2025-09-21
 */
 
 // SPDX-License-Identifier: MIT
@@ -586,8 +586,8 @@ abstract contract Ownable is Context {
     }
 }
 
-contract BABYSONIC is ERC20, ERC20Burnable, Ownable {
-    constructor() ERC20("DataDex", "DTX") {
-        _mint(msg.sender, 23000000 * 10 ** decimals());
+contract ASTER is ERC20, ERC20Burnable, Ownable {
+    constructor() ERC20("Aster", "ASTER") {
+        _mint(msg.sender, 10000000 * 10 ** decimals());
     }
 }
