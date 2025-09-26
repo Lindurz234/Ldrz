@@ -1,17 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.30;
 
-/// @title MUSE (MSE) - ERC20 fixed supply with non-blocking anti-bot monitoring
-/// @author ChatGPT
+/// @title Splash (SPX) - ERC20 fixed supply with non-blocking anti-bot monitoring
 /// @notice Fixed supply ERC20 token. No mint after deployment. Anti-bot feature only emits events / keeps counters (does NOT block transactions).
-contract MUSE {
+contract SPLASH {
     // ERC20 metadata
-    string public constant name = "MUSE";
-    string public constant symbol = "MSE";
+    string public constant name = "Splash";
+    string public constant symbol = "SPX";
     uint8 public constant decimals = 18;
 
-    // Fixed total supply: 25,000,000 * 10^18
-    uint256 public constant TOTAL_SUPPLY = 25_000_000 * (10 ** uint256(decimals));
+    // Fixed total supply: 21,000,000 * 10^18
+    uint256 public constant TOTAL_SUPPLY = 21_000_000 * (10 ** uint256(decimals));
 
     // Balances and allowances
     mapping(address => uint256) private _balances;
