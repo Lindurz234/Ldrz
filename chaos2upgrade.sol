@@ -16,7 +16,7 @@ interface IUniswapV2Router {
         uint amountETHMin,
         address to,
         uint deadline
-    ) external payable returns (uint amountToken, uint amount ETH, uint liquidity);
+    ) external payable returns (uint amountToken, uint amountETH, uint liquidity);
 }
 
 interface IUniswapV2Pair {
