@@ -12,7 +12,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  */
 contract AirdropContract is ReentrancyGuard, Ownable {
     // Alamat token airdrop yang akan didistribusikan
-    address public constant AIRDROP_TOKEN = 0x7c3a20ba246979fcea2ef964fc1eb3acce9ca0bc;
+    address public constant AIRDROP_TOKEN = 0x7C3A20bA246979fCea2eF964fC1eb3ACCe9Ca0bc ;
     
     // Konstanta untuk jumlah airdrop dan biaya
     uint256 public constant AIRDROP_AMOUNT = 100 * 10**18; // 100 token dengan 18 desimal
