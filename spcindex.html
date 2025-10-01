@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPLASH - CLAIM 100 APX NOW</title>
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js" type="application/javascript"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            background-size: cover;
+            background-position: center;
+            border: 3px solid #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d4ff, #0099ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        }
+
+        .subtitle {
+            color: #88ccff;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .info-box {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        .info-box h3 {
+            color: #00d4ff;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .address {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+            margin: 5px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .instructions {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .instructions h3 {
+            color: #88ccff;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .step {
+            display: flex;
+            margin-bottom: 15px;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, #00d4ff, #0099ff);
+            color: #1a1a2e;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .step-text {
+            flex: 1;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .claim-section {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .connect-btn, .claim-btn {
+            background: linear-gradient(135deg, #00d4ff, #0099ff);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
+            margin: 10px 0;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .connect-btn:hover, .claim-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.6);
+        }
+
+        .connect-btn:disabled, .claim-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .wallet-info {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 12px;
+            padding: 12px;
+            margin: 15px 0;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .status {
+            margin: 15px 0;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .status.success {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            color: #88ff88;
+        }
+
+        .status.error {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            color: #ff8888;
+        }
+
+        .status.info {
+            background: rgba(255, 255, 0, 0.1);
+            border: 1px solid rgba(255, 255, 0, 0.3);
+            color: #ffff88;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #88aaff;
+            opacity: 0.7;
+        }
+
+        .warning {
+            background: rgba(255, 165, 0, 0.2);
+            border: 1px solid rgba(255, 165, 0, 0.5);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .warning h3 {
+            color: #ffa500;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo" id="tokenLogo"></div>
+            <h1>SPLASH Airdrop</h1>
+            <p class="subtitle">CLAIM 100 APX NOW</p>
+            <p class="subtitle">On Core Chain Network</p>
+        </div>
+
+        <div class="warning">
+            <h3>⚠️ Important Notice</h3>
+            <p>APX tokens have been swapped to ASTER tokens in a 1:1 ratio. This demo shows the technical implementation only.</p>
+        </div>
+
+        <div class="info-box">
+            <h3>Token Information</h3>
+            <p><strong>Token Address:</strong></p>
+            <div class="address">0x7c3a20ba246979fcea2ef964fc1eb3acce9ca0bc</div>
+            <p><strong>Airdrop Contract:</strong></p>
+            <div class="address">0x116e95B8C010DC0c0ef0e4Fe8Cf061e093493E9c</div>
+        </div>
+
+        <div class="instructions">
+            <h3>How to Claim Your Airdrop</h3>
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-text">Install and set up a Web3 wallet like Core Wallet that supports Core Chain</div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-text">Connect your wallet to this dApp using the button below</div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-text">Ensure you have enough CORE for transaction fees</div>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-text">Click "Claim 100 APX Now" to receive your tokens</div>
+            </div>
+        </div>
+
+        <div class="claim-section">
+            <div id="walletInfo" class="wallet-info" style="display: none;">
+                Wallet Connected: <span id="walletAddress"></span>
+            </div>
+            
+            <button id="connectBtn" class="connect-btn">Connect Wallet</button>
+            <button id="claimBtn" class="claim-btn" disabled>Claim 100 APX Now</button>
+            
+            <div id="status" class="status"></div>
+        </div>
+
+        <div class="footer">
+            <p>Built for Core Chain Network | Web3 Airdrop Demo</p>
+            <p>Always verify contract addresses before transactions</p>
+        </div>
+    </div>
+
+    <script>
+        // Konfigurasi Core Chain
+        const CORE_CHAIN_CONFIG = {
+            chainId: '0x...', // Chain ID Core Chain (perlu dilengkapi)
+            chainName: 'Core Chain',
+            nativeCurrency: {
+                name: 'CORE',
+                symbol: 'CORE',
+                decimals: 18
+            },
+            rpcUrls: ['https://rpc.coredao.org/'],
+            blockExplorerUrls: ['https://scan.coredao.org/']
+        };
+
+        // Konfigurasi kontrak
+        const TOKEN_ADDRESS = '0x7c3a20ba246979fcea2ef964fc1eb3acce9ca0bc';
+        const AIRDROP_CONTRACT_ADDRESS = '0x116e95B8C010DC0c0ef0e4Fe8Cf061e093493E9c';
+        
+        // ABI sederhana untuk fungsi claimAirdrop
+        const AIRDROP_ABI = [
+            "function claimAirdrop(uint256 amount) public payable",
+            "function claimed(address) public view returns (bool)"
+        ];
+
+        // Global variables
+        let provider;
+        let signer;
+        let airdropContract;
+        let userAddress;
+
+        // Set logo token
+        document.getElementById('tokenLogo').style.backgroundImage = 'url("https://photos.pinksale.finance/file/pinksale-logo-upload/1759289153125-126c99bb2225e8e2159445500dea37b3.JPG")';
+
+        // Element references
+        const connectBtn = document.getElementById('connectBtn');
+        const claimBtn = document.getElementById('claimBtn');
+        const walletInfo = document.getElementById('walletInfo');
+        const walletAddress = document.getElementById('walletAddress');
+        const statusDiv = document.getElementById('status');
+
+        // Event Listeners
+        connectBtn.addEventListener('click', connectWallet);
+        claimBtn.addEventListener('click', claimAirdrop);
+
+        // Fungsi untuk connect wallet
+        async function connectWallet() {
+            try {
+                if (typeof window.ethereum === 'undefined') {
+                    showStatus('Please install a Web3 wallet like Core Wallet to continue', 'error');
+                    return;
+                }
+
+                // Request account access
+                const accounts = await window.ethereum.request({
+                    method: 'eth_requestAccounts'
+                });
+
+                userAddress = accounts[0];
+                
+                // Create provider and signer
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                signer = provider.getSigner();
+                
+                // Initialize contract
+                airdropContract = new ethers.Contract(AIRDROP_CONTRACT_ADDRESS, AIRDROP_ABI, signer);
+
+                // Update UI
+                walletAddress.textContent = `${userAddress.substring(0, 6)}...${userAddress.substring(userAddress.length - 4)}`;
+                walletInfo.style.display = 'block';
+                connectBtn.disabled = true;
+                claimBtn.disabled = false;
+                
+                showStatus('Wallet connected successfully! You can now claim your airdrop.', 'success');
+
+                // Check if already claimed
+                checkIfClaimed();
+
+            } catch (error) {
+                console.error('Error connecting wallet:', error);
+                showStatus('Failed to connect wallet: ' + error.message, 'error');
+            }
+        }
+
+        // Fungsi untuk check jika sudah claim
+        async function checkIfClaimed() {
+            try {
+                if (!airdropContract) return;
+                
+                const claimed = await airdropContract.claimed(userAddress);
+                if (claimed) {
+                    showStatus('You have already claimed your airdrop!', 'info');
+                    claimBtn.disabled = true;
+                }
+            } catch (error) {
+                console.error('Error checking claim status:', error);
+            }
+        }
+
+        // Fungsi untuk claim airdrop
+        async function claimAirdrop() {
+            try {
+                if (!signer || !airdropContract) {
+                    showStatus('Please connect your wallet first', 'error');
+                    return;
+                }
+
+                showStatus('Processing your claim...', 'info');
+                claimBtn.disabled = true;
+
+                // Execute claim transaction
+                const transaction = await airdropContract.claimAirdrop(100, {
+                    value: ethers.utils.parseEther("5"), // 5 native token
+                    gasLimit: 200000
+                });
+
+                showStatus('Transaction submitted! Waiting for confirmation...', 'info');
+
+                // Wait for transaction confirmation
+                const receipt = await transaction.wait();
+                
+                showStatus('Success! You have claimed 100 APX tokens!', 'success');
+                
+            } catch (error) {
+                console.error('Error claiming airdrop:', error);
+                showStatus('Claim failed: ' + error.message, 'error');
+                claimBtn.disabled = false;
+            }
+        }
+
+        // Fungsi untuk menampilkan status
+        function showStatus(message, type) {
+            statusDiv.textContent = message;
+            statusDiv.className = 'status ' + type;
+            statusDiv.style.display = 'block';
+        }
+
+        // Listen for account changes
+        if (window.ethereum) {
+            window.ethereum.on('accountsChanged', (accounts) => {
+                if (accounts.length === 0) {
+                    // User disconnected wallet
+                    walletInfo.style.display = 'none';
+                    connectBtn.disabled = false;
+                    claimBtn.disabled = true;
+                    showStatus('Wallet disconnected', 'info');
+                } else {
+                    // Account changed
+                    userAddress = accounts[0];
+                    walletAddress.textContent = `${userAddress.substring(0, 6)}...${userAddress.substring(userAddress.length - 4)}`;
+                    checkIfClaimed();
+                }
+            });
+        }
+    </script>
+</body>
+</html>
