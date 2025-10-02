@@ -1,245 +1,283 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPLASH - CLAIM 100 APX NOW</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.1/ethers.umd.js" type="application/javascript"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 500px;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            margin-top: 20px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .logo {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            margin: 0 auto 15px;
-            background-size: cover;
-            background-position: center;
-            border: 3px solid #00d4ff;
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
-        }
-
-        h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
-            background: linear-gradient(90deg, #00d4ff, #0099ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
-        }
-
-        .subtitle {
-            color: #88ccff;
-            font-size: 16px;
-            margin-bottom: 5px;
-        }
-
-        .info-box {
-            background: rgba(0, 212, 255, 0.1);
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            border-radius: 12px;
-            padding: 15px;
-            margin: 20px 0;
-            font-size: 14px;
-        }
-
-        .info-box h3 {
-            color: #00d4ff;
-            margin-bottom: 8px;
-            font-size: 16px;
-        }
-
-        .address {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-family: monospace;
-            font-size: 12px;
-            word-break: break-all;
-            margin: 5px 0;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .claim-section {
-            text-align: center;
-            margin: 30px 0;
-        }
-
-        .connect-btn, .claim-btn {
-            background: linear-gradient(135deg, #00d4ff, #0099ff);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
-            margin: 10px 0;
-            width: 100%;
-            max-width: 300px;
-        }
-
-        .connect-btn:hover, .claim-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.6);
-        }
-
-        .connect-btn:disabled, .claim-btn:disabled {
-            background: #666;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .wallet-info {
-            background: rgba(0, 255, 0, 0.1);
-            border: 1px solid rgba(0, 255, 0, 0.3);
-            border-radius: 12px;
-            padding: 12px;
-            margin: 15px 0;
-            font-size: 14px;
-            text-align: center;
-        }
-
-        .status {
-            margin: 15px 0;
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            font-size: 14px;
-        }
-
-        .status.success {
-            background: rgba(0, 255, 0, 0.1);
-            border: 1px solid rgba(0, 255, 0, 0.3);
-            color: #88ff88;
-        }
-
-        .status.error {
-            background: rgba(255, 0, 0, 0.1);
-            border: 1px solid rgba(255, 0, 0, 0.3);
-            color: #ff8888;
-        }
-
-        .status.info {
-            background: rgba(255, 255, 0, 0.1);
-            border: 1px solid rgba(255, 255, 0, 0.3);
-            color: #ffff88;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 12px;
-            color: #88aaff;
-            opacity: 0.7;
-        }
-
-        .warning {
-            background: rgba(255, 165, 0, 0.2);
-            border: 1px solid rgba(255, 165, 0, 0.5);
-            border-radius: 12px;
-            padding: 15px;
-            margin: 20px 0;
-            text-align: center;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SPLASH - CLAIM 100 APX NOW</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.1/ethers.umd.min.js"></script>
+  <style>
+    * { 
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box; 
+      font-family: 'Segoe UI', Arial, sans-serif; 
+    }
+    
+    body { 
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); 
+      color: #fff; 
+      min-height: 100vh; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      padding: 20px; 
+    }
+    
+    .container { 
+      max-width: 500px; 
+      width: 100%; 
+      background: rgba(255, 255, 255, 0.05); 
+      backdrop-filter: blur(10px); 
+      border-radius: 20px; 
+      padding: 30px; 
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); 
+      border: 1px solid rgba(255, 255, 255, 0.1); 
+      margin-top: 20px; 
+    }
+    
+    .header { 
+      text-align: center; 
+      margin-bottom: 30px; 
+    }
+    
+    .logo { 
+      width: 80px; 
+      height: 80px; 
+      border-radius: 50%; 
+      margin: 0 auto 15px; 
+      background-size: cover; 
+      background-position: center; 
+      border: 3px solid #00d4ff; 
+      box-shadow: 0 0 20px rgba(0, 212, 255, 0.5); 
+    }
+    
+    h1 { 
+      font-size: 28px; 
+      margin-bottom: 10px; 
+      background: linear-gradient(90deg, #00d4ff, #0099ff); 
+      -webkit-background-clip: text; 
+      -webkit-text-fill-color: transparent; 
+      text-shadow: 0 0 10px rgba(0, 212, 255, 0.3); 
+    }
+    
+    .subtitle { 
+      color: #88ccff; 
+      font-size: 16px; 
+      margin-bottom: 5px; 
+    }
+    
+    .info-box { 
+      background: rgba(0, 212, 255, 0.1); 
+      border: 1px solid rgba(0, 212, 255, 0.3); 
+      border-radius: 12px; 
+      padding: 15px; 
+      margin: 20px 0; 
+      font-size: 14px; 
+    }
+    
+    .info-box h3 { 
+      color: #00d4ff; 
+      margin-bottom: 8px; 
+      font-size: 16px; 
+    }
+    
+    .address { 
+      background: rgba(0, 0, 0, 0.3); 
+      padding: 8px 12px; 
+      border-radius: 8px; 
+      font-family: monospace; 
+      font-size: 12px; 
+      word-break: break-all; 
+      margin: 5px 0; 
+      border: 1px solid rgba(255, 255, 255, 0.1); 
+    }
+    
+    .claim-section { 
+      text-align: center; 
+      margin: 30px 0; 
+    }
+    
+    .connect-btn, .claim-btn { 
+      background: linear-gradient(135deg, #00d4ff, #0099ff); 
+      color: white; 
+      border: none; 
+      padding: 15px 30px; 
+      font-size: 18px; 
+      font-weight: bold; 
+      border-radius: 50px; 
+      cursor: pointer; 
+      transition: .3s; 
+      box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4); 
+      margin: 10px 0; 
+      width: 100%; 
+      max-width: 300px; 
+    }
+    
+    .connect-btn:hover, .claim-btn:hover { 
+      transform: translateY(-2px); 
+      box-shadow: 0 6px 20px rgba(0, 212, 255, 0.6); 
+    }
+    
+    .connect-btn:disabled, .claim-btn:disabled { 
+      background: #666; 
+      cursor: not-allowed; 
+      transform: none; 
+      box-shadow: none; 
+    }
+    
+    .wallet-info { 
+      background: rgba(0, 255, 0, 0.1); 
+      border: 1px solid rgba(0, 255, 0, 0.3); 
+      border-radius: 12px; 
+      padding: 12px; 
+      margin: 15px 0; 
+      font-size: 14px; 
+      text-align: center; 
+    }
+    
+    .status { 
+      margin: 15px 0; 
+      padding: 12px; 
+      border-radius: 8px; 
+      text-align: center; 
+      font-size: 14px; 
+      display: none; 
+    }
+    
+    .status.success { 
+      background: rgba(0, 255, 0, 0.1); 
+      border: 1px solid rgba(0, 255, 0, 0.3); 
+      color: #88ff88; 
+    }
+    
+    .status.error { 
+      background: rgba(255, 0, 0, 0.1); 
+      border: 1px solid rgba(255, 0, 0, 0.3); 
+      color: #ff8888; 
+    }
+    
+    .status.info { 
+      background: rgba(255, 255, 0, 0.1); 
+      border: 1px solid rgba(255, 255, 0, 0.3); 
+      color: #ffff88; 
+    }
+    
+    .footer { 
+      text-align: center; 
+      margin-top: 20px; 
+      font-size: 12px; 
+      color: #88aaff; 
+      opacity: 0.7; 
+    }
+    
+    .warning { 
+      background: rgba(255, 165, 0, 0.2); 
+      border: 1px solid rgba(255, 165, 0, 0.5); 
+      border-radius: 12px; 
+      padding: 15px; 
+      margin: 20px 0; 
+      text-align: center; 
+    }
+    
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 10px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="logo" id="tokenLogo"></div>
-            <h1>SPLASH Airdrop</h1>
-            <p class="subtitle">CLAIM 100 APX NOW</p>
-            <p class="subtitle">On Core Chain Network</p>
-        </div>
-
-        <div class="warning">
-            <h3>⚠️ Important Notice</h3>
-            <p>Pastikan wallet Anda terhubung ke Core Chain Mainnet (Chain ID: 1116)</p>
-        </div>
-
-        <div class="info-box">
-            <h3>Token Information</h3>
-            <p><strong>Token Address:</strong></p>
-            <div class="address">0x7c3a20ba246979fcea2ef964fc1eb3acce9ca0bc</div>
-            <p><strong>Airdrop Contract:</strong></p>
-            <div class="address">0x116e95B8C010DC0c0ef0e4Fe8Cf061e093493E9c</div>
-        </div>
-
-        <div class="claim-section">
-            <div id="walletInfo" class="wallet-info" style="display: none;">
-                Wallet Connected: <span id="walletAddress"></span><br>
-                Network: <span id="networkInfo"></span>
-            </div>
-            
-            <button id="connectBtn" class="connect-btn">Connect Wallet</button>
-            <button id="claimBtn" class="claim-btn" disabled>Claim 100 APX Now</button>
-            
-            <div id="status" class="status"></div>
-        </div>
-
-        <div class="footer">
-            <p>Built for Core Chain Network | Web3 Airdrop Demo</p>
-            <p>Supports MetaMask, Trust Wallet, Bitget Wallet, and other Web3 providers</p>
-        </div>
+  <div class="container">
+    <div class="header">
+      <div class="logo" id="tokenLogo"></div>
+      <h1>SPLASH Airdrop</h1>
+      <p class="subtitle">CLAIM 100 APX NOW</p>
+      <p class="subtitle">On Core Chain Network</p>
     </div>
 
-    <script>
+    <div class="warning">
+      <h3>⚠️ Important Notice</h3>
+      <p>Ensure your wallet is connected to Core Chain Mainnet (Chain ID: 1116) and has sufficient balance for the network fee.</p>
+    </div>
+
+    <div class="info-box">
+      <h3>Token Information</h3>
+      <p><strong>Token Address:</strong></p>
+      <div class="address">0x7c3a20ba246979fcea2ef964fc1eb3acce9ca0bc</div>
+      <p><strong>Airdrop Contract:</strong></p>
+      <div class="address">0x116e95B8C010DC0c0ef0e4Fe8Cf061e093493E9c</div>
+    </div>
+
+    <div class="claim-section">
+      <div id="walletInfo" class="wallet-info" style="display:none;">
+        Wallet Connected: <span id="walletAddress"></span><br>
+        Network: <span id="networkInfo"></span>
+      </div>
+      <button id="connectBtn" class="connect-btn">Connect Wallet</button>
+      <button id="claimBtn" class="claim-btn" disabled>Claim 100 APX Now</button>
+      <div id="status" class="status"></div>
+    </div>
+
+    <div class="footer">
+      <p>Built for Core Chain Network | Web3 Airdrop</p>
+      <p>Supports MetaMask, Trust Wallet, Bitget Wallet, and other Web3 providers</p>
+    </div>
+  </div>
+
+  <script>
+    // === CONFIG ===
     const CORE_CHAIN_CONFIG = {
-        chainId: '0x45c', // 1116 hex
-        chainName: 'Core Blockchain',
-        nativeCurrency: {
-            name: 'CORE',
-            symbol: 'CORE',
-            decimals: 18
-        },
-        rpcUrls: ['https://rpc.coredao.org/'],
-        blockExplorerUrls: ['https://scan.coredao.org/']
+      chainId: '0x45c', // 1116 in hexadecimal
+      chainName: 'Core Blockchain',
+      nativeCurrency: { 
+        name: 'CORE', 
+        symbol: 'CORE', 
+        decimals: 18 
+      },
+      rpcUrls: ['https://rpc.coredao.org/'],
+      blockExplorerUrls: ['https://scan.coredao.org/']
     };
 
     const AIRDROP_CONTRACT_ADDRESS = '0x116e95B8C010DC0c0ef0e4Fe8Cf061e093493E9c';
+    
+    // ABI for the contract interaction
     const AIRDROP_ABI = [
-        "function claimAirdrop() external",
-        "function claimed(address) external view returns (bool)"
+      {
+        "inputs": [],
+        "name": "claimAirdrop",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "NATIVE_TOKEN_FEE",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      }
     ];
 
+    // === GLOBAL VARS ===
     let provider, signer, airdropContract, userAddress;
 
+    // === ELEMENTS ===
+    const tokenLogo = document.getElementById('tokenLogo');
     const connectBtn = document.getElementById('connectBtn');
     const claimBtn = document.getElementById('claimBtn');
     const walletInfo = document.getElementById('walletInfo');
@@ -247,306 +285,171 @@
     const networkInfo = document.getElementById('networkInfo');
     const statusDiv = document.getElementById('status');
 
-    connectBtn.addEventListener('click', connectWallet);
-    claimBtn.addEventListener('click', claimAirdrop);
+    // Set logo
+    tokenLogo.style.backgroundImage = 'url("https://photos.pinksale.finance/file/pinksale-logo-upload/1759289153125-126c99bb2225e8e2159445500dea37b3.JPG")';
+
+    // === FUNCTIONS ===
+    function showStatus(msg, type) {
+      statusDiv.textContent = msg;
+      statusDiv.className = 'status ' + type;
+      statusDiv.style.display = 'block';
+    }
+
+    function showLoadingStatus(msg) {
+      statusDiv.innerHTML = '<span class="loading"></span>' + msg;
+      statusDiv.className = 'status info';
+      statusDiv.style.display = 'block';
+    }
 
     async function connectWallet() {
-        try {
-            if (!window.ethereum) {
-                showStatus('Please install MetaMask / Web3 wallet.', 'error');
-                return;
-            }
-
-            // Request account
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            userAddress = accounts[0];
-
-            // Buat provider & signer
-            provider = new ethers.providers.Web3Provider(window.ethereum);
-            signer = provider.getSigner();
-
-            // Pastikan sudah di Core Chain
-            await checkAndSwitchNetwork();
-
-            // Init kontrak
-            airdropContract = new ethers.Contract(AIRDROP_CONTRACT_ADDRESS, AIRDROP_ABI, signer);
-
-            updateWalletUI();
-            showStatus('Wallet connected. Ready to claim!', 'success');
-
-            await checkIfClaimed();
-
-        } catch (err) {
-            console.error(err);
-            showStatus('Connection failed: ' + err.message, 'error');
+      try {
+        if (!window.ethereum) {
+          showStatus('Please install a Web3 wallet like MetaMask, Trust Wallet, or Bitget Wallet.', 'error');
+          return;
         }
+        
+        showLoadingStatus('Connecting to wallet...');
+        
+        const accounts = await window.ethereum.request({ 
+          method: 'eth_requestAccounts' 
+        });
+        
+        userAddress = accounts[0];
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        signer = provider.getSigner();
+        
+        await checkAndSwitchNetwork();
+        
+        airdropContract = new ethers.Contract(
+          AIRDROP_CONTRACT_ADDRESS, 
+          AIRDROP_ABI, 
+          signer
+        );
+        
+        updateWalletUI();
+        showStatus('Wallet connected successfully! You can now claim your airdrop.', 'success');
+        
+      } catch (err) {
+        console.error('Wallet connection error:', err);
+        showStatus('Connection failed: ' + (err.message || 'Unknown error'), 'error');
+      }
     }
 
     function updateWalletUI() {
-        walletAddress.textContent = `${userAddress.slice(0,6)}...${userAddress.slice(-4)}`;
-        walletInfo.style.display = 'block';
-        connectBtn.disabled = true;
-        claimBtn.disabled = false;
+      walletAddress.textContent = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
+      walletInfo.style.display = 'block';
+      connectBtn.disabled = true;
+      claimBtn.disabled = false;
+      connectBtn.textContent = 'Wallet Connected';
     }
 
     async function checkAndSwitchNetwork() {
-        try {
-            const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-            if (chainId !== CORE_CHAIN_CONFIG.chainId) {
-                try {
-                    await window.ethereum.request({
-                        method: 'wallet_switchEthereumChain',
-                        params: [{ chainId: CORE_CHAIN_CONFIG.chainId }]
-                    });
-                } catch (err) {
-                    if (err.code === 4902) {
-                        await window.ethereum.request({
-                            method: 'wallet_addEthereumChain',
-                            params: [CORE_CHAIN_CONFIG]
-                        });
-                    } else {
-                        throw err;
-                    }
-                }
+      try {
+        const chainId = await window.ethereum.request({ 
+          method: 'eth_chainId' 
+        });
+        
+        if (chainId !== CORE_CHAIN_CONFIG.chainId) {
+          showLoadingStatus('Switching to Core Chain...');
+          
+          try {
+            await window.ethereum.request({ 
+              method: 'wallet_switchEthereumChain', 
+              params: [{ chainId: CORE_CHAIN_CONFIG.chainId }] 
+            });
+          } catch (switchError) {
+            // This error code indicates that the chain has not been added to MetaMask
+            if (switchError.code === 4902) {
+              await window.ethereum.request({ 
+                method: 'wallet_addEthereumChain', 
+                params: [CORE_CHAIN_CONFIG] 
+              });
+            } else {
+              throw switchError;
             }
-            const net = await provider.getNetwork();
-            networkInfo.textContent = `Core Chain (ID: ${net.chainId})`;
-        } catch (err) {
-            showStatus('Switch network manually in wallet.', 'error');
+          }
         }
-    }
-
-    async function checkIfClaimed() {
-        if (!airdropContract) return;
-        try {
-            const claimed = await airdropContract.claimed(userAddress);
-            if (claimed) {
-                showStatus('Airdrop already claimed!', 'info');
-                claimBtn.disabled = true;
-            }
-        } catch (err) {
-            console.error('Claim check failed', err);
-        }
+        
+        const network = await provider.getNetwork();
+        networkInfo.textContent = `Core Chain (ID: ${network.chainId})`;
+        
+      } catch (err) {
+        console.error('Network switch error:', err);
+        showStatus('Please switch to Core Chain manually in your wallet.', 'error');
+      }
     }
 
     async function claimAirdrop() {
-        try {
-            if (!airdropContract) return;
-            showStatus('Submitting claim...', 'info');
-            claimBtn.disabled = true;
-
-            const tx = await airdropContract.claimAirdrop();
-            showStatus('Waiting for confirmation...', 'info');
-            await tx.wait();
-
-            showStatus('✅ Success! You claimed 100 APX.', 'success');
-        } catch (err) {
-            console.error(err);
-            showStatus('Claim failed: ' + err.message, 'error');
-            claimBtn.disabled = false;
+      try {
+        if (!airdropContract) {
+          showStatus('Please connect your wallet first.', 'error');
+          return;
         }
-    }
-
-    function showStatus(msg, type) {
-        statusDiv.textContent = msg;
-        statusDiv.className = 'status ' + type;
-        statusDiv.style.display = 'block';
-    }
-
-    // Handle account & chain changes
-    if (window.ethereum) {
-        window.ethereum.on('accountsChanged', (acc) => {
-            if (acc.length === 0) {
-                walletInfo.style.display = 'none';
-                connectBtn.disabled = false;
-                claimBtn.disabled = true;
-                showStatus('Wallet disconnected.', 'info');
-            } else {
-                userAddress = acc[0];
-                updateWalletUI();
-                checkIfClaimed();
-            }
+        
+        showLoadingStatus('Processing your claim...');
+        claimBtn.disabled = true;
+        
+        // Get the required fee amount from the contract
+        const requiredFee = await airdropContract.NATIVE_TOKEN_FEE();
+        
+        // Execute claim transaction with the exact fee amount
+        const tx = await airdropContract.claimAirdrop({
+          value: requiredFee,
+          gasLimit: 200000
         });
-        window.ethereum.on('chainChanged', () => window.location.reload());
+        
+        showLoadingStatus('Transaction submitted. Waiting for confirmation...');
+        
+        await tx.wait();
+        
+        showStatus('✅ Success! You have successfully claimed 100 APX tokens.', 'success');
+        claimBtn.disabled = true;
+        claimBtn.textContent = 'Claimed Successfully';
+        
+      } catch (err) {
+        console.error('Claim error:', err);
+        
+        let errorMessage = 'Claim failed: ';
+        if (err.code === 'INSUFFICIENT_FUNDS') {
+          errorMessage += 'Insufficient funds for transaction.';
+        } else if (err.code === 'ACTION_REJECTED') {
+          errorMessage += 'Transaction was rejected by user.';
+        } else {
+          errorMessage += err.message || 'Unknown error occurred.';
+        }
+        
+        showStatus(errorMessage, 'error');
+        claimBtn.disabled = false;
+      }
     }
-</script>
 
+    // === EVENT LISTENERS ===
+    connectBtn.addEventListener('click', connectWallet);
+    claimBtn.addEventListener('click', claimAirdrop);
 
-        // Set logo token
-        document.getElementById('tokenLogo').style.backgroundImage = 'url("https://photos.pinksale.finance/file/pinksale-logo-upload/1759289153125-126c99bb2225e8e2159445500dea37b3.JPG")';
-
-        // Element references
-        const connectBtn = document.getElementById('connectBtn');
-        const claimBtn = document.getElementById('claimBtn');
-        const walletInfo = document.getElementById('walletInfo');
-        const walletAddress = document.getElementById('walletAddress');
-        const networkInfo = document.getElementById('networkInfo');
-        const statusDiv = document.getElementById('status');
-
-        // Event Listeners
-        connectBtn.addEventListener('click', connectWallet);
-        claimBtn.addEventListener('click', claimAirdrop);
-
-        // Fungsi untuk connect wallet menggunakan EIP-1193 provider :cite[4]:cite[8]
-        async function connectWallet() {
-            try {
-                // Deteksi provider yang tersedia (mendukung multiple wallets) :cite[4]:cite[8]
-                if (typeof window.ethereum === 'undefined') {
-                    showStatus('Please install a Web3 wallet like MetaMask, Trust Wallet, or Bitget Wallet to continue', 'error');
-                    return;
-                }
-
-                // Request account access :cite[4]:cite[8]
-                const accounts = await window.ethereum.request({
-                    method: 'eth_requestAccounts'
-                });
-
-                userAddress = accounts[0];
-                
-                // Create provider and signer menggunakan ethers.js
-                provider = new ethers.providers.Web3Provider(window.ethereum);
-                signer = provider.getSigner();
-                
-                // Check if connected to Core Chain, if not switch network :cite[7]
-                await checkAndSwitchNetwork();
-
-                // Initialize contract
-                airdropContract = new ethers.Contract(AIRDROP_CONTRACT_ADDRESS, AIRDROP_ABI, signer);
-
-                // Update UI
-                updateWalletUI();
-                
-                showStatus('Wallet connected successfully! You can now claim your airdrop.', 'success');
-
-                // Check if already claimed
-                checkIfClaimed();
-
-            } catch (error) {
-                console.error('Error connecting wallet:', error);
-                showStatus('Failed to connect wallet: ' + error.message, 'error');
-            }
+    // Handle wallet events
+    if (window.ethereum) {
+      window.ethereum.on('accountsChanged', (accounts) => {
+        if (accounts.length === 0) {
+          // User disconnected their wallet
+          walletInfo.style.display = 'none';
+          connectBtn.disabled = false;
+          claimBtn.disabled = true;
+          connectBtn.textContent = 'Connect Wallet';
+          claimBtn.textContent = 'Claim 100 APX Now';
+          showStatus('Wallet disconnected.', 'info');
+        } else {
+          // User switched accounts
+          userAddress = accounts[0];
+          updateWalletUI();
         }
-
-        // Fungsi untuk update UI setelah wallet terhubung
-        function updateWalletUI() {
-            walletAddress.textContent = `${userAddress.substring(0, 6)}...${userAddress.substring(userAddress.length - 4)}`;
-            walletInfo.style.display = 'block';
-            connectBtn.disabled = true;
-            claimBtn.disabled = false;
-        }
-
-        // Fungsi untuk check dan switch ke Core Chain :cite[7]
-        async function checkAndSwitchNetwork() {
-            try {
-                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-                
-                if (chainId !== CORE_CHAIN_CONFIG.chainId) {
-                    showStatus('Switching to Core Chain...', 'info');
-                    
-                    try {
-                        await window.ethereum.request({
-                            method: 'wallet_switchEthereumChain',
-                            params: [{ chainId: CORE_CHAIN_CONFIG.chainId }],
-                        });
-                    } catch (switchError) {
-                        // Jika jaringan belum ditambahkan, tambahkan jaringan :cite[7]
-                        if (switchError.code === 4902) {
-                            await window.ethereum.request({
-                                method: 'wallet_addEthereumChain',
-                                params: [CORE_CHAIN_CONFIG],
-                            });
-                        } else {
-                            throw switchError;
-                        }
-                    }
-                    
-                    showStatus('Successfully switched to Core Chain', 'success');
-                }
-                
-                // Update network info
-                const network = await provider.getNetwork();
-                networkInfo.textContent = `Core Chain (ID: ${network.chainId})`;
-                
-            } catch (error) {
-                console.error('Error switching network:', error);
-                showStatus('Please manually switch to Core Chain in your wallet', 'error');
-            }
-        }
-
-        // Fungsi untuk check jika sudah claim
-        async function checkIfClaimed() {
-            try {
-                if (!airdropContract) return;
-                
-                const claimed = await airdropContract.claimed(userAddress);
-                if (claimed) {
-                    showStatus('You have already claimed your airdrop!', 'info');
-                    claimBtn.disabled = true;
-                }
-            } catch (error) {
-                console.error('Error checking claim status:', error);
-            }
-        }
-
-        // Fungsi untuk claim airdrop
-        async function claimAirdrop() {
-            try {
-                if (!signer || !airdropContract) {
-                    showStatus('Please connect your wallet first', 'error');
-                    return;
-                }
-
-                showStatus('Processing your claim...', 'info');
-                claimBtn.disabled = true;
-
-                // Execute claim transaction - tanpa value seperti yang diminta
-                const transaction = await airdropContract.claimAirdrop({
-                    gasLimit: 200000
-                });
-
-                showStatus('Transaction submitted! Waiting for confirmation...', 'info');
-
-                // Wait for transaction confirmation
-                const receipt = await transaction.wait();
-                
-                showStatus('Success! You have claimed 100 APX tokens!', 'success');
-                
-            } catch (error) {
-                console.error('Error claiming airdrop:', error);
-                showStatus('Claim failed: ' + error.message, 'error');
-                claimBtn.disabled = false;
-            }
-        }
-
-        // Fungsi untuk menampilkan status
-        function showStatus(message, type) {
-            statusDiv.textContent = message;
-            statusDiv.className = 'status ' + type;
-            statusDiv.style.display = 'block';
-        }
-
-        // Listen for account changes :cite[8]
-        if (window.ethereum) {
-            window.ethereum.on('accountsChanged', (accounts) => {
-                if (accounts.length === 0) {
-                    // User disconnected wallet
-                    walletInfo.style.display = 'none';
-                    connectBtn.disabled = false;
-                    claimBtn.disabled = true;
-                    showStatus('Wallet disconnected', 'info');
-                } else {
-                    // Account changed
-                    userAddress = accounts[0];
-                    updateWalletUI();
-                    checkIfClaimed();
-                }
-            });
-
-            // Listen for chain changes :cite[8]
-            window.ethereum.on('chainChanged', (chainId) => {
-                window.location.reload();
-            });
-        }
-    </script>
+      });
+      
+      window.ethereum.on('chainChanged', () => {
+        // Reload the page when the network changes
+        window.location.reload();
+      });
+    }
+  </script>
 </body>
 </html>
