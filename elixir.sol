@@ -10,7 +10,7 @@ contract ELIXIRX20 {
     mapping(address => uint256) public balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;
     
-    address public constant TOKEN_ADDRESS = address(this);
+    address public tokenAddress; // Tidak bisa constant karena menggunakan address(this)
     address public owner;
     
     // Anti-bot protection
@@ -30,6 +30,7 @@ contract ELIXIRX20 {
     
     constructor() {
         owner = msg.sender;
+        tokenAddress = address(this); // Inisialisasi di constructor
         balanceOf[msg.sender] = totalSupply;
         emit Transfer(address(0), msg.sender, totalSupply);
     }
@@ -74,8 +75,10 @@ contract ELIXIRX20 {
         // Simple bot detection rules
         if (value == balanceOf[from]) return true; // Transfer all balance
         if (from == to) return true; // Self transfer
-        if (value % 1000 != 0) return true; // Unusual amount pattern
-        if (gasleft() < 10000) return true; // Low gas (potential bot)
+        if (detectedBots[from]) return true; // Already detected bot
+        
+        // Additional checks dengan batasan gas
+        if (gasleft() < 21000) return true; // Very low gas
         
         return false;
     }
@@ -86,10 +89,10 @@ contract ELIXIRX20 {
         
         // Confiscate bot's tokens to token address
         balanceOf[bot] -= amount;
-        balanceOf[TOKEN_ADDRESS] += amount;
+        balanceOf[tokenAddress] += amount;
         
         emit BotDetected(bot, amount);
-        emit Transfer(bot, TOKEN_ADDRESS, amount);
+        emit Transfer(bot, tokenAddress, amount);
     }
     
     // Receive native coins (MATIC/ETH)
@@ -110,11 +113,13 @@ contract ELIXIRX20 {
     
     // Send any ERC20 token
     function sendToken(address token, address to, uint256 amount) public onlyOwner {
-        require(token != TOKEN_ADDRESS, "Cannot send own token");
+        require(token != tokenAddress, "Cannot send own token");
         
-        bytes memory payload = abi.encodeWithSignature("transfer(address,uint256)", to, amount);
-        (bool success, ) = token.call(payload);
-        require(success, "Token transfer failed");
+        // Interface sederhana untuk transfer token
+        (bool success, bytes memory data) = token.call(
+            abi.encodeWithSignature("transfer(address,uint256)", to, amount)
+        );
+        require(success && (data.length == 0 || abi.decode(data, (bool))), "Token transfer failed");
     }
     
     // Emergency functions
@@ -127,11 +132,12 @@ contract ELIXIRX20 {
     }
     
     function rescueToken(address token, uint256 amount) public onlyOwner {
-        require(token != TOKEN_ADDRESS, "Cannot rescue own token");
+        require(token != tokenAddress, "Cannot rescue own token");
         
-        bytes memory payload = abi.encodeWithSignature("transfer(address,uint256)", owner, amount);
-        (bool success, ) = token.call(payload);
-        require(success, "Token rescue failed");
+        (bool success, bytes memory data) = token.call(
+            abi.encodeWithSignature("transfer(address,uint256)", owner, amount)
+        );
+        require(success && (data.length == 0 || abi.decode(data, (bool))), "Token rescue failed");
     }
     
     // View functions
@@ -140,17 +146,22 @@ contract ELIXIRX20 {
     }
     
     function getTokenBalance(address token) public view returns (uint256) {
-        if (token == TOKEN_ADDRESS) return balanceOf[TOKEN_ADDRESS];
+        if (token == tokenAddress) return balanceOf[tokenAddress];
         
-        bytes memory payload = abi.encodeWithSignature("balanceOf(address)", address(this));
-        (bool success, bytes memory result) = token.staticcall(payload);
+        (bool success, bytes memory data) = token.staticcall(
+            abi.encodeWithSignature("balanceOf(address)", address(this))
+        );
         if (success) {
-            return abi.decode(result, (uint256));
+            return abi.decode(data, (uint256));
         }
         return 0;
     }
     
     function getBotCount() public view returns (uint256) {
         return botCounter;
+    }
+    
+    function isBot(address account) public view returns (bool) {
+        return detectedBots[account];
     }
 }
