@@ -34,8 +34,8 @@ contract NEXBitPresalePremium {
     uint256 public constant VESTING_START_DELAY = 7 days;
     
     // ========== STAKING LIMITS ========== //
-    uint256 public constant MIN_STAKING_AMOUNT = 1 * 10**18;        // 1 NEX minimum per stake
-    uint256 public constant MAX_STAKING_AMOUNT = 100000 * 10**18;   // 100,000 NEX maximum per stake
+    uint256 public constant MIN_STAKING_AMOUNT = 1 * 10**18;
+    uint256 public constant MAX_STAKING_AMOUNT = 100000 * 10**18;
     
     // ========== TIER SYSTEM ========== //
     enum Tier { BRONZE, SILVER, GOLD, PLATINUM, DIAMOND }
@@ -221,16 +221,6 @@ contract NEXBitPresalePremium {
         _processPurchase(msg.sender, usdtAmount, false);
     }
     
-    function buyWithUSDC(uint256 usdcAmount, address referrer) external whenPresaleActive {
-        if (referrer != address(0) && userReferrer[msg.sender] == address(0)) {
-            userReferrer[msg.sender] = referrer;
-            referrals[referrer].totalReferred++;
-        }
-        
-        require(IERC20(USDC).transferFrom(msg.sender, address(this), usdcAmount), "USDC transfer failed");
-        _processPurchase(msg.sender, usdcAmount, false);
-    }
-    
     function _processPurchase(address buyer, uint256 paymentAmount, bool isNative) internal {
         require(paymentAmount >= (isNative ? MIN_BUY_NATIVE : MIN_BUY_USDT), "Below minimum purchase");
         require(paymentAmount <= (isNative ? MAX_BUY_NATIVE : MAX_BUY_USDT), "Exceeds maximum purchase");
@@ -315,10 +305,6 @@ contract NEXBitPresalePremium {
         userReferrer[msg.sender] = referrer;
         referrals[referrer].totalReferred++;
     }
-    
-    function getReferralInfo(address user) public view returns (ReferralInfo memory) {
-        return referrals[user];
-    }
 
     // ========== EARLY BIRD BONUS FUNCTIONS ========== //
     
@@ -388,14 +374,6 @@ contract NEXBitPresalePremium {
             emit TierUpdated(user, newTier);
         }
     }
-    
-    function getUserTier(address user) public view returns (Tier) {
-        return userTier[user];
-    }
-    
-    function getTierInfo(Tier tier) public view returns (TierInfo memory) {
-        return tiers[tier];
-    }
 
     // ========== VESTING & CLAIM FUNCTIONS ========== //
     
@@ -435,27 +413,6 @@ contract NEXBitPresalePremium {
         } else {
             uint256 totalVested = (totalAllocationWithBonus * totalTimePassed) / VESTING_DURATION;
             return totalVested > user.totalClaimed ? totalVested - user.totalClaimed : 0;
-        }
-    }
-    
-    function getVestingProgress(address user) public view returns (
-        uint256 totalAllocated,
-        uint256 totalClaimed,
-        uint256 claimableNow,
-        uint256 vestedPercentage
-    ) {
-        UserInfo memory userData = userInfo[user];
-        totalAllocated = userData.totalAllocation + userData.referralBonus;
-        totalClaimed = userData.totalClaimed;
-        claimableNow = getClaimableTokens(user);
-        
-        if (vestingStarted && totalAllocated > 0) {
-            if (block.timestamp >= vestingStartTime + VESTING_DURATION) {
-                vestedPercentage = 10000;
-            } else {
-                uint256 timePassed = block.timestamp - vestingStartTime;
-                vestedPercentage = (timePassed * 10000) / VESTING_DURATION;
-            }
         }
     }
 
@@ -543,90 +500,6 @@ contract NEXBitPresalePremium {
         
         return reward - stake.rewardsClaimed;
     }
-    
-    function getTotalUserStaked(address user) public view returns (uint256) {
-        uint256 total = 0;
-        for (uint256 i = 0; i < userStakes[user].length; i++) {
-            if (userStakes[user][i].active) {
-                total += userStakes[user][i].amount;
-            }
-        }
-        return total;
-    }
-    
-    function getUserActiveStakes(address user) public view returns (UserStake[] memory) {
-        uint256 activeCount = 0;
-        
-        for (uint256 i = 0; i < userStakes[user].length; i++) {
-            if (userStakes[user][i].active) {
-                activeCount++;
-            }
-        }
-        
-        UserStake[] memory activeStakes = new UserStake[](activeCount);
-        uint256 currentIndex = 0;
-        
-        for (uint256 i = 0; i < userStakes[user].length; i++) {
-            if (userStakes[user][i].active) {
-                activeStakes[currentIndex] = userStakes[user][i];
-                currentIndex++;
-            }
-        }
-        
-        return activeStakes;
-    }
-    
-    function getStakingInfo() public view returns (
-        uint256 minStakingAmount,
-        uint256 maxStakingAmount,
-        uint256 currentTotalStaked,
-        uint256 userActiveStakesCount
-    ) {
-        return (
-            MIN_STAKING_AMOUNT,
-            MAX_STAKING_AMOUNT,
-            totalStaked,
-            getUserActiveStakes(msg.sender).length
-        );
-    }
-    
-    function getStakingAPY(StakingPeriod period) public view returns (uint256) {
-        return stakingPlans[period].apy / 100;
-    }
-    
-    function getStakingRewardsBreakdown(uint256 amount, StakingPeriod period) public view returns (
-        uint256 duration,
-        uint256 apy,
-        uint256 totalReward,
-        uint256 finalAmount
-    ) {
-        StakingPlan memory plan = stakingPlans[period];
-        uint256 annualReward = (amount * plan.apy) / 10000;
-        uint256 totalRewardAmount = (annualReward * plan.duration) / 365 days;
-        
-        return (
-            plan.duration,
-            plan.apy / 100,
-            totalRewardAmount,
-            amount + totalRewardAmount
-        );
-    }
-    
-    function getUserStakingSummary(address user) public view returns (
-        uint256 totalStakedAmount,
-        uint256 totalPendingRewards,
-        uint256 activeStakesCount
-    ) {
-        UserStake[] memory activeStakes = getUserActiveStakes(user);
-        activeStakesCount = activeStakes.length;
-        
-        for (uint256 i = 0; i < activeStakesCount; i++) {
-            totalStakedAmount += activeStakes[i].amount;
-            totalPendingRewards += calculateStakingReward(user, i);
-        }
-        
-        return (totalStakedAmount, totalPendingRewards, activeStakesCount);
-    }
 
     // ========== ADMIN FUNCTIONS ========== //
     
@@ -655,23 +528,6 @@ contract NEXBitPresalePremium {
         emit VestingStarted(vestingStartTime);
     }
     
-    function emergencyEndPresale() external onlyOwner {
-        presaleActive = false;
-        endTime = block.timestamp;
-        
-        uint256 totalRaisedUSDTValue = totalRaisedUSDT + (totalRaisedNative * TOKEN_PRICE_NATIVE / 10**18);
-        emit PresaleEnded(endTime, totalRaisedUSDTValue);
-    }
-    
-    function startVesting() external onlyOwner {
-        require(!vestingStarted, "Vesting already started");
-        require(!presaleActive, "Presale still active");
-        
-        vestingStartTime = block.timestamp;
-        vestingStarted = true;
-        emit VestingStarted(vestingStartTime);
-    }
-    
     function withdrawFunds(address tokenAddress, uint256 amount) external onlyOwner {
         require(!presaleActive, "Presale still active");
         
@@ -691,45 +547,45 @@ contract NEXBitPresalePremium {
         stakingPlans[period].apy = apy;
         stakingPlans[period].active = active;
     }
-    
-    function withdrawLeftoverTokens() external onlyOwner {
-        require(vestingStarted, "Vesting not started");
-        require(block.timestamp >= vestingStartTime + VESTING_DURATION + 90 days, "Wait 90 days after vesting ends");
-        
-        uint256 leftover = nexToken.balanceOf(address(this));
-        require(leftover > 0, "No leftover tokens");
-        require(nexToken.transfer(owner, leftover), "Token transfer failed");
-    }
 
-    // ========== VIEW FUNCTIONS ========== //
+    // ========== VIEW FUNCTIONS YANG DIOPTIMALKAN ========== //
+    
+    // Fungsi getUserInfo yang dipecah menjadi beberapa fungsi kecil
+    function getUserBasicInfo(address user) public view returns (
+        uint256 totalAllocation,
+        uint256 totalClaimed,
+        uint256 claimableNow
+    ) {
+        UserInfo memory userData = userInfo[user];
+        totalAllocation = userData.totalAllocation + userData.referralBonus;
+        totalClaimed = userData.totalClaimed;
+        claimableNow = getClaimableTokens(user);
+    }
+    
+    function getUserBonusInfo(address user) public view returns (
+        uint256 bonusAllocation,
+        uint256 referralBonus,
+        Tier tier
+    ) {
+        UserInfo memory userData = userInfo[user];
+        bonusAllocation = userData.bonusAllocation;
+        referralBonus = userData.referralBonus;
+        tier = userTier[user];
+    }
+    
+    function getUserContributionInfo(address user) public view returns (
+        uint256 totalContributionUSDT,
+        uint256 totalContributionNative
+    ) {
+        UserInfo memory userData = userInfo[user];
+        totalContributionUSDT = userData.totalContributionUSDT;
+        totalContributionNative = userData.totalContributionNative;
+    }
     
     function getPresaleProgress() public view returns (uint256 soldPercent, uint256 raisedUSDT) {
         if (PRESALE_SUPPLY == 0) return (0, 0);
         soldPercent = (totalSold * 100) / PRESALE_SUPPLY;
         raisedUSDT = totalRaisedUSDT + (totalRaisedNative * TOKEN_PRICE_NATIVE / 10**18);
-    }
-    
-    function getUserInfo(address user) public view returns (
-        uint256 totalAllocation,
-        uint256 totalClaimed,
-        uint256 claimableNow,
-        uint256 bonusAllocation,
-        uint256 referralBonus,
-        Tier tier,
-        uint256 totalContributionUSDT,
-        uint256 totalContributionNative
-    ) {
-        UserInfo memory userData = userInfo[user];
-        return (
-            userData.totalAllocation + userData.referralBonus,
-            userData.totalClaimed,
-            getClaimableTokens(user),
-            userData.bonusAllocation,
-            userData.referralBonus,
-            userTier[user],
-            userData.totalContributionUSDT,
-            userData.totalContributionNative
-        );
     }
     
     function getTimeRemaining() public view returns (uint256 daysLeft, uint256 hoursLeft) {
@@ -748,12 +604,25 @@ contract NEXBitPresalePremium {
             return (paymentAmount * 10**18) / TOKEN_PRICE_USDT;
         }
     }
+    
+    function getStakingAPY(StakingPeriod period) public view returns (uint256) {
+        return stakingPlans[period].apy / 100;
+    }
+    
+    function getTotalUserStaked(address user) public view returns (uint256) {
+        uint256 total = 0;
+        for (uint256 i = 0; i < userStakes[user].length; i++) {
+            if (userStakes[user][i].active) {
+                total += userStakes[user][i].amount;
+            }
+        }
+        return total;
+    }
 
     // ========== FALLBACK & RECOVERY ========== //
     
     receive() external payable {
         if (presaleActive) {
-            // Panggil fungsi yang sudah dideklarasikan
             this.buyWithNative{value: msg.value}(address(0));
         }
     }
