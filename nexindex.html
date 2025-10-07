@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXBIT Presale - Small Bits, Big Returns</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.1/ethers.umd.min.js"></script>
+    <style>
+        :root {
+            --primary: #4a00e0;
+            --secondary: #8e2de2;
+            --accent: #ff5e62;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #28a745;
+            --warning: #ffc107;
+            --info: #17a2b8;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: var(--light);
+            min-height: 100vh;
+        }
+        
+        .hero-section {
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://photos.pinksale.finance/file/pinksale-logo-upload/1759769385198-fabb7e866e13d49ebef0d54cdcd6ceb5.JPG');
+            background-size: cover;
+            background-position: center;
+            padding: 100px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(74,0,224,0.3), rgba(142,45,226,0.3));
+            animation: pulse 3s infinite alternate;
+            z-index: 1;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.3; }
+            100% { opacity: 0.7; }
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .logo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(142,45,226,0.7);
+        }
+        
+        .slogan {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #ff5e62, #ff9966);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+        
+        .card-custom {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .card-custom:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header-custom {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            border-radius: 15px 15px 0 0 !important;
+            padding: 15px 20px;
+            font-weight: 600;
+        }
+        
+        .btn-primary-custom {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 50px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary-custom:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(142,45,226,0.4);
+        }
+        
+        .btn-secondary-custom {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            border-radius: 50px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary-custom:hover {
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.05);
+        }
+        
+        .progress {
+            height: 10px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            margin: 15px 0;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+        }
+        
+        .bonus-badge {
+            background: linear-gradient(45deg, var(--accent), #ff9966);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .tier-badge {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+        
+        .tier-bronze { background: linear-gradient(45deg, #cd7f32, #b08d57); }
+        .tier-silver { background: linear-gradient(45deg, #c0c0c0, #a8a8a8); }
+        .tier-gold { background: linear-gradient(45deg, #ffd700, #daa520); }
+        .tier-platinum { background: linear-gradient(45deg, #e5e4e2, #b8b8b8); }
+        .tier-diamond { background: linear-gradient(45deg, #b9f2ff, #7fffd4); color: #333; }
+        
+        .social-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .social-icon:hover {
+            background: var(--primary);
+            transform: scale(1.1);
+        }
+        
+        .countdown-box {
+            background: rgba(0,0,0,0.5);
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            margin: 5px;
+        }
+        
+        .countdown-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        
+        .countdown-label {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.7);
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: var(--secondary);
+        }
+        
+        .staking-plan {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .staking-plan:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-3px);
+        }
+        
+        .apy-badge {
+            background: linear-gradient(45deg, var(--accent), #ff9966);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: 600;
+        }
+        
+        .connect-wallet-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            min-width: 300px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .slogan {
+                font-size: 1.8rem;
+            }
+            
+            .connect-wallet-btn {
+                position: relative;
+                top: 0;
+                right: 0;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Notification Area -->
+    <div id="notificationArea" class="notification"></div>
+
+    <!-- Wallet Connection Button -->
+    <div class="connect-wallet-btn">
+        <button id="connectWallet" class="btn btn-primary-custom">
+            <i class="fas fa-wallet me-2"></i> Connect Wallet
+        </button>
+        <div id="walletInfo" class="d-none mt-2 p-2 card-custom">
+            <small>Connected: <span id="walletAddress"></span></small>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="hero-content">
+                <img src="https://photos.pinksale.finance/file/pinksale-logo-upload/1759769706757-a112fb0cb7d0fff59069a55924092519.JPG" alt="NEXBIT Logo" class="logo">
+                <h1 class="slogan">Small Bits, Big Returns</h1>
+                <p class="lead mb-4">Join the NEXBIT presale and get early access to revolutionary staking rewards</p>
+                
+                <div class="row justify-content-center mb-4">
+                    <div class="col-md-8">
+                        <div class="card-custom">
+                            <div class="card-body">
+                                <h5 class="card-title">Presale Progress</h5>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>0 NEX</span>
+                                    <span id="totalSold">0 NEX</span>
+                                    <span>5,400,000 NEX</span>
+                                </div>
+                                <div class="progress">
+                                    <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                </div>
+                                <div class="d-flex justify-content-between mt-2">
+                                    <span>0%</span>
+                                    <span id="progressPercent">0%</span>
+                                    <span>100%</span>
+                                </div>
+                                <div class="mt-3">
+                                    <small class="text-muted">Total Raised: <span id="totalRaised">0 USDT</span></small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="card-custom">
+                            <div class="card-body">
+                                <h5 class="card-title">Early Bird Bonus</h5>
+                                <div class="row text-center">
+                                    <div class="col-md-3 mb-3">
+                                        <div class="countdown-box">
+                                            <div class="countdown-number" id="bonusDays">0</div>
+                                            <div class="countdown-label">Days</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="countdown-box">
+                                            <div class="countdown-number" id="bonusHours">0</div>
+                                            <div class="countdown-label">Hours</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="countdown-box">
+                                            <div class="countdown-number" id="bonusMinutes">0</div>
+                                            <div class="countdown-label">Minutes</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="countdown-box">
+                                            <div class="countdown-number" id="bonusSeconds">0</div>
+                                            <div class="countdown-label">Seconds</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-center mt-3">
+                                    <span class="bonus-badge" id="currentBonus">25% Bonus Active</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <!-- Left Column - Purchase Section -->
+                <div class="col-lg-8 mb-4">
+                    <div class="card-custom mb-4">
+                        <div class="card-header card-header-custom">
+                            <h5 class="mb-0"><i class="fas fa-shopping-cart me-2"></i> Purchase NEX Tokens</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Payment Method</label>
+                                        <select id="paymentMethod" class="form-select bg-dark text-light">
+                                            <option value="usdt">USDT</option>
+                                            <option value="usdc">USDC</option>
+                                            <option value="core">CORE (Native)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Amount</label>
+                                        <input type="number" id="purchaseAmount" class="form-control bg-dark text-light" placeholder="Enter amount" min="10" max="1000" step="1">
+                                        <div class="form-text text-light">
+                                            Min: <span id="minAmount">10</span> | Max: <span id="maxAmount">1000</span>
+                                            <span id="currencySymbol">USDT</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Referral Code (Optional)</label>
+                                        <input type="text" id="referralCode" class="form-control bg-dark text-light" placeholder="Enter referral address">
+                                        <div class="form-text text-light" id="referralStatus"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">You Will Receive</label>
+                                        <div class="input-group">
+                                            <input type="text" id="tokenAmount" class="form-control bg-dark text-light" readonly>
+                                            <span class="input-group-text bg-secondary text-light">NEX</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <small class="text-success" id="bonusInfo"></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button id="buyTokens" class="btn btn-primary-custom" disabled>
+                                    <i class="fas fa-coins me-2"></i> Buy NEX Tokens
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-custom">
+                        <div class="card-header card-header-custom">
+                            <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i> Staking Plans</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="staking-plan">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6>1 Month</h6>
+                                            <span class="apy-badge">100% APY</span>
+                                        </div>
+                                        <p class="small mb-2">Minimum: 1 NEX</p>
+                                        <p class="small mb-3">Maximum: 100,000 NEX</p>
+                                        <button class="btn btn-secondary-custom btn-sm w-100 stake-btn" data-period="0">
+                                            Stake Now
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="staking-plan">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6>2 Months</h6>
+                                            <span class="apy-badge">150% APY</span>
+                                        </div>
+                                        <p class="small mb-2">Minimum: 1 NEX</p>
+                                        <p class="small mb-3">Maximum: 100,000 NEX</p>
+                                        <button class="btn btn-secondary-custom btn-sm w-100 stake-btn" data-period="1">
+                                            Stake Now
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="staking-plan">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6>3 Months</h6>
+                                            <span class="apy-badge">200% APY</span>
+                                        </div>
+                                        <p class="small mb-2">Minimum: 1 NEX</p>
+                                        <p class="small mb-3">Maximum: 100,000 NEX</p>
+                                        <button class="btn btn-secondary-custom btn-sm w-100 stake-btn" data-period="2">
+                                            Stake Now
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="staking-plan">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6>6 Months</h6>
+                                            <span class="apy-badge">300% APY</span>
+                                        </div>
+                                        <p class="small mb-2">Minimum: 1 NEX</p>
+                                        <p class="small mb-3">Maximum: 100,000 NEX</p>
+                                        <button class="btn btn-secondary-custom btn-sm w-100 stake-btn" data-period="3">
+                                            Stake Now
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="staking-plan">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6>12 Months</h6>
+                                            <span class="apy-badge">600% APY</span>
+                                        </div>
+                                        <p class="small mb-2">Minimum: 1 NEX</p>
+                                        <p class="small mb-3">Maximum: 100,000 NEX</p>
+                                        <button class="btn btn-secondary-custom btn-sm w-100 stake-btn" data-period="4">
+                                            Stake Now
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Column - Info Section -->
+                <div class="col-lg-4">
+                    <div class="card-custom mb-4">
+                        <div class="card-header card-header-custom">
+                            <h5 class="mb-0"><i class="fas fa-user me-2"></i> My Account</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="text-center mb-3">
+                                <div class="tier-badge tier-bronze d-inline-block mb-2" id="userTierBadge">Bronze Tier</div>
+                                <p class="small" id="tierAllocation">Allocation: 10-100 USDT</p>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Total Allocation:</span>
+                                    <span id="userAllocation">0 NEX</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Claimed:</span>
+                                    <span id="userClaimed">0 NEX</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Available to Claim:</span>
+                                    <span id="userClaimable">0 NEX</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Referral Bonus:</span>
+                                    <span id="userReferralBonus">0 NEX</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Total Staked:</span>
+                                    <span id="userTotalStaked">0 NEX</span>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <button id="claimTokens" class="btn btn-secondary-custom" disabled>
+                                    <i class="fas fa-download me-2"></i> Claim Tokens
+                                </button>
+                                <button id="viewStakes" class="btn btn-secondary-custom" disabled>
+                                    <i class="fas fa-list me-2"></i> View My Stakes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-custom mb-4">
+                        <div class="card-header card-header-custom">
+                            <h5 class="mb-0"><i class="fas fa-gift me-2"></i> Referral Program</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="text-center mb-3">
+                                <h6>Earn 5% for referrals</h6>
+                                <p class="small">Your friends get 3% bonus too!</p>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Your Referral Code</label>
+                                <div class="input-group">
+                                    <input type="text" id="referralCodeDisplay" class="form-control bg-dark text-light" readonly>
+                                    <button class="btn btn-outline-light" id="copyReferralCode">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Your Referral Link</label>
+                                <div class="input-group">
+                                    <input type="text" id="referralLink" class="form-control bg-dark text-light" readonly>
+                                    <button class="btn btn-outline-light" id="copyReferralLink">
+                                        <i class="fas fa-link"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Share Buttons -->
+                            <div class="mb-3">
+                                <label class="form-label">Share Referral</label>
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-secondary-custom btn-sm" id="shareTwitter">
+                                        <i class="fab fa-twitter me-2"></i> Share on Twitter
+                                    </button>
+                                    <button class="btn btn-secondary-custom btn-sm" id="shareTelegram">
+                                        <i class="fab fa-telegram-plane me-2"></i> Share on Telegram
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Total Referred:</span>
+                                    <span id="totalReferred">0</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Referral Rewards:</span>
+                                    <span id="referralRewards">0 NEX</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-custom">
+                        <div class="card-header card-header-custom">
+                            <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i> Token Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Token Name:</span>
+                                    <span>NEXBIT (NEX)</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Total Supply:</span>
+                                    <span>27,000,000 NEX</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Presale Supply:</span>
+                                    <span>5,400,000 NEX</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Price:</span>
+                                    <span>0.1 USDT / 0.25 CORE</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Vesting:</span>
+                                    <span>24 Months Linear</span>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center mt-3">
+                                <button class="btn btn-secondary-custom btn-sm me-2" id="addTokenToWallet">
+                                    <i class="fas fa-wallet me-1"></i> Add to Wallet
+                                </button>
+                                <a href="https://scan.coredao.org/token/0xe6EaDB7CEcC7D27E94a2058E3C728bEc8Cf4027f" target="_blank" class="btn btn-secondary-custom btn-sm">
+                                    <i class="fas fa-external-link-alt me-1"></i> View on Explorer
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Features Section -->
+            <div class="row mt-5">
+                <div class="col-12 text-center mb-4">
+                    <h2>Why Choose NEXBIT?</h2>
+                </div>
+                
+                <div class="col-md-4 mb-4">
+                    <div class="card-custom text-center h-100">
+                        <div class="card-body">
+                            <div class="feature-icon">
+                                <i class="fas fa-rocket"></i>
+                            </div>
+                            <h5>High APY Staking</h5>
+                            <p>Earn up to 600% APY with our flexible staking plans designed for maximum returns.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-4">
+                    <div class="card-custom text-center h-100">
+                        <div class="card-body">
+                            <div class="feature-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h5>Tier System</h5>
+                            <p>Unlock higher allocations and bonuses with our 5-tier system based on your contribution.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-4">
+                    <div class="card-custom text-center h-100">
+                        <div class="card-body">
+                            <div class="feature-icon">
+                                <i class="fas fa-hand-holding-usd"></i>
+                            </div>
+                            <h5>Referral Rewards</h5>
+                            <p>Earn 5% bonus for each referral while your friends get 3% bonus on their purchase.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Social Links -->
+            <div class="row mt-5">
+                <div class="col-12 text-center">
+                    <h3 class="mb-4">Join Our Community</h3>
+                    <a href="https://x.com/nexbit_nex" target="_blank" class="social-icon">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="https://t.me/nexbit_nex" target="_blank" class="social-icon">
+                        <i class="fab fa-telegram-plane"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Staking Modal -->
+    <div class="modal fade" id="stakingModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content card-custom">
+                <div class="modal-header card-header-custom">
+                    <h5 class="modal-title">Stake NEX Tokens</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Staking Period</label>
+                        <input type="text" id="stakingPeriodDisplay" class="form-control bg-dark text-light" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">APY</label>
+                        <input type="text" id="stakingAPYDisplay" class="form-control bg-dark text-light" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Amount to Stake (NEX)</label>
+                        <input type="number" id="stakingAmount" class="form-control bg-dark text-light" placeholder="Enter amount" min="1" max="100000">
+                        <div class="form-text text-light">
+                            Available: <span id="availableToStake">0</span> NEX
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary-custom" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary-custom" id="confirmStake">Confirm Stake</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Contract addresses and configuration
+        const TOKEN_CONTRACT = "0xe6EaDB7CEcC7D27E94a2058E3C728bEc8Cf4027f";
+        const PRESALE_CONTRACT = "0xfebe6c8e5d5aa235457c45aae6fa36636aaffdc5";
+        const CHAIN_ID = 1116; // Core Chain ID
+        
+        // Global variables
+        let provider;
+        let signer;
+        let presaleContract;
+        let tokenContract;
+        let userAddress;
+        let currentStakingPeriod;
+        let referralAddress = null;
+        
+        // Contract ABI based on your smart contract
+        const PRESALE_ABI = [
+            "function buyWithNative(address referrer) external payable",
+            "function buyWithUSDT(uint256 usdtAmount, address referrer) external",
+            "function claimTokens() external",
+            "function stakeTokens(uint256 amount, uint8 period) external",
+            "function unstakeTokens(uint256 stakeIndex) external",
+            "function emergencyUnstake(uint256 stakeIndex) external",
+            "function getUserBasicInfo(address user) public view returns (uint256 totalAllocation, uint256 totalClaimed, uint256 claimableNow)",
+            "function getUserBonusInfo(address user) public view returns (uint256 bonusAllocation, uint256 referralBonus, uint8 tier)",
+            "function getUserContributionInfo(address user) public view returns (uint256 totalContributionUSDT, uint256 totalContributionNative)",
+            "function getPresaleProgress() public view returns (uint256 soldPercent, uint256 raisedUSDT)",
+            "function getCurrentEarlyBirdBonus() public view returns (uint256 bonusPercent, uint256 timeRemaining)",
+            "function getTokenAmount(uint256 paymentAmount, bool isNative) public view returns (uint256)",
+            "function getStakingAPY(uint8 period) public view returns (uint256)",
+            "function getTotalUserStaked(address user) public view returns (uint256)",
+            "function userInfo(address) public view returns (uint256 totalContributionUSDT, uint256 totalContributionNative, uint256 totalAllocation, uint256 totalClaimed, uint256 lastClaimTime, uint256 bonusAllocation, uint256 referralBonus)",
+            "function referrals(address) public view returns (address referrer, uint256 totalReferred, uint256 totalReferralVolume, uint256 referralRewards)",
+            "function userTier(address) public view returns (uint8)",
+            "function tiers(uint8) public view returns (uint256 minAllocationUSDT, uint256 maxAllocationUSDT, uint256 requiredPoints, uint256 extraAllocation)",
+            "function presaleActive() public view returns (bool)",
+            "function vestingStarted() public view returns (bool)",
+            "function startTime() public view returns (uint256)",
+            "function endTime() public view returns (uint256)",
+            "function totalSold() public view returns (uint256)"
+        ];
+        
+        const TOKEN_ABI = [
+            "function balanceOf(address account) external view returns (uint256)",
+            "function allowance(address owner, address spender) external view returns (uint256)",
+            "function approve(address spender, uint256 amount) external returns (bool)",
+            "function decimals() external view returns (uint8)",
+            "function symbol() external view returns (string)",
+            "function name() external view returns (string)"
+        ];
+        
+        // Tier information
+        const TIER_INFO = {
+            0: { name: "Bronze", class: "tier-bronze", allocation: "10-100 USDT" },
+            1: { name: "Silver", class: "tier-silver", allocation: "100-500 USDT" },
+            2: { name: "Gold", class: "tier-gold", allocation: "500-1000 USDT" },
+            3: { name: "Platinum", class: "tier-platinum", allocation: "1000-2000 USDT" },
+            4: { name: "Diamond", class: "tier-diamond", allocation: "2000-5000 USDT" }
+        };
+        
+        // Staking periods information
+        const STAKING_PERIODS = [
+            { name: "1 Month", apy: 100, months: 1 },
+            { name: "2 Months", apy: 150, months: 2 },
+            { name: "3 Months", apy: 200, months: 3 },
+            { name: "6 Months", apy: 300, months: 6 },
+            { name: "12 Months", apy: 600, months: 12 }
+        ];
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            setupEventListeners();
+            checkAutoConnect();
+            updateUI();
+        });
+        
+        function initializeApp() {
+            // Check if Web3 is available
+            if (typeof window.ethereum !== 'undefined') {
+                console.log('Web3 detected!');
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                
+                // Setup network change listeners
+                setupNetworkListeners();
+                
+            } else {
+                console.log('Please install MetaMask!');
+                document.getElementById('connectWallet').innerText = 'Install MetaMask';
+                document.getElementById('connectWallet').onclick = function() {
+                    window.open('https://metamask.io/download.html', '_blank');
+                };
+            }
+            
+            // Set initial purchase limits
+            updatePurchaseLimits();
+            
+            // Check for referral parameter in URL
+            checkReferralParameter();
+        }
+        
+        function setupNetworkListeners() {
+            if (window.ethereum) {
+                window.ethereum.on('chainChanged', (chainId) => {
+                    console.log('Network changed to:', chainId);
+                    window.location.reload();
+                });
+
+                window.ethereum.on('accountsChanged', (accounts) => {
+                    console.log('Account changed:', accounts);
+                    if (accounts.length === 0) {
+                        disconnectWallet();
+                    } else {
+                        userAddress = accounts[0];
+                        initializeContracts();
+                        updateUserData();
+                    }
+                });
+            }
+        }
+        
+        function checkAutoConnect() {
+            if (localStorage.getItem('walletConnected') === 'true' && typeof window.ethereum !== 'undefined') {
+                connectWallet();
+            }
+        }
+        
+        function checkReferralParameter() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const refParam = urlParams.get('ref');
+            
+            if (refParam && ethers.utils.isAddress(refParam)) {
+                referralAddress = refParam;
+                document.getElementById('referralCode').value = refParam;
+                document.getElementById('referralStatus').textContent = 'Referral code detected!';
+                document.getElementById('referralStatus').className = 'form-text text-success';
+                showNotification('Referral code detected! You will get 3% bonus on your purchase.', 'success');
+            }
+        }
+        
+        function setupEventListeners() {
+            // Connect wallet button
+            document.getElementById('connectWallet').addEventListener('click', connectWallet);
+            
+            // Purchase amount input
+            document.getElementById('purchaseAmount').addEventListener('input', calculateTokenAmount);
+            
+            // Payment method change
+            document.getElementById('paymentMethod').addEventListener('change', function() {
+                calculateTokenAmount();
+                updatePurchaseLimits();
+            });
+            
+            // Buy tokens button
+            document.getElementById('buyTokens').addEventListener('click', buyTokens);
+            
+            // Claim tokens button
+            document.getElementById('claimTokens').addEventListener('click', claimTokens);
+            
+            // View stakes button
+            document.getElementById('viewStakes').addEventListener('click', viewStakes);
+            
+            // Copy referral buttons
+            document.getElementById('copyReferralCode').addEventListener('click', copyReferralCode);
+            document.getElementById('copyReferralLink').addEventListener('click', copyReferralLink);
+            
+            // Share buttons
+            document.getElementById('shareTwitter').addEventListener('click', shareOnTwitter);
+            document.getElementById('shareTelegram').addEventListener('click', shareOnTelegram);
+            
+            // Add token to wallet
+            document.getElementById('addTokenToWallet').addEventListener('click', addTokenToWallet);
+            
+            // Staking buttons
+            document.querySelectorAll('.stake-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    openStakingModal(parseInt(this.dataset.period));
+                });
+            });
+            
+            // Confirm stake button
+            document.getElementById('confirmStake').addEventListener('click', confirmStake);
+        }
+        
+        async function connectWallet() {
+            try {
+                // Show loading state
+                document.getElementById('connectWallet').innerHTML = '<div class="loading-spinner me-2"></div> Connecting...';
+                document.getElementById('connectWallet').disabled = true;
+                
+                // Request account access
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                
+                // Get the signer
+                signer = provider.getSigner();
+                userAddress = await signer.getAddress();
+                
+                // Initialize contracts
+                await initializeContracts();
+                
+                // Check network
+                const network = await provider.getNetwork();
+                if (network.chainId !== CHAIN_ID) {
+                    await switchToCoreChain();
+                }
+                
+                // Update UI
+                updateWalletUI();
+                
+                // Store connection state
+                localStorage.setItem('walletConnected', 'true');
+                
+                // Update user data
+                await updateUserData();
+                
+            } catch (error) {
+                console.error('Error connecting wallet:', error);
+                showNotification('Error connecting wallet: ' + error.message, 'danger');
+                
+                // Reset button state
+                resetWalletUI();
+            }
+        }
+        
+        async function initializeContracts() {
+            presaleContract = new ethers.Contract(PRESALE_CONTRACT, PRESALE_ABI, signer);
+            tokenContract = new ethers.Contract(TOKEN_CONTRACT, TOKEN_ABI, signer);
+        }
+        
+        function updateWalletUI() {
+            document.getElementById('connectWallet').innerHTML = '<i class="fas fa-check me-2"></i> Connected';
+            document.getElementById('connectWallet').classList.remove('btn-primary-custom');
+            document.getElementById('connectWallet').classList.add('btn-secondary-custom');
+            document.getElementById('connectWallet').disabled = false;
+            
+            document.getElementById('walletInfo').classList.remove('d-none');
+            document.getElementById('walletAddress').textContent = 
+                userAddress.substring(0, 6) + '...' + userAddress.substring(userAddress.length - 4);
+            
+            document.getElementById('buyTokens').disabled = false;
+            document.getElementById('claimTokens').disabled = false;
+            document.getElementById('viewStakes').disabled = false;
+        }
+        
+        function resetWalletUI() {
+            document.getElementById('connectWallet').innerHTML = '<i class="fas fa-wallet me-2"></i> Connect Wallet';
+            document.getElementById('connectWallet').disabled = false;
+            document.getElementById('connectWallet').classList.remove('btn-secondary-custom');
+            document.getElementById('connectWallet').classList.add('btn-primary-custom');
+        }
+        
+        function disconnectWallet() {
+            userAddress = null;
+            presaleContract = null;
+            tokenContract = null;
+            resetWalletUI();
+            document.getElementById('walletInfo').classList.add('d-none');
+            document.getElementById('buyTokens').disabled = true;
+            document.getElementById('claimTokens').disabled = true;
+            document.getElementById('viewStakes').disabled = true;
+            localStorage.removeItem('walletConnected');
+        }
+        
+        async function switchToCoreChain() {
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: '0x45C' }],
+                });
+            } catch (switchError) {
+                if (switchError.code === 4902) {
+                    await window.ethereum.request({
+                        method: 'wallet_addEthereumChain',
+                        params: [
+                            {
+                                chainId: '0x45C',
+                                chainName: 'Core Blockchain',
+                                nativeCurrency: {
+                                    name: 'CORE',
+                                    symbol: 'CORE',
+                                    decimals: 18
+                                },
+                                rpcUrls: ['https://rpc.coredao.org/'],
+                                blockExplorerUrls: ['https://scan.coredao.org/']
+                            }
+                        ]
+                    });
+                } else {
+                    throw switchError;
+                }
+            }
+        }
+        
+        function updatePurchaseLimits() {
+            const paymentMethod = document.getElementById('paymentMethod').value;
+            let minAmount, maxAmount, currencySymbol;
+            
+            if (paymentMethod === 'core') {
+                minAmount = 25;
+                maxAmount = 2500;
+                currencySymbol = 'CORE';
+            } else {
+                minAmount = 10;
+                maxAmount = 1000;
+                currencySymbol = paymentMethod.toUpperCase();
+            }
+            
+            document.getElementById('purchaseAmount').min = minAmount;
+            document.getElementById('purchaseAmount').max = maxAmount;
+            document.getElementById('minAmount').textContent = minAmount;
+            document.getElementById('maxAmount').textContent = maxAmount;
+            document.getElementById('currencySymbol').textContent = currencySymbol;
+        }
+        
+        async function calculateTokenAmount() {
+            const amount = document.getElementById('purchaseAmount').value;
+            const paymentMethod = document.getElementById('paymentMethod').value;
+            
+            if (!amount || amount <= 0) {
+                document.getElementById('tokenAmount').value = '';
+                document.getElementById('bonusInfo').textContent = '';
+                return;
+            }
+            
+            try {
+                let paymentAmountWei;
+                if (paymentMethod === 'core') {
+                    paymentAmountWei = ethers.utils.parseEther(amount);
+                } else {
+                    paymentAmountWei = ethers.utils.parseUnits(amount, 6);
+                }
+                
+                const isNative = paymentMethod === 'core';
+                const tokenAmountWei = await presaleContract.getTokenAmount(paymentAmountWei, isNative);
+                const tokenAmount = ethers.utils.formatEther(tokenAmountWei);
+                
+                const [bonusPercent, timeRemaining] = await presaleContract.getCurrentEarlyBirdBonus();
+                const bonusAmount = tokenAmountWei.mul(bonusPercent).div(100);
+                const totalWithBonus = tokenAmountWei.add(bonusAmount);
+                
+                document.getElementById('tokenAmount').value = parseFloat(ethers.utils.formatEther(totalWithBonus)).toFixed(2);
+                
+                if (bonusPercent > 0) {
+                    document.getElementById('bonusInfo').textContent = 
+                        `+${bonusPercent}% Early Bird Bonus (${ethers.utils.formatEther(bonusAmount)} NEX)`;
+                } else {
+                    document.getElementById('bonusInfo').textContent = '';
+                }
+                
+            } catch (error) {
+                console.error('Error calculating token amount:', error);
+                // Fallback calculation
+                let tokenAmount;
+                if (paymentMethod === 'core') {
+                    tokenAmount = amount / 0.25;
+                } else {
+                    tokenAmount = amount / 0.1;
+                }
+                document.getElementById('tokenAmount').value = tokenAmount.toFixed(2);
+            }
+        }
+        
+        async function buyTokens() {
+            if (!userAddress) {
+                showNotification('Please connect your wallet first', 'warning');
+                return;
+            }
+            
+            const amount = document.getElementById('purchaseAmount').value;
+            const paymentMethod = document.getElementById('paymentMethod').value;
+            const referralCode = document.getElementById('referralCode').value;
+            
+            if (!amount || amount <= 0) {
+                showNotification('Please enter a valid amount', 'warning');
+                return;
+            }
+            
+            const minAmount = paymentMethod === 'core' ? 25 : 10;
+            const maxAmount = paymentMethod === 'core' ? 2500 : 1000;
+            
+            if (amount < minAmount || amount > maxAmount) {
+                showNotification(`Amount must be between ${minAmount} and ${maxAmount} ${paymentMethod.toUpperCase()}`, 'warning');
+                return;
+            }
+            
+            try {
+                let tx;
+                let referrerAddress = ethers.constants.AddressZero;
+                
+                // Use referral code from input or URL parameter
+                if (referralCode && ethers.utils.isAddress(referralCode)) {
+                    referrerAddress = referralCode;
+                } else if (referralAddress) {
+                    referrerAddress = referralAddress;
+                }
+                
+                document.getElementById('buyTokens').innerHTML = '<div class="loading-spinner me-2"></div> Processing...';
+                document.getElementById('buyTokens').disabled = true;
+                
+                if (paymentMethod === 'core') {
+                    const amountWei = ethers.utils.parseEther(amount);
+                    tx = await presaleContract.buyWithNative(referrerAddress, { value: amountWei });
+                } else {
+                    const tokenAddress = paymentMethod === 'usdt' ? 
+                        "0x900101d06A7426441Ae63e9AB3B9b0F63Be145F1" : 
+                        "0xa4151B2B3e269645181dCcF2D426cE75fcbDeca9";
+                    
+                    const stablecoinContract = new ethers.Contract(tokenAddress, [
+                        "function approve(address spender, uint256 amount) external returns (bool)",
+                        "function allowance(address owner, address spender) external view returns (uint256)"
+                    ], signer);
+                    
+                    const amountToken = ethers.utils.parseUnits(amount, 6);
+                    const allowance = await stablecoinContract.allowance(userAddress, PRESALE_CONTRACT);
+                    
+                    if (allowance.lt(amountToken)) {
+                        const approveTx = await stablecoinContract.approve(PRESALE_CONTRACT, amountToken);
+                        await approveTx.wait();
+                    }
+                    
+                    tx = await presaleContract.buyWithUSDT(amountToken, referrerAddress);
+                }
+                
+                await tx.wait();
+                showNotification('Purchase successful!', 'success');
+                resetPurchaseForm();
+                await updateUserData();
+                await updateUI();
+                
+            } catch (error) {
+                console.error('Error purchasing tokens:', error);
+                showNotification('Error purchasing tokens: ' + (error.reason || error.message), 'danger');
+                resetPurchaseForm();
+            }
+        }
+        
+        function resetPurchaseForm() {
+            document.getElementById('buyTokens').innerHTML = '<i class="fas fa-coins me-2"></i> Buy NEX Tokens';
+            document.getElementById('buyTokens').disabled = false;
+            document.getElementById('purchaseAmount').value = '';
+            document.getElementById('tokenAmount').value = '';
+            document.getElementById('bonusInfo').textContent = '';
+        }
+        
+        // Referral and Share Functions
+        function generateReferralCode(address) {
+            return 'NEX' + address.substring(2, 8).toUpperCase();
+        }
+        
+        function copyReferralCode() {
+            const referralCode = document.getElementById('referralCodeDisplay');
+            referralCode.select();
+            document.execCommand('copy');
+            showNotification('Referral code copied to clipboard!', 'success');
+        }
+        
+        function copyReferralLink() {
+            const referralLink = document.getElementById('referralLink');
+            referralLink.select();
+            document.execCommand('copy');
+            showNotification('Referral link copied to clipboard!', 'success');
+        }
+        
+        function shareOnTwitter() {
+            const referralLink = document.getElementById('referralLink').value;
+            const message = `Join NEXBIT Presale and get amazing rewards! Use my referral link: ${referralLink} #NEXBIT #Crypto #Presale`;
+            const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}`;
+            window.open(twitterUrl, '_blank');
+        }
+        
+        function shareOnTelegram() {
+            const referralLink = document.getElementById('referralLink').value;
+            const message = `Join NEXBIT Presale and get amazing rewards! Use my referral link: ${referralLink}`;
+            const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(message)}`;
+            window.open(telegramUrl, '_blank');
+        }
+        
+        function showNotification(message, type = 'info') {
+            const notificationArea = document.getElementById('notificationArea');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} alert-dismissible fade show`;
+            alert.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            notificationArea.appendChild(alert);
+            
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.parentNode.removeChild(alert);
+                }
+            }, 5000);
+        }
+        
+        // Keep the existing functions for staking, claims, etc. (they remain the same)
+        async function claimTokens() {
+            if (!userAddress) {
+                showNotification('Please connect your wallet first', 'warning');
+                return;
+            }
+            
+            try {
+                document.getElementById('claimTokens').innerHTML = '<div class="loading-spinner me-2"></div> Claiming...';
+                document.getElementById('claimTokens').disabled = true;
+                
+                const tx = await presaleContract.claimTokens();
+                await tx.wait();
+                
+                showNotification('Tokens claimed successfully!', 'success');
+                document.getElementById('claimTokens').innerHTML = '<i class="fas fa-download me-2"></i> Claim Tokens';
+                document.getElementById('claimTokens').disabled = false;
+                await updateUserData();
+                
+            } catch (error) {
+                console.error('Error claiming tokens:', error);
+                showNotification('Error claiming tokens: ' + (error.reason || error.message), 'danger');
+                document.getElementById('claimTokens').innerHTML = '<i class="fas fa-download me-2"></i> Claim Tokens';
+                document.getElementById('claimTokens').disabled = false;
+            }
+        }
+        
+        function openStakingModal(period) {
+            if (!userAddress) {
+                showNotification('Please connect your wallet first', 'warning');
+                return;
+            }
+            
+            currentStakingPeriod = period;
+            const stakingPlan = STAKING_PERIODS[period];
+            
+            document.getElementById('stakingPeriodDisplay').value = stakingPlan.name;
+            document.getElementById('stakingAPYDisplay').value = stakingPlan.apy + '% APY';
+            document.getElementById('stakingAmount').value = '';
+            
+            const available = parseFloat(document.getElementById('userClaimable').textContent) || 0;
+            document.getElementById('availableToStake').textContent = available.toFixed(2);
+            
+            const modal = new bootstrap.Modal(document.getElementById('stakingModal'));
+            modal.show();
+        }
+        
+        async function confirmStake() {
+            const amount = document.getElementById('stakingAmount').value;
+            
+            if (!amount || amount < 1 || amount > 100000) {
+                showNotification('Please enter a valid amount between 1 and 100,000 NEX', 'warning');
+                return;
+            }
+            
+            try {
+                document.getElementById('confirmStake').innerHTML = '<div class="loading-spinner me-2"></div> Staking...';
+                document.getElementById('confirmStake').disabled = true;
+                
+                const amountWei = ethers.utils.parseEther(amount);
+                const tx = await presaleContract.stakeTokens(amountWei, currentStakingPeriod);
+                await tx.wait();
+                
+                showNotification('Staking successful!', 'success');
+                const modal = bootstrap.Modal.getInstance(document.getElementById('stakingModal'));
+                modal.hide();
+                document.getElementById('confirmStake').innerHTML = 'Confirm Stake';
+                document.getElementById('confirmStake').disabled = false;
+                await updateUserData();
+                
+            } catch (error) {
+                console.error('Error staking tokens:', error);
+                showNotification('Error staking tokens: ' + (error.reason || error.message), 'danger');
+                document.getElementById('confirmStake').innerHTML = 'Confirm Stake';
+                document.getElementById('confirmStake').disabled = false;
+            }
+        }
+        
+        function viewStakes() {
+            showNotification('Stake management feature will be implemented in the next version.', 'info');
+        }
+        
+        async function updateUserData() {
+            if (!userAddress || !presaleContract) return;
+            
+            try {
+                const [totalAllocation, totalClaimed, claimableNow] = await presaleContract.getUserBasicInfo(userAddress);
+                const [bonusAllocation, referralBonus, tier] = await presaleContract.getUserBonusInfo(userAddress);
+                const [contributionUSDT, contributionNative] = await presaleContract.getUserContributionInfo(userAddress);
+                const referralInfo = await presaleContract.referrals(userAddress);
+                const totalStaked = await presaleContract.getTotalUserStaked(userAddress);
+                
+                // Update user info
+                document.getElementById('userAllocation').textContent = parseFloat(ethers.utils.formatEther(totalAllocation)).toFixed(2) + ' NEX';
+                document.getElementById('userClaimed').textContent = parseFloat(ethers.utils.formatEther(totalClaimed)).toFixed(2) + ' NEX';
+                document.getElementById('userClaimable').textContent = parseFloat(ethers.utils.formatEther(claimableNow)).toFixed(2) + ' NEX';
+                document.getElementById('userReferralBonus').textContent = parseFloat(ethers.utils.formatEther(referralBonus)).toFixed(2) + ' NEX';
+                document.getElementById('userTotalStaked').textContent = parseFloat(ethers.utils.formatEther(totalStaked)).toFixed(2) + ' NEX';
+                
+                // Update tier info
+                const tierInfo = TIER_INFO[tier];
+                if (tierInfo) {
+                    const tierBadge = document.getElementById('userTierBadge');
+                    tierBadge.textContent = tierInfo.name + ' Tier';
+                    tierBadge.className = 'tier-badge ' + tierInfo.class + ' d-inline-block mb-2';
+                    document.getElementById('tierAllocation').textContent = 'Allocation: ' + tierInfo.allocation;
+                }
+                
+                // Update referral info
+                document.getElementById('totalReferred').textContent = referralInfo.totalReferred.toString();
+                document.getElementById('referralRewards').textContent = parseFloat(ethers.utils.formatEther(referralInfo.referralRewards)).toFixed(2) + ' NEX';
+                
+                // Update referral code and link
+                const referralCode = generateReferralCode(userAddress);
+                const referralLink = `${window.location.origin}${window.location.pathname}?ref=${userAddress}`;
+                
+                document.getElementById('referralCodeDisplay').value = referralCode;
+                document.getElementById('referralLink').value = referralLink;
+                
+            } catch (error) {
+                console.error('Error updating user data:', error);
+            }
+        }
+        
+        async function updateUI() {
+            try {
+                if (presaleContract) {
+                    const [soldPercent, raisedUSDT] = await presaleContract.getPresaleProgress();
+                    const progressPercent = soldPercent.toNumber();
+                    
+                    document.getElementById('progressBar').style.width = `${progressPercent}%`;
+                    document.getElementById('progressPercent').textContent = `${progressPercent}%`;
+                    
+                    const totalSoldWei = await presaleContract.totalSold();
+                    const totalSoldFormatted = parseFloat(ethers.utils.formatEther(totalSoldWei)).toLocaleString(undefined, {
+                        maximumFractionDigits: 0
+                    });
+                    document.getElementById('totalSold').textContent = `${totalSoldFormatted} NEX`;
+                    
+                    document.getElementById('totalRaised').textContent = parseFloat(ethers.utils.formatEther(raisedUSDT)).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }) + ' USDT';
+                    
+                    const [bonusPercent, timeRemaining] = await presaleContract.getCurrentEarlyBirdBonus();
+                    updateCountdown(timeRemaining.toNumber(), bonusPercent.toNumber());
+                    
+                    if (userAddress) {
+                        await updateUserData();
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating UI:', error);
+            }
+            
+            setTimeout(updateUI, 5000);
+        }
+        
+        function updateCountdown(timeRemaining, bonusPercent) {
+            if (timeRemaining > 0) {
+                const days = Math.floor(timeRemaining / (60 * 60 * 24));
+                const hours = Math.floor((timeRemaining % (60 * 60 * 24)) / (60 * 60));
+                const minutes = Math.floor((timeRemaining % (60 * 60)) / 60);
+                const seconds = Math.floor(timeRemaining % 60);
+                
+                document.getElementById('bonusDays').textContent = days.toString().padStart(2, '0');
+                document.getElementById('bonusHours').textContent = hours.toString().padStart(2, '0');
+                document.getElementById('bonusMinutes').textContent = minutes.toString().padStart(2, '0');
+                document.getElementById('bonusSeconds').textContent = seconds.toString().padStart(2, '0');
+                
+                document.getElementById('currentBonus').textContent = `${bonusPercent}% Bonus Active`;
+            } else {
+                document.getElementById('currentBonus').textContent = 'Bonus Ended';
+                document.getElementById('bonusDays').textContent = '00';
+                document.getElementById('bonusHours').textContent = '00';
+                document.getElementById('bonusMinutes').textContent = '00';
+                document.getElementById('bonusSeconds').textContent = '00';
+            }
+        }
+        
+        async function addTokenToWallet() {
+            if (typeof window.ethereum === 'undefined') {
+                showNotification('Please install MetaMask to add tokens to your wallet', 'warning');
+                return;
+            }
+            
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_watchAsset',
+                    params: {
+                        type: 'ERC20',
+                        options: {
+                            address: TOKEN_CONTRACT,
+                            symbol: 'NEX',
+                            decimals: 18,
+                            image: 'https://photos.pinksale.finance/file/pinksale-logo-upload/1759769706757-a112fb0cb7d0fff59069a55924092519.JPG',
+                        },
+                    },
+                });
+                showNotification('NEX token added to wallet!', 'success');
+            } catch (error) {
+                console.error('Error adding token to wallet:', error);
+                showNotification('Error adding token to wallet', 'danger');
+            }
+        }
+    </script>
+</body>
+</html>
