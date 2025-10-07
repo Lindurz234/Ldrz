@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXBit Presale - Admin Panel</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.1/ethers.umd.min.js"></script>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --gray: #95a5a6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px 0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .admin-badge {
+            background-color: var(--warning);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .wallet-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background-color: #e67e22;
+        }
+        
+        .btn-danger {
+            background-color: var(--accent);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--primary);
+            border-bottom: 1px solid var(--light);
+            padding-bottom: 10px;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            color: var(--gray);
+        }
+        
+        .stat-value {
+            font-weight: 600;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid var(--secondary);
+            color: var(--secondary);
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .alert {
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .alert-success {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: var(--success);
+            border-left: 4px solid var(--success);
+        }
+        
+        .alert-warning {
+            background-color: rgba(243, 156, 18, 0.2);
+            color: var(--warning);
+            border-left: 4px solid var(--warning);
+        }
+        
+        .alert-danger {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: var(--accent);
+            border-left: 4px solid var(--accent);
+        }
+        
+        .network-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            background-color: rgba(46, 204, 113, 0.2);
+            color: var(--success);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .network-indicator.offline {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: var(--accent);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .admin-section {
+            border-left: 4px solid var(--warning);
+            background-color: rgba(243, 156, 18, 0.1);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        
+        .danger-section {
+            border-left: 4px solid var(--accent);
+            background-color: rgba(231, 76, 60, 0.1);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="logo">NEXBit Presale Premium - Admin Panel</div>
+                <div class="wallet-info">
+                    <span id="networkIndicator" class="network-indicator offline">Disconnected</span>
+                    <span id="walletAddress">Not Connected</span>
+                    <span id="adminStatus" class="admin-badge hidden">Not Owner</span>
+                    <button id="connectWallet" class="btn btn-primary">Connect Wallet</button>
+                </div>
+            </div>
+        </header>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="presaleControl">Presale Control</div>
+            <div class="tab" data-tab="vestingControl">Vesting Control</div>
+            <div class="tab" data-tab="tierManagement">Tier Management</div>
+            <div class="tab" data-tab="stakingManagement">Staking Management</div>
+            <div class="tab" data-tab="fundManagement">Fund Management</div>
+        </div>
+        
+        <!-- Presale Control Tab -->
+        <div id="presaleControl" class="tab-content active">
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">Presale Status</div>
+                    <div class="stats">
+                        <span class="stat-label">Presale Active:</span>
+                        <span id="presaleStatus" class="stat-value">Loading...</span>
+                    </div>
+                    <div class="stats">
+                        <span class="stat-label">Start Time:</span>
+                        <span id="presaleStartTime" class="stat-value">-</span>
+                    </div>
+                    <div class="stats">
+                        <span class="stat-label">End Time:</span>
+                        <span id="presaleEndTime" class="stat-value">-</span>
+                    </div>
+                    <div class="stats">
+                        <span class="stat-label">Total Sold:</span>
+                        <span id="adminTotalSold" class="stat-value">0 NEX</span>
+                    </div>
+                    <div class="stats">
+                        <span class="stat-label">Total Raised:</span>
+                        <span id="adminTotalRaised" class="stat-value">0 USDT</span>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">Start Presale</div>
+                    <div class="admin-section">
+                        <div class="form-group">
+                            <label for="presaleDuration">Presale Duration (Days)</label>
+                            <input type="number" id="presaleDuration" placeholder="Enter duration in days" min="1" max="365">
+                        </div>
+                        <div class="form-group">
+                            <button id="startPresaleBtn" class="btn btn-success">Start Presale</button>
+                        </div>
+                        <div id="startPresaleStatus" class="alert hidden"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">Early Bird Bonuses</div>
+                <div id="earlyBirdList">
+                    <!-- Early bird bonuses will be loaded here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Vesting Control Tab -->
+        <div id="vestingControl" class="tab-content">
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">Vesting Status</div>
+                    <div class="stats">
+                        <span class="stat-label">Vesting Started:</span>
+                        <span id="vestingStatus" class="stat-value">Loading...</span>
+                    </div>
+                    <div class="stats">
+                        <span class="stat-label">Vesting Start Time:</span>
+                        <span id="vestingStartTime" class="stat-value">-</span>
+                    </div>
+                    <div class="stats">
+                        <span class="stat-label">Vesting Duration:</span>
+                        <span class="stat-value">24 Months</span>
+                    </div>
+                    <div class="stats">
+                        <span class="stat-label">Vesting Start Delay:</span>
+                        <span class="stat-value">7 Days</span>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">End Presale & Start Vesting</div>
+                    <div class="admin-section">
+                        <p>This will:</p>
+                        <ul>
+                            <li>End the presale immediately</li>
+                            <li>Start vesting period after 7 days delay</li>
+                            <li>Allow users to claim their tokens</li>
+                        </ul>
+                        <div class="form-group">
+                            <button id="endPresaleBtn" class="btn btn-warning">End Presale & Start Vesting</button>
+                        </div>
+                        <div id="endPresaleStatus" class="alert hidden"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tier Management Tab -->
+        <div id="tierManagement" class="tab-content">
+            <div class="card">
+                <div class="card-title">Current Tier System</div>
+                <div id="tiersList">
+                    <!-- Tiers will be loaded here -->
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">Add Whitelist Points</div>
+                <div class="admin-section">
+                    <div class="form-group">
+                        <label for="whitelistAddresses">Addresses (comma separated)</label>
+                        <textarea id="whitelistAddresses" placeholder="0x123...,0x456..." rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="whitelistPoints">Points for each address</label>
+                        <input type="number" id="whitelistPoints" placeholder="Enter points">
+                    </div>
+                    <div class="form-group">
+                        <button id="addWhitelistPointsBtn" class="btn btn-primary">Add Whitelist Points</button>
+                    </div>
+                    <div id="whitelistStatus" class="alert hidden"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Staking Management Tab -->
+        <div id="stakingManagement" class="tab-content">
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">Staking Statistics</div>
+                    <div class="stats">
+                        <span class="stat-label">Total Staked:</span>
+                        <span id="adminTotalStaked" class="stat-value">0 NEX</span>
+                    </div>
+                    <div class="stats">
+                        <span class="stat-label">Total Rewards Distributed:</span>
+                        <span id="adminTotalRewards" class="stat-value">0 NEX</span>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">Update Staking Plan</div>
+                    <div class="admin-section">
+                        <div class="form-group">
+                            <label for="stakingPlanPeriod">Staking Period</label>
+                            <select id="stakingPlanPeriod">
+                                <option value="0">1 Month</option>
+                                <option value="1">2 Months</option>
+                                <option value="2">3 Months</option>
+                                <option value="3">6 Months</option>
+                                <option value="4">12 Months</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="stakingPlanAPY">New APY (basis points - 10000 = 100%)</label>
+                            <input type="number" id="stakingPlanAPY" placeholder="e.g., 10000 for 100% APY">
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="stakingPlanActive" checked>
+                                Plan Active
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <button id="updateStakingPlanBtn" class="btn btn-primary">Update Staking Plan</button>
+                        </div>
+                        <div id="stakingPlanStatus" class="alert hidden"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Fund Management Tab -->
+        <div id="fundManagement" class="tab-content">
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">Contract Balances</div>
+                    <div class="stats">
+                        <span class="stat-label">Native Balance:</span>
+                        <span id="nativeBalance" class="stat-value">0 CORE</span>
+                    </div>
+                    <div class="stats">
+                        <span class="stat-label">USDT Balance:</span>
+                        <span id="usdtBalance" class="stat-value">0 USDT</span>
+                    </div>
+                    <div class="stats">
+                        <span class="stat-label">NEX Balance:</span>
+                        <span id="nexBalance" class="stat-value">0 NEX</span>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">Withdraw Funds</div>
+                    <div class="admin-section">
+                        <div class="form-group">
+                            <label for="withdrawToken">Token to Withdraw</label>
+                            <select id="withdrawToken">
+                                <option value="native">Native (CORE)</option>
+                                <option value="usdt">USDT</option>
+                                <option value="usdc">USDC</option>
+                                <option value="other">Other ERC20</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="customTokenGroup" style="display: none;">
+                            <label for="customTokenAddress">Token Address</label>
+                            <input type="text" id="customTokenAddress" placeholder="0x...">
+                        </div>
+                        <div class="form-group">
+                            <label for="withdrawAmount">Amount (0 for max)</label>
+                            <input type="number" id="withdrawAmount" placeholder="Enter amount">
+                        </div>
+                        <div class="form-group">
+                            <button id="withdrawFundsBtn" class="btn btn-warning">Withdraw Funds</button>
+                        </div>
+                        <div id="withdrawStatus" class="alert hidden"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">Recovery Functions</div>
+                <div class="danger-section">
+                    <div class="form-group">
+                        <label for="recoverTokenAddress">Token Address to Recover</label>
+                        <input type="text" id="recoverTokenAddress" placeholder="0x...">
+                    </div>
+                    <div class="form-group">
+                        <label for="recoverAmount">Amount to Recover</label>
+                        <input type="number" id="recoverAmount" placeholder="Enter amount">
+                    </div>
+                    <div class="form-group">
+                        <button id="recoverTokensBtn" class="btn btn-danger">Recover ERC20 Tokens</button>
+                    </div>
+                    <small>Note: Cannot recover NEX tokens</small>
+                    <div id="recoverStatus" class="alert hidden"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Contract ABI - Hanya fungsi admin yang diperlukan
+        const contractABI = [
+            // Admin Functions
+            "function owner() public view returns (address)",
+            "function startPresale(uint256 durationInDays) external onlyOwner",
+            "function endPresaleAndStartVesting() external onlyOwner",
+            "function addWhitelistPoints(address[] memory users, uint256[] memory points) external onlyOwner",
+            "function updateStakingPlan(uint8 period, uint256 apy, bool active) external onlyOwner",
+            "function withdrawFunds(address tokenAddress, uint256 amount) external onlyOwner",
+            "function recoverERC20(address tokenAddress, uint256 amount) external onlyOwner",
+            "function transferOwnership(address newOwner) external onlyOwner",
+            
+            // View Functions
+            "function presaleActive() public view returns (bool)",
+            "function vestingStarted() public view returns (bool)",
+            "function startTime() public view returns (uint256)",
+            "function endTime() public view returns (uint256)",
+            "function vestingStartTime() public view returns (uint256)",
+            "function totalSold() public view returns (uint256)",
+            "function totalRaisedUSDT() public view returns (uint256)",
+            "function totalRaisedNative() public view returns (uint256)",
+            "function totalStaked() public view returns (uint256)",
+            "function totalStakingRewards() public view returns (uint256)",
+            "function getPresaleProgress() public view returns (uint256 soldPercent, uint256 raisedUSDT)",
+            "function earlyBirdBonuses(uint256) public view returns (uint256 timeLimit, uint256 bonusPercent)",
+            "function tiers(uint8) public view returns (uint256 minAllocationUSDT, uint256 maxAllocationUSDT, uint256 requiredPoints, uint256 extraAllocation)",
+            "function stakingPlans(uint8) public view returns (uint256 duration, uint256 apy, bool active)",
+            
+            // Constants
+            "function USDT() public view returns (address)",
+            "function USDC() public view returns (address)",
+            "function nexToken() public view returns (address)"
+        ];
+
+        // Konfigurasi
+        const CORE_CHAIN_ID = 1116;
+        const CONTRACT_ADDRESS = "0xfebe6c8e5d5aa235457c45aae6fa36636aaffdc5";
+        const USDT_ADDRESS = "0x900101d06A7426441Ae63e9AB3B9b0F63Be145F1";
+        const USDC_ADDRESS = "0xa4151B2B3e269645181dCcF2D426cE75fcbDeca9";
+        
+        // Variabel global
+        let provider;
+        let signer;
+        let contract;
+        let userAddress;
+        let isConnected = false;
+        let isOwner = false;
+
+        // Inisialisasi aplikasi
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            setupEventListeners();
+            setupTabs();
+            checkAutoConnect();
+        });
+
+        function initializeApp() {
+            if (typeof window.ethereum === 'undefined') {
+                alert('MetaMask tidak terdeteksi. Silakan install MetaMask terlebih dahulu.');
+                return;
+            }
+
+            provider = new ethers.providers.Web3Provider(window.ethereum);
+            contract = new ethers.Contract(CONTRACT_ADDRESS, contractABI, provider);
+            
+            window.ethereum.on('chainChanged', (chainId) => {
+                handleNetworkChange(parseInt(chainId, 16));
+            });
+            
+            window.ethereum.on('accountsChanged', (accounts) => {
+                if (accounts.length > 0) {
+                    userAddress = accounts[0];
+                    checkOwnerStatus();
+                    updateAdminUI();
+                } else {
+                    disconnectWallet();
+                }
+            });
+        }
+
+        function setupEventListeners() {
+            // Wallet connection
+            document.getElementById('connectWallet').addEventListener('click', connectWallet);
+            
+            // Presale control
+            document.getElementById('startPresaleBtn').addEventListener('click', startPresale);
+            document.getElementById('endPresaleBtn').addEventListener('click', endPresaleAndStartVesting);
+            
+            // Tier management
+            document.getElementById('addWhitelistPointsBtn').addEventListener('click', addWhitelistPoints);
+            
+            // Staking management
+            document.getElementById('updateStakingPlanBtn').addEventListener('click', updateStakingPlan);
+            
+            // Fund management
+            document.getElementById('withdrawToken').addEventListener('change', toggleCustomToken);
+            document.getElementById('withdrawFundsBtn').addEventListener('click', withdrawFunds);
+            document.getElementById('recoverTokensBtn').addEventListener('click', recoverERC20);
+        }
+
+        function setupTabs() {
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    const tabId = tab.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                    
+                    if (isConnected) {
+                        updateAdminUI();
+                    }
+                });
+            });
+        }
+
+        async function connectWallet() {
+            try {
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                
+                signer = provider.getSigner();
+                userAddress = await signer.getAddress();
+                contract = contract.connect(signer);
+                
+                const network = await provider.getNetwork();
+                await handleNetworkChange(network.chainId);
+                
+                isConnected = true;
+                await checkOwnerStatus();
+                updateAdminUI();
+                
+            } catch (error) {
+                console.error('Error connecting wallet:', error);
+                alert('Gagal menghubungkan wallet: ' + error.message);
+            }
+        }
+
+        async function handleNetworkChange(chainId) {
+            const networkIndicator = document.getElementById('networkIndicator');
+            
+            if (chainId === CORE_CHAIN_ID) {
+                networkIndicator.textContent = 'Core Network';
+                networkIndicator.classList.remove('offline');
+                if (userAddress) {
+                    await checkOwnerStatus();
+                    updateAdminUI();
+                }
+            } else {
+                networkIndicator.textContent = 'Wrong Network';
+                networkIndicator.classList.add('offline');
+                alert('Silakan ubah jaringan ke Core Mainnet (Chain ID: 1116)');
+            }
+        }
+
+        async function checkOwnerStatus() {
+            try {
+                const contractOwner = await contract.owner();
+                isOwner = (contractOwner.toLowerCase() === userAddress.toLowerCase());
+                
+                const adminStatus = document.getElementById('adminStatus');
+                if (isOwner) {
+                    adminStatus.textContent = 'Owner';
+                    adminStatus.classList.remove('hidden');
+                } else {
+                    adminStatus.textContent = 'Not Owner';
+                    adminStatus.classList.remove('hidden');
+                }
+                
+            } catch (error) {
+                console.error('Error checking owner status:', error);
+                isOwner = false;
+            }
+        }
+
+        function disconnectWallet() {
+            isConnected = false;
+            isOwner = false;
+            userAddress = null;
+            signer = null;
+            document.getElementById('walletAddress').textContent = 'Not Connected';
+            document.getElementById('adminStatus').classList.add('hidden');
+            document.getElementById('networkIndicator').classList.add('offline');
+        }
+
+        function checkAutoConnect() {
+            if (window.ethereum && window.ethereum.selectedAddress) {
+                connectWallet();
+            }
+        }
+
+        async function updateAdminUI() {
+            if (!isConnected) return;
+            
+            try {
+                document.getElementById('walletAddress').textContent = 
+                    `${userAddress.substring(0, 6)}...${userAddress.substring(userAddress.length - 4)}`;
+                
+                if (isOwner) {
+                    await updatePresaleStatus();
+                    await updateVestingStatus();
+                    await updateTiersInfo();
+                    await updateStakingInfo();
+                    await updateFundsInfo();
+                }
+                
+            } catch (error) {
+                console.error('Error updating admin UI:', error);
+            }
+        }
+
+        async function updatePresaleStatus() {
+            try {
+                const presaleActive = await contract.presaleActive();
+                const startTime = await contract.startTime();
+                const endTime = await contract.endTime();
+                const totalSold = await contract.totalSold();
+                const [soldPercent, totalRaised] = await contract.getPresaleProgress();
+                
+                document.getElementById('presaleStatus').textContent = presaleActive ? 'Active' : 'Inactive';
+                document.getElementById('presaleStartTime').textContent = startTime.gt(0) ? 
+                    new Date(startTime * 1000).toLocaleString() : 'Not Started';
+                document.getElementById('presaleEndTime').textContent = endTime.gt(0) ? 
+                    new Date(endTime * 1000).toLocaleString() : 'Not Set';
+                document.getElementById('adminTotalSold').textContent = 
+                    ethers.utils.formatUnits(totalSold, 18).split('.')[0] + ' NEX';
+                document.getElementById('adminTotalRaised').textContent = 
+                    ethers.utils.formatUnits(totalRaised, 18).split('.')[0] + ' USDT';
+                
+                // Load early bird bonuses
+                await loadEarlyBirdBonuses();
+                
+            } catch (error) {
+                console.error('Error updating presale status:', error);
+            }
+        }
+
+        async function loadEarlyBirdBonuses() {
+            try {
+                const container = document.getElementById('earlyBirdList');
+                container.innerHTML = '';
+                
+                for (let i = 0; i < 4; i++) {
+                    try {
+                        const bonus = await contract.earlyBirdBonuses(i);
+                        const bonusElement = document.createElement('div');
+                        bonusElement.className = 'stats';
+                        bonusElement.innerHTML = `
+                            <span class="stat-label">Bonus ${i + 1}:</span>
+                            <span class="stat-value">${bonus.bonusPercent}% (${bonus.timeLimit / 3600}h)</span>
+                        `;
+                        container.appendChild(bonusElement);
+                    } catch (error) {
+                        break;
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Error loading early bird bonuses:', error);
+            }
+        }
+
+        async function updateVestingStatus() {
+            try {
+                const vestingStarted = await contract.vestingStarted();
+                const vestingStartTime = await contract.vestingStartTime();
+                
+                document.getElementById('vestingStatus').textContent = vestingStarted ? 'Active' : 'Inactive';
+                document.getElementById('vestingStartTime').textContent = vestingStartTime.gt(0) ? 
+                    new Date(vestingStartTime * 1000).toLocaleString() : 'Not Started';
+                
+            } catch (error) {
+                console.error('Error updating vesting status:', error);
+            }
+        }
+
+        async function updateTiersInfo() {
+            try {
+                const container = document.getElementById('tiersList');
+                container.innerHTML = '';
+                
+                const tierNames = ['BRONZE', 'SILVER', 'GOLD', 'PLATINUM', 'DIAMOND'];
+                
+                for (let i = 0; i < 5; i++) {
+                    const tier = await contract.tiers(i);
+                    const tierElement = document.createElement('div');
+                    tierElement.className = 'stats';
+                    tierElement.innerHTML = `
+                        <span class="stat-label">${tierNames[i]}:</span>
+                        <span class="stat-value">${ethers.utils.formatUnits(tier.minAllocationUSDT, 18)}-${ethers.utils.formatUnits(tier.maxAllocationUSDT, 18)} USDT | ${tier.extraAllocation}% Bonus | ${tier.requiredPoints} Points</span>
+                    `;
+                    container.appendChild(tierElement);
+                }
+                
+            } catch (error) {
+                console.error('Error updating tiers info:', error);
+            }
+        }
+
+        async function updateStakingInfo() {
+            try {
+                const totalStaked = await contract.totalStaked();
+                const totalRewards = await contract.totalStakingRewards();
+                
+                document.getElementById('adminTotalStaked').textContent = 
+                    ethers.utils.formatUnits(totalStaked, 18).split('.')[0] + ' NEX';
+                document.getElementById('adminTotalRewards').textContent = 
+                    ethers.utils.formatUnits(totalRewards, 18).split('.')[0] + ' NEX';
+                
+            } catch (error) {
+                console.error('Error updating staking info:', error);
+            }
+        }
+
+        async function updateFundsInfo() {
+            try {
+                // Get native balance
+                const nativeBalance = await provider.getBalance(CONTRACT_ADDRESS);
+                document.getElementById('nativeBalance').textContent = 
+                    ethers.utils.formatEther(nativeBalance) + ' CORE';
+                
+                // Get USDT balance
+                const usdtAbi = ["function balanceOf(address) view returns (uint256)"];
+                const usdtContract = new ethers.Contract(USDT_ADDRESS, usdtAbi, provider);
+                const usdtBalance = await usdtContract.balanceOf(CONTRACT_ADDRESS);
+                document.getElementById('usdtBalance').textContent = 
+                    ethers.utils.formatUnits(usdtBalance, 18) + ' USDT';
+                
+                // Get NEX balance
+                const nexTokenAddress = await contract.nexToken();
+                const nexContract = new ethers.Contract(nexTokenAddress, usdtAbi, provider);
+                const nexBalance = await nexContract.balanceOf(CONTRACT_ADDRESS);
+                document.getElementById('nexBalance').textContent = 
+                    ethers.utils.formatUnits(nexBalance, 18) + ' NEX';
+                
+            } catch (error) {
+                console.error('Error updating funds info:', error);
+            }
+        }
+
+        // ADMIN FUNCTIONS
+
+        async function startPresale() {
+            if (!isOwner) {
+                alert('Hanya owner yang dapat memulai presale');
+                return;
+            }
+            
+            const duration = document.getElementById('presaleDuration').value;
+            if (!duration || duration <= 0) {
+                alert('Masukkan durasi yang valid');
+                return;
+            }
+            
+            try {
+                const statusElement = document.getElementById('startPresaleStatus');
+                statusElement.textContent = 'Mengirim transaksi...';
+                statusElement.className = 'alert alert-warning';
+                statusElement.classList.remove('hidden');
+                
+                const tx = await contract.startPresale(duration);
+                statusElement.textContent = 'Transaksi dikirim! TX Hash: ' + tx.hash;
+                
+                await tx.wait();
+                statusElement.textContent = 'Presale berhasil dimulai!';
+                statusElement.className = 'alert alert-success';
+                
+                updateAdminUI();
+                
+            } catch (error) {
+                console.error('Error starting presale:', error);
+                const statusElement = document.getElementById('startPresaleStatus');
+                statusElement.textContent = 'Gagal memulai presale: ' + error.message;
+                statusElement.className = 'alert alert-danger';
+                statusElement.classList.remove('hidden');
+            }
+        }
+
+        async function endPresaleAndStartVesting() {
+            if (!isOwner) {
+                alert('Hanya owner yang dapat mengakhiri presale');
+                return;
+            }
+            
+            if (!confirm('Apakah Anda yakin ingin mengakhiri presale dan memulai vesting? Tindakan ini tidak dapat dibatalkan.')) {
+                return;
+            }
+            
+            try {
+                const statusElement = document.getElementById('endPresaleStatus');
+                statusElement.textContent = 'Mengirim transaksi...';
+                statusElement.className = 'alert alert-warning';
+                statusElement.classList.remove('hidden');
+                
+                const tx = await contract.endPresaleAndStartVesting();
+                statusElement.textContent = 'Transaksi dikirim! TX Hash: ' + tx.hash;
+                
+                await tx.wait();
+                statusElement.textContent = 'Presale berhasil diakhiri dan vesting dimulai!';
+                statusElement.className = 'alert alert-success';
+                
+                updateAdminUI();
+                
+            } catch (error) {
+                console.error('Error ending presale:', error);
+                const statusElement = document.getElementById('endPresaleStatus');
+                statusElement.textContent = 'Gagal mengakhiri presale: ' + error.message;
+                statusElement.className = 'alert alert-danger';
+                statusElement.classList.remove('hidden');
+            }
+        }
+
+        async function addWhitelistPoints() {
+            if (!isOwner) {
+                alert('Hanya owner yang dapat menambah whitelist points');
+                return;
+            }
+            
+            const addressesInput = document.getElementById('whitelistAddresses').value;
+            const points = document.getElementById('whitelistPoints').value;
+            
+            if (!addressesInput || !points) {
+                alert('Masukkan alamat dan points yang valid');
+                return;
+            }
+            
+            const addresses = addressesInput.split(',').map(addr => addr.trim()).filter(addr => addr !== '');
+            const pointsArray = Array(addresses.length).fill(points);
+            
+            // Validasi alamat
+            for (const addr of addresses) {
+                if (!ethers.utils.isAddress(addr)) {
+                    alert(`Alamat tidak valid: ${addr}`);
+                    return;
+                }
+            }
+            
+            try {
+                const statusElement = document.getElementById('whitelistStatus');
+                statusElement.textContent = `Menambah ${points} points ke ${addresses.length} alamat...`;
+                statusElement.className = 'alert alert-warning';
+                statusElement.classList.remove('hidden');
+                
+                const tx = await contract.addWhitelistPoints(addresses, pointsArray);
+                statusElement.textContent = 'Transaksi dikirim! TX Hash: ' + tx.hash;
+                
+                await tx.wait();
+                statusElement.textContent = `Berhasil menambah points ke ${addresses.length} alamat!`;
+                statusElement.className = 'alert alert-success';
+                
+                // Clear form
+                document.getElementById('whitelistAddresses').value = '';
+                document.getElementById('whitelistPoints').value = '';
+                
+            } catch (error) {
+                console.error('Error adding whitelist points:', error);
+                const statusElement = document.getElementById('whitelistStatus');
+                statusElement.textContent = 'Gagal menambah points: ' + error.message;
+                statusElement.className = 'alert alert-danger';
+                statusElement.classList.remove('hidden');
+            }
+        }
+
+        async function updateStakingPlan() {
+            if (!isOwner) {
+                alert('Hanya owner yang dapat mengupdate staking plan');
+                return;
+            }
+            
+            const period = document.getElementById('stakingPlanPeriod').value;
+            const apy = document.getElementById('stakingPlanAPY').value;
+            const active = document.getElementById('stakingPlanActive').checked;
+            
+            if (!apy) {
+                alert('Masukkan APY yang valid');
+                return;
+            }
+            
+            try {
+                const statusElement = document.getElementById('stakingPlanStatus');
+                statusElement.textContent = 'Mengupdate staking plan...';
+                statusElement.className = 'alert alert-warning';
+                statusElement.classList.remove('hidden');
+                
+                const tx = await contract.updateStakingPlan(period, apy, active);
+                statusElement.textContent = 'Transaksi dikirim! TX Hash: ' + tx.hash;
+                
+                await tx.wait();
+                statusElement.textContent = 'Staking plan berhasil diupdate!';
+                statusElement.className = 'alert alert-success';
+                
+            } catch (error) {
+                console.error('Error updating staking plan:', error);
+                const statusElement = document.getElementById('stakingPlanStatus');
+                statusElement.textContent = 'Gagal mengupdate staking plan: ' + error.message;
+                statusElement.className = 'alert alert-danger';
+                statusElement.classList.remove('hidden');
+            }
+        }
+
+        function toggleCustomToken() {
+            const tokenType = document.getElementById('withdrawToken').value;
+            const customTokenGroup = document.getElementById('customTokenGroup');
+            
+            if (tokenType === 'other') {
+                customTokenGroup.style.display = 'block';
+            } else {
+                customTokenGroup.style.display = 'none';
+            }
+        }
+
+        async function withdrawFunds() {
+            if (!isOwner) {
+                alert('Hanya owner yang dapat menarik dana');
+                return;
+            }
+            
+            const tokenType = document.getElementById('withdrawToken').value;
+            const amount = document.getElementById('withdrawAmount').value;
+            let tokenAddress;
+            
+            switch (tokenType) {
+                case 'native':
+                    tokenAddress = ethers.constants.AddressZero;
+                    break;
+                case 'usdt':
+                    tokenAddress = USDT_ADDRESS;
+                    break;
+                case 'usdc':
+                    tokenAddress = USDC_ADDRESS;
+                    break;
+                case 'other':
+                    tokenAddress = document.getElementById('customTokenAddress').value;
+                    if (!ethers.utils.isAddress(tokenAddress)) {
+                        alert('Alamat token tidak valid');
+                        return;
+                    }
+                    break;
+            }
+            
+            const withdrawAmount = amount === '' || amount === '0' ? 
+                ethers.constants.MaxUint256 : 
+                ethers.utils.parseUnits(amount, tokenType === 'native' ? 18 : 18);
+            
+            try {
+                const statusElement = document.getElementById('withdrawStatus');
+                statusElement.textContent = 'Menarik dana...';
+                statusElement.className = 'alert alert-warning';
+                statusElement.classList.remove('hidden');
+                
+                const tx = await contract.withdrawFunds(tokenAddress, withdrawAmount);
+                statusElement.textContent = 'Transaksi dikirim! TX Hash: ' + tx.hash;
+                
+                await tx.wait();
+                statusElement.textContent = 'Dana berhasil ditarik!';
+                statusElement.className = 'alert alert-success';
+                
+                updateFundsInfo();
+                
+            } catch (error) {
+                console.error('Error withdrawing funds:', error);
+                const statusElement = document.getElementById('withdrawStatus');
+                statusElement.textContent = 'Gagal menarik dana: ' + error.message;
+                statusElement.className = 'alert alert-danger';
+                statusElement.classList.remove('hidden');
+            }
+        }
+
+        async function recoverERC20() {
+            if (!isOwner) {
+                alert('Hanya owner yang dapat melakukan recovery');
+                return;
+            }
+            
+            const tokenAddress = document.getElementById('recoverTokenAddress').value;
+            const amount = document.getElementById('recoverAmount').value;
+            
+            if (!ethers.utils.isAddress(tokenAddress)) {
+                alert('Alamat token tidak valid');
+                return;
+            }
+            
+            if (!amount || amount <= 0) {
+                alert('Masukkan jumlah yang valid');
+                return;
+            }
+            
+            const recoverAmount = ethers.utils.parseUnits(amount, 18);
+            
+            try {
+                const statusElement = document.getElementById('recoverStatus');
+                statusElement.textContent = 'Melakukan recovery token...';
+                statusElement.className = 'alert alert-warning';
+                statusElement.classList.remove('hidden');
+                
+                const tx = await contract.recoverERC20(tokenAddress, recoverAmount);
+                statusElement.textContent = 'Transaksi dikirim! TX Hash: ' + tx.hash;
+                
+                await tx.wait();
+                statusElement.textContent = 'Token berhasil di-recover!';
+                statusElement.className = 'alert alert-success';
+                
+            } catch (error) {
+                console.error('Error recovering tokens:', error);
+                const statusElement = document.getElementById('recoverStatus');
+                statusElement.textContent = 'Gagal melakukan recovery: ' + error.message;
+                statusElement.className = 'alert alert-danger';
+                statusElement.classList.remove('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
