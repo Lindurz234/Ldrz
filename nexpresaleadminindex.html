@@ -668,10 +668,10 @@
         const USDC_ADDRESS = "0xa4151B2B3e269645181dCcF2D426cE75fcbDeca9";
         
         // Variabel global
-        let provider;
-        let signer;
-        let contract;
-        let userAddress;
+        let provider = null;
+        let signer = null;
+        let contract = null;
+        let userAddress = null;
         let isConnected = false;
         let isOwner = false;
 
@@ -689,22 +689,36 @@
                 return;
             }
 
-            provider = new ethers.providers.Web3Provider(window.ethereum);
-            contract = new ethers.Contract(CONTRACT_ADDRESS, contractABI, provider);
-            
-            window.ethereum.on('chainChanged', (chainId) => {
-                handleNetworkChange(parseInt(chainId, 16));
-            });
-            
-            window.ethereum.on('accountsChanged', (accounts) => {
-                if (accounts.length > 0) {
-                    userAddress = accounts[0];
-                    checkOwnerStatus();
-                    updateAdminUI();
-                } else {
-                    disconnectWallet();
-                }
-            });
+            try {
+                // Inisialisasi provider
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                
+                // Inisialisasi kontrak dengan provider (read-only dulu)
+                contract = new ethers.Contract(CONTRACT_ADDRESS, contractABI, provider);
+                
+                // Setup event listeners untuk perubahan
+                window.ethereum.on('chainChanged', (chainId) => {
+                    console.log('Chain changed:', chainId);
+                    handleNetworkChange(parseInt(chainId, 16));
+                });
+                
+                window.ethereum.on('accountsChanged', (accounts) => {
+                    console.log('Accounts changed:', accounts);
+                    if (accounts.length > 0) {
+                        userAddress = accounts[0];
+                        checkOwnerStatus();
+                        updateAdminUI();
+                    } else {
+                        disconnectWallet();
+                    }
+                });
+                
+                console.log('App initialized successfully');
+                
+            } catch (error) {
+                console.error('Error initializing app:', error);
+                alert('Error initializing application: ' + error.message);
+            }
         }
 
         function setupEventListeners() {
@@ -738,7 +752,7 @@
                     const tabId = tab.getAttribute('data-tab');
                     document.getElementById(tabId).classList.add('active');
                     
-                    if (isConnected) {
+                    if (isConnected && isOwner) {
                         updateAdminUI();
                     }
                 });
@@ -751,24 +765,51 @@
                 button.textContent = 'Connecting...';
                 button.disabled = true;
                 
-                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                console.log('Requesting accounts...');
                 
+                // Request account access
+                const accounts = await window.ethereum.request({ 
+                    method: 'eth_requestAccounts' 
+                });
+                
+                console.log('Accounts received:', accounts);
+                
+                if (accounts.length === 0) {
+                    throw new Error('No accounts found');
+                }
+                
+                // Pastikan provider sudah diinisialisasi
+                if (!provider) {
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                }
+                
+                // Dapatkan signer
                 signer = provider.getSigner();
                 userAddress = await signer.getAddress();
+                
+                console.log('User address:', userAddress);
+                
+                // Update kontrak dengan signer untuk write operations
                 contract = contract.connect(signer);
                 
+                // Periksa jaringan
                 const network = await provider.getNetwork();
+                console.log('Network:', network);
                 await handleNetworkChange(network.chainId);
                 
                 isConnected = true;
                 await checkOwnerStatus();
-                updateAdminUI();
+                await updateAdminUI();
                 
                 button.textContent = 'Connected';
+                button.disabled = false;
+                
+                console.log('Wallet connected successfully');
                 
             } catch (error) {
                 console.error('Error connecting wallet:', error);
                 alert('Gagal menghubungkan wallet: ' + error.message);
+                
                 const button = document.getElementById('connectWallet');
                 button.textContent = 'Connect Wallet';
                 button.disabled = false;
@@ -781,6 +822,8 @@
             if (chainId === CORE_CHAIN_ID) {
                 networkIndicator.textContent = 'Core Network';
                 networkIndicator.classList.remove('offline');
+                console.log('Connected to Core Network');
+                
                 if (userAddress) {
                     await checkOwnerStatus();
                     updateAdminUI();
@@ -788,13 +831,18 @@
             } else {
                 networkIndicator.textContent = 'Wrong Network';
                 networkIndicator.classList.add('offline');
+                console.log('Wrong network, please switch to Core');
                 alert('Silakan ubah jaringan ke Core Mainnet (Chain ID: 1116)');
             }
         }
 
         async function checkOwnerStatus() {
             try {
+                console.log('Checking owner status...');
                 const contractOwner = await contract.owner();
+                console.log('Contract owner:', contractOwner);
+                console.log('User address:', userAddress);
+                
                 isOwner = (contractOwner.toLowerCase() === userAddress.toLowerCase());
                 
                 const adminStatus = document.getElementById('adminStatus');
@@ -806,18 +854,28 @@
                     ownerInfo.classList.remove('hidden');
                     
                     // Enable all admin buttons
-                    document.querySelectorAll('#presaleControl .btn, #vestingControl .btn, #tierManagement .btn, #stakingManagement .btn, #fundManagement .btn').forEach(btn => {
+                    const adminButtons = document.querySelectorAll(
+                        '#startPresaleBtn, #endPresaleBtn, #addWhitelistPointsBtn, #updateStakingPlanBtn, #withdrawFundsBtn, #recoverTokensBtn'
+                    );
+                    adminButtons.forEach(btn => {
                         btn.disabled = false;
                     });
+                    
+                    console.log('User is contract owner');
                 } else {
                     adminStatus.textContent = 'Not Owner';
                     adminStatus.classList.remove('hidden');
                     ownerInfo.classList.remove('hidden');
                     
                     // Disable all admin buttons
-                    document.querySelectorAll('#presaleControl .btn, #vestingControl .btn, #tierManagement .btn, #stakingManagement .btn, #fundManagement .btn').forEach(btn => {
+                    const adminButtons = document.querySelectorAll(
+                        '#startPresaleBtn, #endPresaleBtn, #addWhitelistPointsBtn, #updateStakingPlanBtn, #withdrawFundsBtn, #recoverTokensBtn'
+                    );
+                    adminButtons.forEach(btn => {
                         btn.disabled = true;
                     });
+                    
+                    console.log('User is NOT contract owner');
                 }
                 
                 // Update owner info
@@ -836,6 +894,10 @@
             } catch (error) {
                 console.error('Error checking owner status:', error);
                 isOwner = false;
+                
+                const adminStatus = document.getElementById('adminStatus');
+                adminStatus.textContent = 'Error';
+                adminStatus.classList.remove('hidden');
             }
         }
 
@@ -850,28 +912,35 @@
             document.getElementById('networkIndicator').classList.add('offline');
             document.getElementById('connectWallet').textContent = 'Connect Wallet';
             document.getElementById('connectWallet').disabled = false;
+            
+            // Disable all admin buttons
+            const adminButtons = document.querySelectorAll(
+                '#startPresaleBtn, #endPresaleBtn, #addWhitelistPointsBtn, #updateStakingPlanBtn, #withdrawFundsBtn, #recoverTokensBtn'
+            );
+            adminButtons.forEach(btn => {
+                btn.disabled = true;
+            });
         }
 
         function checkAutoConnect() {
             if (window.ethereum && window.ethereum.selectedAddress) {
+                console.log('Auto-connecting wallet...');
                 connectWallet();
             }
         }
 
         async function updateAdminUI() {
-            if (!isConnected) return;
+            if (!isConnected || !isOwner) return;
             
             try {
                 document.getElementById('walletAddress').textContent = 
                     `${userAddress.substring(0, 6)}...${userAddress.substring(userAddress.length - 4)}`;
                 
-                if (isOwner) {
-                    await updatePresaleStatus();
-                    await updateVestingStatus();
-                    await updateTiersInfo();
-                    await updateStakingInfo();
-                    await updateFundsInfo();
-                }
+                await updatePresaleStatus();
+                await updateVestingStatus();
+                await updateTiersInfo();
+                await updateStakingInfo();
+                await updateFundsInfo();
                 
             } catch (error) {
                 console.error('Error updating admin UI:', error);
@@ -880,15 +949,13 @@
 
         async function updatePresaleStatus() {
             try {
+                console.log('Updating presale status...');
                 const presaleActive = await contract.presaleActive();
                 const startTime = await contract.startTime();
                 const endTime = await contract.endTime();
                 const totalSold = await contract.totalSold();
                 const [soldPercent, totalRaised] = await contract.getPresaleProgress();
                 
-                document.getElementById('presaleStatus').textContent = presaleActive ? 
-                    '<span class="status-active">Active</span>' : 
-                    '<span class="status-inactive">Inactive</span>';
                 document.getElementById('presaleStatus').innerHTML = presaleActive ? 
                     '<span class="status-active">Active</span>' : 
                     '<span class="status-inactive">Inactive</span>';
