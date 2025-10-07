@@ -117,6 +117,11 @@
             background-color: #c0392b;
         }
         
+        .btn:disabled {
+            background-color: var(--gray);
+            cursor: not-allowed;
+        }
+        
         .card {
             background: white;
             border-radius: 10px;
@@ -164,12 +169,17 @@
             font-weight: 500;
         }
         
-        input, select {
+        input, select, textarea {
             width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
             font-size: 16px;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 80px;
         }
         
         .tabs {
@@ -260,6 +270,44 @@
             border-radius: 5px;
         }
         
+        .owner-info {
+            border-left: 4px solid var(--success);
+            background-color: rgba(46, 204, 113, 0.1);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: var(--light);
+            border-radius: 5px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: var(--success);
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+        
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        .status-active {
+            color: var(--success);
+            font-weight: bold;
+        }
+        
+        .status-inactive {
+            color: var(--accent);
+            font-weight: bold;
+        }
+        
         @media (max-width: 768px) {
             .grid {
                 grid-template-columns: 1fr;
@@ -289,6 +337,22 @@
                 </div>
             </div>
         </header>
+
+        <!-- Owner Information -->
+        <div id="ownerInfo" class="owner-info hidden">
+            <div class="stats">
+                <span class="stat-label">Contract Owner:</span>
+                <span id="contractOwner" class="stat-value">-</span>
+            </div>
+            <div class="stats">
+                <span class="stat-label">Your Address:</span>
+                <span id="yourAddress" class="stat-value">-</span>
+            </div>
+            <div class="stats">
+                <span class="stat-label">Status:</span>
+                <span id="ownerMatchStatus" class="stat-value">-</span>
+            </div>
+        </div>
         
         <div class="tabs">
             <div class="tab active" data-tab="presaleControl">Presale Control</div>
@@ -323,6 +387,13 @@
                         <span class="stat-label">Total Raised:</span>
                         <span id="adminTotalRaised" class="stat-value">0 USDT</span>
                     </div>
+                    <div class="progress-bar">
+                        <div id="presaleProgress" class="progress" style="width: 0%"></div>
+                    </div>
+                    <div class="stats">
+                        <span class="stat-label">Progress:</span>
+                        <span id="presaleProgressPercent" class="stat-value">0%</span>
+                    </div>
                 </div>
                 
                 <div class="card">
@@ -330,10 +401,10 @@
                     <div class="admin-section">
                         <div class="form-group">
                             <label for="presaleDuration">Presale Duration (Days)</label>
-                            <input type="number" id="presaleDuration" placeholder="Enter duration in days" min="1" max="365">
+                            <input type="number" id="presaleDuration" placeholder="Enter duration in days" min="1" max="365" value="30">
                         </div>
                         <div class="form-group">
-                            <button id="startPresaleBtn" class="btn btn-success">Start Presale</button>
+                            <button id="startPresaleBtn" class="btn btn-success" disabled>Start Presale</button>
                         </div>
                         <div id="startPresaleStatus" class="alert hidden"></div>
                     </div>
@@ -369,19 +440,24 @@
                         <span class="stat-label">Vesting Start Delay:</span>
                         <span class="stat-value">7 Days</span>
                     </div>
+                    <div class="stats">
+                        <span class="stat-label">Time Until Vesting:</span>
+                        <span id="timeUntilVesting" class="stat-value">-</span>
+                    </div>
                 </div>
                 
                 <div class="card">
                     <div class="card-title">End Presale & Start Vesting</div>
                     <div class="admin-section">
-                        <p>This will:</p>
-                        <ul>
+                        <p><strong>This action will:</strong></p>
+                        <ul style="margin-left: 20px; margin-bottom: 15px;">
                             <li>End the presale immediately</li>
                             <li>Start vesting period after 7 days delay</li>
                             <li>Allow users to claim their tokens</li>
+                            <li><strong>Cannot be undone!</strong></li>
                         </ul>
                         <div class="form-group">
-                            <button id="endPresaleBtn" class="btn btn-warning">End Presale & Start Vesting</button>
+                            <button id="endPresaleBtn" class="btn btn-warning" disabled>End Presale & Start Vesting</button>
                         </div>
                         <div id="endPresaleStatus" class="alert hidden"></div>
                     </div>
@@ -402,15 +478,17 @@
                 <div class="card-title">Add Whitelist Points</div>
                 <div class="admin-section">
                     <div class="form-group">
-                        <label for="whitelistAddresses">Addresses (comma separated)</label>
-                        <textarea id="whitelistAddresses" placeholder="0x123...,0x456..." rows="3"></textarea>
+                        <label for="whitelistAddresses">Addresses (one per line or comma separated)</label>
+                        <textarea id="whitelistAddresses" placeholder="0x123...
+0x456...
+0x789..."></textarea>
                     </div>
                     <div class="form-group">
                         <label for="whitelistPoints">Points for each address</label>
-                        <input type="number" id="whitelistPoints" placeholder="Enter points">
+                        <input type="number" id="whitelistPoints" placeholder="Enter points" min="1" value="10">
                     </div>
                     <div class="form-group">
-                        <button id="addWhitelistPointsBtn" class="btn btn-primary">Add Whitelist Points</button>
+                        <button id="addWhitelistPointsBtn" class="btn btn-primary" disabled>Add Whitelist Points</button>
                     </div>
                     <div id="whitelistStatus" class="alert hidden"></div>
                 </div>
@@ -430,6 +508,10 @@
                         <span class="stat-label">Total Rewards Distributed:</span>
                         <span id="adminTotalRewards" class="stat-value">0 NEX</span>
                     </div>
+                    <div class="stats">
+                        <span class="stat-label">Active Staking Plans:</span>
+                        <span id="activeStakingPlans" class="stat-value">0/5</span>
+                    </div>
                 </div>
                 
                 <div class="card">
@@ -438,16 +520,16 @@
                         <div class="form-group">
                             <label for="stakingPlanPeriod">Staking Period</label>
                             <select id="stakingPlanPeriod">
-                                <option value="0">1 Month</option>
-                                <option value="1">2 Months</option>
-                                <option value="2">3 Months</option>
-                                <option value="3">6 Months</option>
-                                <option value="4">12 Months</option>
+                                <option value="0">1 Month (100% APY)</option>
+                                <option value="1">2 Months (150% APY)</option>
+                                <option value="2">3 Months (200% APY)</option>
+                                <option value="3">6 Months (300% APY)</option>
+                                <option value="4">12 Months (600% APY)</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="stakingPlanAPY">New APY (basis points - 10000 = 100%)</label>
-                            <input type="number" id="stakingPlanAPY" placeholder="e.g., 10000 for 100% APY">
+                            <input type="number" id="stakingPlanAPY" placeholder="e.g., 10000 for 100% APY" min="0" step="100">
                         </div>
                         <div class="form-group">
                             <label>
@@ -456,10 +538,17 @@
                             </label>
                         </div>
                         <div class="form-group">
-                            <button id="updateStakingPlanBtn" class="btn btn-primary">Update Staking Plan</button>
+                            <button id="updateStakingPlanBtn" class="btn btn-primary" disabled>Update Staking Plan</button>
                         </div>
                         <div id="stakingPlanStatus" class="alert hidden"></div>
                     </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Current Staking Plans</div>
+                <div id="stakingPlansList">
+                    <!-- Staking plans will be loaded here -->
                 </div>
             </div>
         </div>
@@ -470,12 +559,16 @@
                 <div class="card">
                     <div class="card-title">Contract Balances</div>
                     <div class="stats">
-                        <span class="stat-label">Native Balance:</span>
+                        <span class="stat-label">Native Balance (CORE):</span>
                         <span id="nativeBalance" class="stat-value">0 CORE</span>
                     </div>
                     <div class="stats">
                         <span class="stat-label">USDT Balance:</span>
                         <span id="usdtBalance" class="stat-value">0 USDT</span>
+                    </div>
+                    <div class="stats">
+                        <span class="stat-label">USDC Balance:</span>
+                        <span id="usdcBalance" class="stat-value">0 USDC</span>
                     </div>
                     <div class="stats">
                         <span class="stat-label">NEX Balance:</span>
@@ -500,11 +593,11 @@
                             <input type="text" id="customTokenAddress" placeholder="0x...">
                         </div>
                         <div class="form-group">
-                            <label for="withdrawAmount">Amount (0 for max)</label>
-                            <input type="number" id="withdrawAmount" placeholder="Enter amount">
+                            <label for="withdrawAmount">Amount (0 for maximum available)</label>
+                            <input type="number" id="withdrawAmount" placeholder="Enter amount" min="0" step="0.001" value="0">
                         </div>
                         <div class="form-group">
-                            <button id="withdrawFundsBtn" class="btn btn-warning">Withdraw Funds</button>
+                            <button id="withdrawFundsBtn" class="btn btn-warning" disabled>Withdraw Funds</button>
                         </div>
                         <div id="withdrawStatus" class="alert hidden"></div>
                     </div>
@@ -514,18 +607,19 @@
             <div class="card">
                 <div class="card-title">Recovery Functions</div>
                 <div class="danger-section">
+                    <p><strong>Warning:</strong> Use this only to recover accidentally sent ERC20 tokens (excluding NEX tokens).</p>
                     <div class="form-group">
                         <label for="recoverTokenAddress">Token Address to Recover</label>
                         <input type="text" id="recoverTokenAddress" placeholder="0x...">
                     </div>
                     <div class="form-group">
-                        <label for="recoverAmount">Amount to Recover</label>
-                        <input type="number" id="recoverAmount" placeholder="Enter amount">
+                        <label for="recoverAmount">Amount to Recover (0 for maximum)</label>
+                        <input type="number" id="recoverAmount" placeholder="Enter amount" min="0" step="0.001" value="0">
                     </div>
                     <div class="form-group">
-                        <button id="recoverTokensBtn" class="btn btn-danger">Recover ERC20 Tokens</button>
+                        <button id="recoverTokensBtn" class="btn btn-danger" disabled>Recover ERC20 Tokens</button>
                     </div>
-                    <small>Note: Cannot recover NEX tokens</small>
+                    <small>Note: Cannot recover NEX tokens. Funds will be sent to owner address.</small>
                     <div id="recoverStatus" class="alert hidden"></div>
                 </div>
             </div>
@@ -653,6 +747,10 @@
 
         async function connectWallet() {
             try {
+                const button = document.getElementById('connectWallet');
+                button.textContent = 'Connecting...';
+                button.disabled = true;
+                
                 await window.ethereum.request({ method: 'eth_requestAccounts' });
                 
                 signer = provider.getSigner();
@@ -666,9 +764,14 @@
                 await checkOwnerStatus();
                 updateAdminUI();
                 
+                button.textContent = 'Connected';
+                
             } catch (error) {
                 console.error('Error connecting wallet:', error);
                 alert('Gagal menghubungkan wallet: ' + error.message);
+                const button = document.getElementById('connectWallet');
+                button.textContent = 'Connect Wallet';
+                button.disabled = false;
             }
         }
 
@@ -695,12 +798,39 @@
                 isOwner = (contractOwner.toLowerCase() === userAddress.toLowerCase());
                 
                 const adminStatus = document.getElementById('adminStatus');
+                const ownerInfo = document.getElementById('ownerInfo');
+                
                 if (isOwner) {
                     adminStatus.textContent = 'Owner';
                     adminStatus.classList.remove('hidden');
+                    ownerInfo.classList.remove('hidden');
+                    
+                    // Enable all admin buttons
+                    document.querySelectorAll('#presaleControl .btn, #vestingControl .btn, #tierManagement .btn, #stakingManagement .btn, #fundManagement .btn').forEach(btn => {
+                        btn.disabled = false;
+                    });
                 } else {
                     adminStatus.textContent = 'Not Owner';
                     adminStatus.classList.remove('hidden');
+                    ownerInfo.classList.remove('hidden');
+                    
+                    // Disable all admin buttons
+                    document.querySelectorAll('#presaleControl .btn, #vestingControl .btn, #tierManagement .btn, #stakingManagement .btn, #fundManagement .btn').forEach(btn => {
+                        btn.disabled = true;
+                    });
+                }
+                
+                // Update owner info
+                document.getElementById('contractOwner').textContent = contractOwner;
+                document.getElementById('yourAddress').textContent = userAddress;
+                
+                const ownerMatchStatus = document.getElementById('ownerMatchStatus');
+                if (isOwner) {
+                    ownerMatchStatus.textContent = '✅ Anda adalah Owner';
+                    ownerMatchStatus.className = 'stat-value status-active';
+                } else {
+                    ownerMatchStatus.textContent = '❌ Bukan Owner';
+                    ownerMatchStatus.className = 'stat-value status-inactive';
                 }
                 
             } catch (error) {
@@ -716,7 +846,10 @@
             signer = null;
             document.getElementById('walletAddress').textContent = 'Not Connected';
             document.getElementById('adminStatus').classList.add('hidden');
+            document.getElementById('ownerInfo').classList.add('hidden');
             document.getElementById('networkIndicator').classList.add('offline');
+            document.getElementById('connectWallet').textContent = 'Connect Wallet';
+            document.getElementById('connectWallet').disabled = false;
         }
 
         function checkAutoConnect() {
@@ -753,15 +886,29 @@
                 const totalSold = await contract.totalSold();
                 const [soldPercent, totalRaised] = await contract.getPresaleProgress();
                 
-                document.getElementById('presaleStatus').textContent = presaleActive ? 'Active' : 'Inactive';
+                document.getElementById('presaleStatus').textContent = presaleActive ? 
+                    '<span class="status-active">Active</span>' : 
+                    '<span class="status-inactive">Inactive</span>';
+                document.getElementById('presaleStatus').innerHTML = presaleActive ? 
+                    '<span class="status-active">Active</span>' : 
+                    '<span class="status-inactive">Inactive</span>';
+                
                 document.getElementById('presaleStartTime').textContent = startTime.gt(0) ? 
                     new Date(startTime * 1000).toLocaleString() : 'Not Started';
                 document.getElementById('presaleEndTime').textContent = endTime.gt(0) ? 
                     new Date(endTime * 1000).toLocaleString() : 'Not Set';
                 document.getElementById('adminTotalSold').textContent = 
-                    ethers.utils.formatUnits(totalSold, 18).split('.')[0] + ' NEX';
+                    parseFloat(ethers.utils.formatUnits(totalSold, 18)).toLocaleString() + ' NEX';
                 document.getElementById('adminTotalRaised').textContent = 
-                    ethers.utils.formatUnits(totalRaised, 18).split('.')[0] + ' USDT';
+                    parseFloat(ethers.utils.formatUnits(totalRaised, 18)).toLocaleString() + ' USDT';
+                
+                // Update progress bar
+                document.getElementById('presaleProgress').style.width = soldPercent + '%';
+                document.getElementById('presaleProgressPercent').textContent = soldPercent + '%';
+                
+                // Update button states
+                document.getElementById('startPresaleBtn').disabled = presaleActive;
+                document.getElementById('endPresaleBtn').disabled = !presaleActive;
                 
                 // Load early bird bonuses
                 await loadEarlyBirdBonuses();
@@ -776,14 +923,16 @@
                 const container = document.getElementById('earlyBirdList');
                 container.innerHTML = '';
                 
+                const timeLabels = ['24 Hours', '72 Hours', '7 Days', '14 Days'];
+                
                 for (let i = 0; i < 4; i++) {
                     try {
                         const bonus = await contract.earlyBirdBonuses(i);
                         const bonusElement = document.createElement('div');
                         bonusElement.className = 'stats';
                         bonusElement.innerHTML = `
-                            <span class="stat-label">Bonus ${i + 1}:</span>
-                            <span class="stat-value">${bonus.bonusPercent}% (${bonus.timeLimit / 3600}h)</span>
+                            <span class="stat-label">${timeLabels[i]}:</span>
+                            <span class="stat-value">${bonus.bonusPercent}% Bonus</span>
                         `;
                         container.appendChild(bonusElement);
                     } catch (error) {
@@ -801,9 +950,27 @@
                 const vestingStarted = await contract.vestingStarted();
                 const vestingStartTime = await contract.vestingStartTime();
                 
-                document.getElementById('vestingStatus').textContent = vestingStarted ? 'Active' : 'Inactive';
+                document.getElementById('vestingStatus').innerHTML = vestingStarted ? 
+                    '<span class="status-active">Active</span>' : 
+                    '<span class="status-inactive">Inactive</span>';
+                
                 document.getElementById('vestingStartTime').textContent = vestingStartTime.gt(0) ? 
                     new Date(vestingStartTime * 1000).toLocaleString() : 'Not Started';
+                
+                // Calculate time until vesting
+                if (vestingStartTime.gt(0)) {
+                    const now = Math.floor(Date.now() / 1000);
+                    if (vestingStartTime.gt(now)) {
+                        const timeLeft = vestingStartTime.sub(now);
+                        const days = Math.floor(timeLeft / 86400);
+                        const hours = Math.floor((timeLeft % 86400) / 3600);
+                        document.getElementById('timeUntilVesting').textContent = `${days}d ${hours}h`;
+                    } else {
+                        document.getElementById('timeUntilVesting').textContent = 'Vesting Started';
+                    }
+                } else {
+                    document.getElementById('timeUntilVesting').textContent = 'Not Scheduled';
+                }
                 
             } catch (error) {
                 console.error('Error updating vesting status:', error);
@@ -823,7 +990,11 @@
                     tierElement.className = 'stats';
                     tierElement.innerHTML = `
                         <span class="stat-label">${tierNames[i]}:</span>
-                        <span class="stat-value">${ethers.utils.formatUnits(tier.minAllocationUSDT, 18)}-${ethers.utils.formatUnits(tier.maxAllocationUSDT, 18)} USDT | ${tier.extraAllocation}% Bonus | ${tier.requiredPoints} Points</span>
+                        <span class="stat-value">
+                            ${parseFloat(ethers.utils.formatUnits(tier.minAllocationUSDT, 18))}-${parseFloat(ethers.utils.formatUnits(tier.maxAllocationUSDT, 18))} USDT | 
+                            +${tier.extraAllocation}% Bonus | 
+                            ${tier.requiredPoints} Points
+                        </span>
                     `;
                     container.appendChild(tierElement);
                 }
@@ -839,12 +1010,48 @@
                 const totalRewards = await contract.totalStakingRewards();
                 
                 document.getElementById('adminTotalStaked').textContent = 
-                    ethers.utils.formatUnits(totalStaked, 18).split('.')[0] + ' NEX';
+                    parseFloat(ethers.utils.formatUnits(totalStaked, 18)).toLocaleString() + ' NEX';
                 document.getElementById('adminTotalRewards').textContent = 
-                    ethers.utils.formatUnits(totalRewards, 18).split('.')[0] + ' NEX';
+                    parseFloat(ethers.utils.formatUnits(totalRewards, 18)).toLocaleString() + ' NEX';
+                
+                // Load staking plans
+                await loadStakingPlans();
                 
             } catch (error) {
                 console.error('Error updating staking info:', error);
+            }
+        }
+
+        async function loadStakingPlans() {
+            try {
+                const container = document.getElementById('stakingPlansList');
+                container.innerHTML = '';
+                
+                const planNames = ['1 Month', '2 Months', '3 Months', '6 Months', '12 Months'];
+                let activeCount = 0;
+                
+                for (let i = 0; i < 5; i++) {
+                    const plan = await contract.stakingPlans(i);
+                    const planElement = document.createElement('div');
+                    planElement.className = 'stats';
+                    const apyPercent = (plan.apy / 100).toFixed(0);
+                    planElement.innerHTML = `
+                        <span class="stat-label">${planNames[i]}:</span>
+                        <span class="stat-value">
+                            ${apyPercent}% APY | 
+                            ${plan.active ? '<span style="color: green">Active</span>' : '<span style="color: red">Inactive</span>'} |
+                            ${Math.floor(plan.duration / 86400)} days
+                        </span>
+                    `;
+                    container.appendChild(planElement);
+                    
+                    if (plan.active) activeCount++;
+                }
+                
+                document.getElementById('activeStakingPlans').textContent = `${activeCount}/5`;
+                
+            } catch (error) {
+                console.error('Error loading staking plans:', error);
             }
         }
 
@@ -853,21 +1060,27 @@
                 // Get native balance
                 const nativeBalance = await provider.getBalance(CONTRACT_ADDRESS);
                 document.getElementById('nativeBalance').textContent = 
-                    ethers.utils.formatEther(nativeBalance) + ' CORE';
+                    parseFloat(ethers.utils.formatEther(nativeBalance)).toFixed(4) + ' CORE';
                 
                 // Get USDT balance
                 const usdtAbi = ["function balanceOf(address) view returns (uint256)"];
                 const usdtContract = new ethers.Contract(USDT_ADDRESS, usdtAbi, provider);
                 const usdtBalance = await usdtContract.balanceOf(CONTRACT_ADDRESS);
                 document.getElementById('usdtBalance').textContent = 
-                    ethers.utils.formatUnits(usdtBalance, 18) + ' USDT';
+                    parseFloat(ethers.utils.formatUnits(usdtBalance, 18)).toLocaleString() + ' USDT';
+                
+                // Get USDC balance
+                const usdcContract = new ethers.Contract(USDC_ADDRESS, usdtAbi, provider);
+                const usdcBalance = await usdcContract.balanceOf(CONTRACT_ADDRESS);
+                document.getElementById('usdcBalance').textContent = 
+                    parseFloat(ethers.utils.formatUnits(usdcBalance, 18)).toLocaleString() + ' USDC';
                 
                 // Get NEX balance
                 const nexTokenAddress = await contract.nexToken();
                 const nexContract = new ethers.Contract(nexTokenAddress, usdtAbi, provider);
                 const nexBalance = await nexContract.balanceOf(CONTRACT_ADDRESS);
                 document.getElementById('nexBalance').textContent = 
-                    ethers.utils.formatUnits(nexBalance, 18) + ' NEX';
+                    parseFloat(ethers.utils.formatUnits(nexBalance, 18)).toLocaleString() + ' NEX';
                 
             } catch (error) {
                 console.error('Error updating funds info:', error);
@@ -890,9 +1103,14 @@
             
             try {
                 const statusElement = document.getElementById('startPresaleStatus');
+                const button = document.getElementById('startPresaleBtn');
+                
                 statusElement.textContent = 'Mengirim transaksi...';
                 statusElement.className = 'alert alert-warning';
                 statusElement.classList.remove('hidden');
+                
+                button.textContent = 'Processing...';
+                button.disabled = true;
                 
                 const tx = await contract.startPresale(duration);
                 statusElement.textContent = 'Transaksi dikirim! TX Hash: ' + tx.hash;
@@ -900,6 +1118,9 @@
                 await tx.wait();
                 statusElement.textContent = 'Presale berhasil dimulai!';
                 statusElement.className = 'alert alert-success';
+                
+                button.textContent = 'Start Presale';
+                button.disabled = true; // Tetap disabled karena presale sudah aktif
                 
                 updateAdminUI();
                 
@@ -909,6 +1130,10 @@
                 statusElement.textContent = 'Gagal memulai presale: ' + error.message;
                 statusElement.className = 'alert alert-danger';
                 statusElement.classList.remove('hidden');
+                
+                const button = document.getElementById('startPresaleBtn');
+                button.textContent = 'Start Presale';
+                button.disabled = false;
             }
         }
 
@@ -918,15 +1143,30 @@
                 return;
             }
             
-            if (!confirm('Apakah Anda yakin ingin mengakhiri presale dan memulai vesting? Tindakan ini tidak dapat dibatalkan.')) {
-                return;
-            }
+            // Get owner address for confirmation
+            const ownerAddress = await contract.owner();
+            
+            const confirmation = confirm(
+                `Konfirmasi End Presale:\n\n` +
+                `Tindakan ini akan:\n` +
+                `• Mengakhiri presale secara permanen\n` +
+                `• Memulai periode vesting setelah 7 hari\n` +
+                `• Dana akan dikirim ke: ${ownerAddress}\n\n` +
+                `Apakah Anda yakin?`
+            );
+            
+            if (!confirmation) return;
             
             try {
                 const statusElement = document.getElementById('endPresaleStatus');
+                const button = document.getElementById('endPresaleBtn');
+                
                 statusElement.textContent = 'Mengirim transaksi...';
                 statusElement.className = 'alert alert-warning';
                 statusElement.classList.remove('hidden');
+                
+                button.textContent = 'Processing...';
+                button.disabled = true;
                 
                 const tx = await contract.endPresaleAndStartVesting();
                 statusElement.textContent = 'Transaksi dikirim! TX Hash: ' + tx.hash;
@@ -934,6 +1174,9 @@
                 await tx.wait();
                 statusElement.textContent = 'Presale berhasil diakhiri dan vesting dimulai!';
                 statusElement.className = 'alert alert-success';
+                
+                button.textContent = 'End Presale & Start Vesting';
+                button.disabled = true; // Tetap disabled karena presale sudah berakhir
                 
                 updateAdminUI();
                 
@@ -943,6 +1186,10 @@
                 statusElement.textContent = 'Gagal mengakhiri presale: ' + error.message;
                 statusElement.className = 'alert alert-danger';
                 statusElement.classList.remove('hidden');
+                
+                const button = document.getElementById('endPresaleBtn');
+                button.textContent = 'End Presale & Start Vesting';
+                button.disabled = false;
             }
         }
 
@@ -960,7 +1207,16 @@
                 return;
             }
             
-            const addresses = addressesInput.split(',').map(addr => addr.trim()).filter(addr => addr !== '');
+            // Parse addresses (support both comma separated and new line)
+            const addresses = addressesInput.split(/[,\n]/)
+                .map(addr => addr.trim())
+                .filter(addr => addr !== '');
+            
+            if (addresses.length === 0) {
+                alert('Tidak ada alamat yang valid');
+                return;
+            }
+            
             const pointsArray = Array(addresses.length).fill(points);
             
             // Validasi alamat
@@ -971,22 +1227,39 @@
                 }
             }
             
+            const confirmation = confirm(
+                `Konfirmasi Add Whitelist Points:\n\n` +
+                `Jumlah Alamat: ${addresses.length}\n` +
+                `Points per Alamat: ${points}\n` +
+                `Total Points: ${addresses.length * points}\n\n` +
+                `Apakah Anda yakin?`
+            );
+            
+            if (!confirmation) return;
+            
             try {
                 const statusElement = document.getElementById('whitelistStatus');
+                const button = document.getElementById('addWhitelistPointsBtn');
+                
                 statusElement.textContent = `Menambah ${points} points ke ${addresses.length} alamat...`;
                 statusElement.className = 'alert alert-warning';
                 statusElement.classList.remove('hidden');
+                
+                button.textContent = 'Processing...';
+                button.disabled = true;
                 
                 const tx = await contract.addWhitelistPoints(addresses, pointsArray);
                 statusElement.textContent = 'Transaksi dikirim! TX Hash: ' + tx.hash;
                 
                 await tx.wait();
-                statusElement.textContent = `Berhasil menambah points ke ${addresses.length} alamat!`;
+                statusElement.textContent = `Berhasil menambah ${points} points ke ${addresses.length} alamat!`;
                 statusElement.className = 'alert alert-success';
+                
+                button.textContent = 'Add Whitelist Points';
+                button.disabled = false;
                 
                 // Clear form
                 document.getElementById('whitelistAddresses').value = '';
-                document.getElementById('whitelistPoints').value = '';
                 
             } catch (error) {
                 console.error('Error adding whitelist points:', error);
@@ -994,6 +1267,10 @@
                 statusElement.textContent = 'Gagal menambah points: ' + error.message;
                 statusElement.className = 'alert alert-danger';
                 statusElement.classList.remove('hidden');
+                
+                const button = document.getElementById('addWhitelistPointsBtn');
+                button.textContent = 'Add Whitelist Points';
+                button.disabled = false;
             }
         }
 
@@ -1007,16 +1284,34 @@
             const apy = document.getElementById('stakingPlanAPY').value;
             const active = document.getElementById('stakingPlanActive').checked;
             
-            if (!apy) {
+            if (!apy || apy < 0) {
                 alert('Masukkan APY yang valid');
                 return;
             }
             
+            const planNames = ['1 Month', '2 Months', '3 Months', '6 Months', '12 Months'];
+            const apyPercent = (apy / 100).toFixed(0);
+            
+            const confirmation = confirm(
+                `Konfirmasi Update Staking Plan:\n\n` +
+                `Plan: ${planNames[period]}\n` +
+                `New APY: ${apyPercent}%\n` +
+                `Status: ${active ? 'Active' : 'Inactive'}\n\n` +
+                `Apakah Anda yakin?`
+            );
+            
+            if (!confirmation) return;
+            
             try {
                 const statusElement = document.getElementById('stakingPlanStatus');
+                const button = document.getElementById('updateStakingPlanBtn');
+                
                 statusElement.textContent = 'Mengupdate staking plan...';
                 statusElement.className = 'alert alert-warning';
                 statusElement.classList.remove('hidden');
+                
+                button.textContent = 'Processing...';
+                button.disabled = true;
                 
                 const tx = await contract.updateStakingPlan(period, apy, active);
                 statusElement.textContent = 'Transaksi dikirim! TX Hash: ' + tx.hash;
@@ -1025,12 +1320,21 @@
                 statusElement.textContent = 'Staking plan berhasil diupdate!';
                 statusElement.className = 'alert alert-success';
                 
+                button.textContent = 'Update Staking Plan';
+                button.disabled = false;
+                
+                updateAdminUI();
+                
             } catch (error) {
                 console.error('Error updating staking plan:', error);
                 const statusElement = document.getElementById('stakingPlanStatus');
                 statusElement.textContent = 'Gagal mengupdate staking plan: ' + error.message;
                 statusElement.className = 'alert alert-danger';
                 statusElement.classList.remove('hidden');
+                
+                const button = document.getElementById('updateStakingPlanBtn');
+                button.textContent = 'Update Staking Plan';
+                button.disabled = false;
             }
         }
 
@@ -1054,16 +1358,20 @@
             const tokenType = document.getElementById('withdrawToken').value;
             const amount = document.getElementById('withdrawAmount').value;
             let tokenAddress;
+            let tokenName;
             
             switch (tokenType) {
                 case 'native':
                     tokenAddress = ethers.constants.AddressZero;
+                    tokenName = 'CORE';
                     break;
                 case 'usdt':
                     tokenAddress = USDT_ADDRESS;
+                    tokenName = 'USDT';
                     break;
                 case 'usdc':
                     tokenAddress = USDC_ADDRESS;
+                    tokenName = 'USDC';
                     break;
                 case 'other':
                     tokenAddress = document.getElementById('customTokenAddress').value;
@@ -1071,18 +1379,39 @@
                         alert('Alamat token tidak valid');
                         return;
                     }
+                    tokenName = 'ERC20 Token';
                     break;
             }
+            
+            // Get owner address for confirmation
+            const ownerAddress = await contract.owner();
             
             const withdrawAmount = amount === '' || amount === '0' ? 
                 ethers.constants.MaxUint256 : 
                 ethers.utils.parseUnits(amount, tokenType === 'native' ? 18 : 18);
             
+            const amountDisplay = amount === '' || amount === '0' ? 'SEMUA' : amount + ' ' + tokenName;
+            
+            const confirmation = confirm(
+                `Konfirmasi Withdraw:\n\n` +
+                `Token: ${tokenName}\n` +
+                `Amount: ${amountDisplay}\n` +
+                `Tujuan: ${ownerAddress}\n\n` +
+                `Apakah Anda yakin?`
+            );
+            
+            if (!confirmation) return;
+            
             try {
                 const statusElement = document.getElementById('withdrawStatus');
+                const button = document.getElementById('withdrawFundsBtn');
+                
                 statusElement.textContent = 'Menarik dana...';
                 statusElement.className = 'alert alert-warning';
                 statusElement.classList.remove('hidden');
+                
+                button.textContent = 'Processing...';
+                button.disabled = true;
                 
                 const tx = await contract.withdrawFunds(tokenAddress, withdrawAmount);
                 statusElement.textContent = 'Transaksi dikirim! TX Hash: ' + tx.hash;
@@ -1090,6 +1419,9 @@
                 await tx.wait();
                 statusElement.textContent = 'Dana berhasil ditarik!';
                 statusElement.className = 'alert alert-success';
+                
+                button.textContent = 'Withdraw Funds';
+                button.disabled = false;
                 
                 updateFundsInfo();
                 
@@ -1099,6 +1431,10 @@
                 statusElement.textContent = 'Gagal menarik dana: ' + error.message;
                 statusElement.className = 'alert alert-danger';
                 statusElement.classList.remove('hidden');
+                
+                const button = document.getElementById('withdrawFundsBtn');
+                button.textContent = 'Withdraw Funds';
+                button.disabled = false;
             }
         }
 
@@ -1116,18 +1452,35 @@
                 return;
             }
             
-            if (!amount || amount <= 0) {
-                alert('Masukkan jumlah yang valid');
-                return;
-            }
+            // Get owner address for confirmation
+            const ownerAddress = await contract.owner();
             
-            const recoverAmount = ethers.utils.parseUnits(amount, 18);
+            const recoverAmount = amount === '' || amount === '0' ? 
+                ethers.constants.MaxUint256 : 
+                ethers.utils.parseUnits(amount, 18);
+            
+            const amountDisplay = amount === '' || amount === '0' ? 'SEMUA' : amount;
+            
+            const confirmation = confirm(
+                `Konfirmasi Recovery:\n\n` +
+                `Token: ${tokenAddress}\n` +
+                `Amount: ${amountDisplay}\n` +
+                `Tujuan: ${ownerAddress}\n\n` +
+                `Apakah Anda yakin?`
+            );
+            
+            if (!confirmation) return;
             
             try {
                 const statusElement = document.getElementById('recoverStatus');
+                const button = document.getElementById('recoverTokensBtn');
+                
                 statusElement.textContent = 'Melakukan recovery token...';
                 statusElement.className = 'alert alert-warning';
                 statusElement.classList.remove('hidden');
+                
+                button.textContent = 'Processing...';
+                button.disabled = true;
                 
                 const tx = await contract.recoverERC20(tokenAddress, recoverAmount);
                 statusElement.textContent = 'Transaksi dikirim! TX Hash: ' + tx.hash;
@@ -1136,12 +1489,23 @@
                 statusElement.textContent = 'Token berhasil di-recover!';
                 statusElement.className = 'alert alert-success';
                 
+                button.textContent = 'Recover ERC20 Tokens';
+                button.disabled = false;
+                
+                // Clear form
+                document.getElementById('recoverTokenAddress').value = '';
+                document.getElementById('recoverAmount').value = '0';
+                
             } catch (error) {
                 console.error('Error recovering tokens:', error);
                 const statusElement = document.getElementById('recoverStatus');
                 statusElement.textContent = 'Gagal melakukan recovery: ' + error.message;
                 statusElement.className = 'alert alert-danger';
                 statusElement.classList.remove('hidden');
+                
+                const button = document.getElementById('recoverTokensBtn');
+                button.textContent = 'Recover ERC20 Tokens';
+                button.disabled = false;
             }
         }
     </script>
