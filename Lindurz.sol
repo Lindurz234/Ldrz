@@ -47,10 +47,10 @@ contract QUANTUM is ERC20Interface, SafeMath {
      * Initializes contract with initial supply tokens to the creator of the contract
      */
     constructor() public {
-        name = "Iridescent";
-        symbol = "CENT";
+        name = "Tes Token A";
+        symbol = "TTA";
         decimals = 18;
-        _totalSupply = 3200000 * 10 ** 18;
+        _totalSupply = 320000000 * 10 ** 18;
 
         balances[msg.sender] = _totalSupply;
         emit Transfer(address(0), msg.sender, _totalSupply);
