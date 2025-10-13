@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.30;
 
-/// @title CozySwap Treasury
+/// @title CozySwapTreasury
 /// @notice Treasury receive eth erc20
 contract CozySwapTreasury {
     address public owner;
