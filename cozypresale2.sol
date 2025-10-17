@@ -15,7 +15,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * - Presale otomatis aktif selama 3 bulan saat diaktifkan
  */
 contract CozyTokenPresale is Ownable, ReentrancyGuard {
-    IERC20 public immutable cozyToken = IERC20(0x06e2ef46662834f4e42dbf9ff9222b077c57df5c);
+    IERC20 public immutable cozyToken = IERC20(0x06E2Ef46662834F4E42dBf9fF9222B077C57dF5C);
 
     uint256 public constant MAX_SUPPLY = 120_000_000 * 10**18;
     uint256 public constant PRESALE_PERCENTAGE = 20;
