@@ -7,12 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
  * @title CozyTokenPresale
- * @notice Presale resmi token COZY di jaringan Plasma 9745.
- * - Hanya menerima native XPL
- * - Tidak perlu parameter saat deploy
- * - Bisa menerima & mengirim XPL dan token ERC lainnya
- * - Owner dapat menarik XPL atau token salah kirim
- * - Presale otomatis aktif selama 3 bulan saat diaktifkan
+ * @notice Presale COZY Token on Plasma chain 9745.
  */
 contract CozyTokenPresale is Ownable, ReentrancyGuard {
     IERC20 public immutable cozyToken = IERC20(0x06E2Ef46662834F4E42dBf9fF9222B077C57dF5C);
