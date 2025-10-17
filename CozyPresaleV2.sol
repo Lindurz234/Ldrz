@@ -87,7 +87,7 @@ contract CozyTokenPresale is Ownable, ReentrancyGuard {
 
     function _processPurchase(address investor, uint256 xplAmount) internal {
         require(block.timestamp >= startTime && block.timestamp <= endTime, "Presale not running");
-        require(xplAmount >= 1 ether && xplAmount <= 1000 ether, "Buy limit 1–1000 XPL");
+        require(xplAmount >= 1 ether && xplAmount <= 1000 ether, "Buy limit 1-1000 XPL");
         require(totalRaised + xplAmount <= HARD_CAP, "Hard cap reached");
 
         uint256 tokensToReceive = xplAmount.mul(TOKENS_PER_XPL).div(1 ether);
