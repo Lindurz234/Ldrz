@@ -11,7 +11,7 @@ contract CozyTokenPresale is Ownable, ReentrancyGuard {
 
     // COZY Token Information
     IERC20 public cozyToken;
-    address public constant COZY_ADDRESS = 0x06e2Ef46662834f4E42DBf9fF9222b077C57df5C;
+    address public constant COZY_ADDRESS = 0x06E2Ef46662834F4E42dBf9fF9222B077C57dF5C;
 
     // Tokenomics
     uint256 public constant MAX_SUPPLY = 120_000_000 * 10**18;
