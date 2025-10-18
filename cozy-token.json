@@ -1,0 +1,33 @@
+{
+  "name": "Cozy Token",
+  "symbol": "COZY",
+  "type": "token",
+  "network": "Plasma Chain",
+  "contract_address": "0x06e2...df5c",
+  "decimals": 18,
+  "description": "Cozy Token (COZY) is the native utility token of CozySwap, a decentralized exchange (DEX) powered by Plasma Chain. It is designed to support liquidity pools, staking, governance, and community-driven development.",
+  "website": "https://cozyswap.org",
+  "explorer": "https://plasmascan.org/token/0x06e2...df5c",
+  "whitepaper": "https://cozyswap.org/whitepaper.pdf",
+  "status": "active",
+  "tags": ["DEX", "DeFi", "Liquidity", "Plasma", "Utility Token"],
+  "links": {
+    "twitter": "https://x.com/CozySwap",
+    "telegram": "https://t.me/CozySwap",
+    "discord": "https://discord.gg/cozyswap",
+    "github": "https://github.com/cozyswap",
+    "medium": "https://medium.com/@cozyswap",
+    "documentation": "https://docs.cozyswap.org"
+  },
+  "market_data": {
+    "price_usd": 0.0003846,
+    "fdv_usd": 46100,
+    "liquidity_usd": 13.7,
+    "volume_24h_usd": 0
+  },
+  "socials": {
+    "cozy_twitter": "@CozySwap",
+    "community": "https://t.me/CozySwapCommunity"
+  },
+  "disclaimer": "Cozy Token (COZY) is a decentralized digital asset with no central entity ownership. Users should conduct their own research (DYOR) before interacting with any smart contracts or decentralized applications associated with CozySwap."
+}
