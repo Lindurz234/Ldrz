@@ -549,17 +549,19 @@ function selectToken(type, token) {
 }
 
 // Simple toggle function
-function toggleDropdown(type) {
+function toggleDropdown(type, event) {
+  if (event) event.stopPropagation();
+  
   const dropdown = document.getElementById(`${type}Dropdown`);
   const allDropdowns = document.querySelectorAll('.token-dropdown');
-  
+
   // Close all other dropdowns
   allDropdowns.forEach(dd => {
     if (dd.id !== `${type}Dropdown`) {
       dd.style.display = 'none';
     }
   });
-  
+
   // Toggle current dropdown
   if (dropdown.style.display === 'block') {
     dropdown.style.display = 'none';
@@ -570,13 +572,65 @@ function toggleDropdown(type) {
 
 // Close dropdowns when clicking outside
 document.addEventListener('click', function(e) {
-  // Cek jika klik bukan di dalam token-select-container
+  // Only close if clicking outside token selectors
   if (!e.target.closest('.token-select-container')) {
     document.querySelectorAll('.token-dropdown').forEach(dd => {
       dd.style.display = 'none';
     });
   }
 });
+
+// Update juga event handlers di token options
+function refreshSelectors() {
+  const fromDropdown = document.getElementById('fromDropdown');
+  const toDropdown = document.getElementById('toDropdown');
+  
+  fromDropdown.innerHTML = '';
+  toDropdown.innerHTML = '';
+
+  tokens.forEach(token => {
+    // For FROM dropdown
+    const fromOption = document.createElement('div');
+    fromOption.className = 'token-option';
+    fromOption.innerHTML = `
+      <img src="${token.logoURI || getDefaultLogo(token.symbol)}" 
+           alt="${token.symbol}" 
+           class="token-logo-sm"
+           onerror="this.src='${getDefaultLogo(token.symbol)}'">
+      <div class="token-info">
+        <span class="token-symbol">${token.symbol}</span>
+        <span class="token-name">${token.name || token.symbol} Token</span>
+      </div>
+    `;
+    fromOption.onclick = (e) => {
+      e.stopPropagation(); // Important!
+      selectToken('from', token);
+    };
+    fromDropdown.appendChild(fromOption);
+
+    // For TO dropdown
+    const toOption = document.createElement('div');
+    toOption.className = 'token-option';
+    toOption.innerHTML = `
+      <img src="${token.logoURI || getDefaultLogo(token.symbol)}" 
+           alt="${token.symbol}" 
+           class="token-logo-sm"
+           onerror="this.src='${getDefaultLogo(token.symbol)}'">
+      <div class="token-info">
+        <span class="token-symbol">${token.symbol}</span>
+        <span class="token-name">${token.name || token.symbol} Token</span>
+      </div>
+    `;
+    toOption.onclick = (e) => {
+      e.stopPropagation(); // Important!
+      selectToken('to', token);
+    };
+    toDropdown.appendChild(toOption);
+  });
+
+  selectToken('from', selectedFromToken);
+  selectToken('to', selectedToToken);
+}
 
 
 function setStatus(s) {
