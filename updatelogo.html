@@ -549,13 +549,13 @@ function selectToken(type, token) {
 }
 
 // =========================================================
-// ✅ FIX: TOKEN SELECTOR LOGIC (Siap Tempel Ulang)
-// Pastikan hanya ada SATU definisi untuk fungsi-fungsi ini
+// ✅ FIX: MEMBUAT FUNGSI TERSEDIA SECARA GLOBAL
+// Pindahkan fungsi ini DI LUAR blok (async()=>{...})()
 // =========================================================
 
-// Fungsi untuk membuka/menutup dropdown
+// Fungsi untuk membuka/menutup dropdown (Harus di luar IIFE)
 function toggleDropdown(type, event) {
-  // **SANGAT PENTING:** Menghentikan event agar tidak menyebar ke event listener 'document' yang menutup dropdown.
+  // Menghentikan event agar tidak menyebar ke event listener 'document' yang menutup dropdown.
   if (event) event.stopPropagation(); 
 
   const dropdown = document.getElementById(`${type}Dropdown`);
@@ -572,7 +572,7 @@ function toggleDropdown(type, event) {
   dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
 }
 
-// Tutup dropdown saat klik di luar area token selector
+// Tutup dropdown saat klik di luar area token selector (Bisa tetap di dalam, tapi lebih rapi di luar)
 document.addEventListener('click', function(e) {
   // Periksa apakah target klik BUKAN bagian dari kontainer token selector
   if (!e.target.closest('.token-select-container')) {
@@ -582,118 +582,9 @@ document.addEventListener('click', function(e) {
   }
 });
 
-// Fungsi untuk mengisi ulang dropdown selector
-function refreshSelectors() {
-  // Perlu definisi fungsi lain yang dipakai di sini (getDefaultLogo, selectToken)
-  // Pastikan fungsi selectToken dan getDefaultLogo didefinisikan sebelumnya.
-
-  const fromDropdown = document.getElementById('fromDropdown');
-  const toDropdown = document.getElementById('toDropdown');
-
-  // Bersihkan opsi yang ada
-  fromDropdown.innerHTML = '';
-  toDropdown.innerHTML = '';
-
-  // Asumsi variabel 'tokens' sudah dimuat dan berisi data token
-  tokens.forEach(token => {
-    const optionHTML = `
-      <img src="${token.logoURI || getDefaultLogo(token.symbol)}" 
-           alt="${token.symbol}" 
-           class="token-logo-sm"
-           onerror="this.src='${getDefaultLogo(token.symbol)}'">
-      <div class="token-info">
-        <span class="token-symbol">${token.symbol}</span>
-        <span class="token-name">${token.name || token.symbol} Token</span>
-      </div>
-    `;
-
-    // --- FROM Dropdown ---
-    const fromOption = document.createElement('div');
-    fromOption.className = 'token-option';
-    fromOption.innerHTML = optionHTML;
-    fromOption.onclick = (e) => {
-      e.stopPropagation(); // Mencegah klik menyebar ke .selected-token (parent)
-      selectToken('from', token);
-    };
-    fromDropdown.appendChild(fromOption);
-
-    // --- TO Dropdown ---
-    const toOption = document.createElement('div');
-    toOption.className = 'token-option';
-    toOption.innerHTML = optionHTML;
-    toOption.onclick = (e) => {
-      e.stopPropagation(); // Mencegah klik menyebar ke .selected-token (parent)
-      selectToken('to', token);
-    };
-    toDropdown.appendChild(toOption);
-  });
-
-  // Perbarui tampilan token yang terpilih
-  selectToken('from', selectedFromToken);
-  selectToken('to', selectedToToken);
-}
-
-// Panggil refreshSelectors di awal (misal, di akhir (async ()=> { ... }) blok Anda)
-// Pastikan fungsi ini dipanggil setelah 'tokens', 'selectedFromToken', dan 'selectedToToken' didefinisikan.
-
-// =========================================================
-
-
-// Fungsi untuk mengisi ulang dropdown selector
-function refreshSelectors() {
-  const fromDropdown = document.getElementById('fromDropdown');
-  const toDropdown = document.getElementById('toDropdown');
-
-  // Bersihkan opsi yang ada
-  fromDropdown.innerHTML = '';
-  toDropdown.innerHTML = '';
-
-  // Buat opsi token untuk kedua dropdown
-  tokens.forEach(token => {
-    const optionHTML = `
-      <img src="${token.logoURI || getDefaultLogo(token.symbol)}" 
-           alt="${token.symbol}" 
-           class="token-logo-sm"
-           onerror="this.src='${getDefaultLogo(token.symbol)}'">
-      <div class="token-info">
-        <span class="token-symbol">${token.symbol}</span>
-        <span class="token-name">${token.name || token.symbol} Token</span>
-      </div>
-    `;
-
-    // --- FROM Dropdown ---
-    const fromOption = document.createElement('div');
-    fromOption.className = 'token-option';
-    fromOption.innerHTML = optionHTML;
-    fromOption.onclick = (e) => {
-      e.stopPropagation(); // ✅ SOLUSI: Mencegah klik menyebar ke .selected-token (parent)
-      selectToken('from', token);
-    };
-    fromDropdown.appendChild(fromOption);
-
-    // --- TO Dropdown ---
-    const toOption = document.createElement('div');
-    toOption.className = 'token-option';
-    toOption.innerHTML = optionHTML;
-    toOption.onclick = (e) => {
-      e.stopPropagation(); // ✅ SOLUSI: Mencegah klik menyebar ke .selected-token (parent)
-      selectToken('to', token);
-    };
-    toDropdown.appendChild(toOption);
-  });
-
-  // Perbarui tampilan token yang terpilih
-  selectToken('from', selectedFromToken);
-  selectToken('to', selectedToToken);
-}
-
-// Tambahkan inisialisasi awal agar dropdown terisi saat halaman dimuat
-document.addEventListener('DOMContentLoaded', refreshSelectors);
-
-// Pastikan Anda telah MENGHAPUS semua definisi ganda fungsi di atas
-// terutama definisi lama untuk refreshSelectors dan toggleDropdown.
-// =========================================================
-
+// Anda juga harus memastikan fungsi `refreshSelectors` dipanggil di dalam IIFE.
+// Selanjutnya, hapus semua definisi duplikat `toggleDropdown` dan `document.addEventListener('click')` 
+// dari dalam IIFE Anda.
   // FIXED WALLET CONNECTION
   async function ensureProvider() {
     if (window.ethereum) {
