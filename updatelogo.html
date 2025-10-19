@@ -548,94 +548,103 @@ function selectToken(type, token) {
   computeOutput();
 }
 
-// Simple toggle function
-function toggleDropdown(type, event) {
-  if (event) event.stopPropagation();
-  
-  const dropdown = document.getElementById(`${type}Dropdown`);
-  const allDropdowns = document.querySelectorAll('.token-dropdown');
+// =========================================================
+// ✅ FIX: TOKEN SELECTOR LOGIC (Siap Tempel)
+// =========================================================
 
-  // Close all other dropdowns
-  allDropdowns.forEach(dd => {
-    if (dd.id !== `${type}Dropdown`) {
-      dd.style.display = 'none';
-    }
-  });
-
-  // Toggle current dropdown
-  if (dropdown.style.display === 'block') {
-    dropdown.style.display = 'none';
-  } else {
-    dropdown.style.display = 'block';
-  }
+// Helper function to get default logo (Pastikan fungsi ini ada di kode Anda)
+function getDefaultLogo(symbol) {
+  const defaultLogos = {
+    'XPL': 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMCIgY3k9IjEwIiByPSIxMCIgZmlsbD0iIzZjNjNmZiIvPjwvc3ZnPg==',
+    'WXPL': 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMCIgY3k9IjEwIiByPSIxMCIgZmlsbD0iIzAwYzZmZiIvPjwvc3ZnPg==',
+    'COZY': 'https://photos.pinksale.finance/file/pinksale-logo-upload/1760207026339-3c980e075709984d5362d951f45695a5.png'
+  };
+  return defaultLogos[symbol] || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMCIgY3k9IjEwIiByPSIxMCIgZmlsbD0iIzlmOWY5ZiIvPjwvc3ZnPg==';
 }
 
-// Close dropdowns when clicking outside
+// Simple toggle function dengan stopPropagation
+function toggleDropdown(type, event) {
+  if (event) event.stopPropagation(); // Hentikan event agar tidak menutup dari listener document
+
+  const dropdown = document.getElementById(`${type}Dropdown`);
+  const allDropdowns = document.querySelectorAll('.token-dropdown');
+
+  // Tutup semua dropdown lain
+  allDropdowns.forEach(dd => {
+    if (dd.id !== `${type}Dropdown`) {
+      dd.style.display = 'none';
+    }
+  });
+
+  // Buka/tutup dropdown saat ini
+  dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+}
+
+// Tutup dropdown saat klik di luar area token selector
 document.addEventListener('click', function(e) {
-  // Only close if clicking outside token selectors
-  if (!e.target.closest('.token-select-container')) {
-    document.querySelectorAll('.token-dropdown').forEach(dd => {
-      dd.style.display = 'none';
-    });
-  }
+  // Periksa apakah target klik BUKAN bagian dari kontainer token selector
+  if (!e.target.closest('.token-select-container')) {
+    document.querySelectorAll('.token-dropdown').forEach(dd => {
+      dd.style.display = 'none';
+    });
+  }
 });
 
-// Update juga event handlers di token options
+
+// Fungsi untuk mengisi ulang dropdown selector
 function refreshSelectors() {
-  const fromDropdown = document.getElementById('fromDropdown');
-  const toDropdown = document.getElementById('toDropdown');
-  
-  fromDropdown.innerHTML = '';
-  toDropdown.innerHTML = '';
+  const fromDropdown = document.getElementById('fromDropdown');
+  const toDropdown = document.getElementById('toDropdown');
 
-  tokens.forEach(token => {
-    // For FROM dropdown
-    const fromOption = document.createElement('div');
-    fromOption.className = 'token-option';
-    fromOption.innerHTML = `
-      <img src="${token.logoURI || getDefaultLogo(token.symbol)}" 
-           alt="${token.symbol}" 
-           class="token-logo-sm"
-           onerror="this.src='${getDefaultLogo(token.symbol)}'">
-      <div class="token-info">
-        <span class="token-symbol">${token.symbol}</span>
-        <span class="token-name">${token.name || token.symbol} Token</span>
-      </div>
-    `;
-    fromOption.onclick = (e) => {
-      e.stopPropagation(); // Important!
-      selectToken('from', token);
-    };
-    fromDropdown.appendChild(fromOption);
+  // Bersihkan opsi yang ada
+  fromDropdown.innerHTML = '';
+  toDropdown.innerHTML = '';
 
-    // For TO dropdown
-    const toOption = document.createElement('div');
-    toOption.className = 'token-option';
-    toOption.innerHTML = `
-      <img src="${token.logoURI || getDefaultLogo(token.symbol)}" 
-           alt="${token.symbol}" 
-           class="token-logo-sm"
-           onerror="this.src='${getDefaultLogo(token.symbol)}'">
-      <div class="token-info">
-        <span class="token-symbol">${token.symbol}</span>
-        <span class="token-name">${token.name || token.symbol} Token</span>
-      </div>
-    `;
-    toOption.onclick = (e) => {
-      e.stopPropagation(); // Important!
-      selectToken('to', token);
-    };
-    toDropdown.appendChild(toOption);
-  });
+  // Buat opsi token untuk kedua dropdown
+  tokens.forEach(token => {
+    const optionHTML = `
+      <img src="${token.logoURI || getDefaultLogo(token.symbol)}" 
+           alt="${token.symbol}" 
+           class="token-logo-sm"
+           onerror="this.src='${getDefaultLogo(token.symbol)}'">
+      <div class="token-info">
+        <span class="token-symbol">${token.symbol}</span>
+        <span class="token-name">${token.name || token.symbol} Token</span>
+      </div>
+    `;
 
-  selectToken('from', selectedFromToken);
-  selectToken('to', selectedToToken);
+    // --- FROM Dropdown ---
+    const fromOption = document.createElement('div');
+    fromOption.className = 'token-option';
+    fromOption.innerHTML = optionHTML;
+    fromOption.onclick = (e) => {
+      e.stopPropagation(); // ✅ SOLUSI: Mencegah klik menyebar ke .selected-token (parent)
+      selectToken('from', token);
+    };
+    fromDropdown.appendChild(fromOption);
+
+    // --- TO Dropdown ---
+    const toOption = document.createElement('div');
+    toOption.className = 'token-option';
+    toOption.innerHTML = optionHTML;
+    toOption.onclick = (e) => {
+      e.stopPropagation(); // ✅ SOLUSI: Mencegah klik menyebar ke .selected-token (parent)
+      selectToken('to', token);
+    };
+    toDropdown.appendChild(toOption);
+  });
+
+  // Perbarui tampilan token yang terpilih
+  selectToken('from', selectedFromToken);
+  selectToken('to', selectedToToken);
 }
 
+// Tambahkan inisialisasi awal agar dropdown terisi saat halaman dimuat
+document.addEventListener('DOMContentLoaded', refreshSelectors);
 
-function setStatus(s) {
-  if (statusEl) statusEl.innerText = s;
-}
+// Pastikan Anda telah MENGHAPUS semua definisi ganda fungsi di atas
+// terutama definisi lama untuk refreshSelectors dan toggleDropdown.
+// =========================================================
 
   // FIXED WALLET CONNECTION
   async function ensureProvider() {
