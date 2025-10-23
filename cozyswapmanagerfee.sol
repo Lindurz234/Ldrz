@@ -64,7 +64,7 @@
             color: #333;
         }
         
-        .input-group input, .input-group textarea {
+        .input-group input {
             width: 100%;
             padding: 12px 15px;
             border: 2px solid #e1e5e9;
@@ -73,7 +73,7 @@
             transition: border-color 0.3s;
         }
         
-        .input-group input:focus, .input-group textarea:focus {
+        .input-group input:focus {
             outline: none;
             border-color: #667eea;
         }
@@ -149,12 +149,6 @@
             border: 1px solid #b3d7ff;
         }
         
-        .loading {
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
-        }
-        
         .wallet-info {
             background: #e7f3ff;
             border-radius: 10px;
@@ -177,28 +171,37 @@
             gap: 10px;
             margin-top: 15px;
         }
+        
+        .balance-info {
+            background: #e7f3ff;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>🏦 CozySwap Manager</h1>
-            <p>Kelola Treasury, Burn LP, dan Ubah feeTo</p>
+            <p>Transfer dari Treasury • Burn LP • Set feeTo</p>
         </div>
 
         <!-- Wallet Connection -->
         <div class="section">
-            <h2>🔗 Connect Wallet</h2>
+            <h2>🔗 Connect Wallet (Plasma Chain 9745)</h2>
             <button class="connect-btn" onclick="connectWallet()" id="connectBtn">Connect MetaMask</button>
             <div class="wallet-info" id="walletInfo">
                 <p><strong>Connected:</strong> <span id="walletAddress"></span></p>
                 <p><strong>Network:</strong> <span id="networkInfo"></span></p>
+                <p><strong>Balance:</strong> <span id="walletBalance"></span> ETH</p>
             </div>
         </div>
 
-        <!-- Treasury Management -->
+        <!-- Treasury Transfer -->
         <div class="section">
-            <h2>🏦 Treasury Management</h2>
+            <h2>🏦 Treasury Transfer</h2>
             <div class="info-box">
                 <strong>Treasury Address:</strong> 0x1B4f447cFBAE0fdA4d6a1eAAc2bE1e6a008082Cf
             </div>
@@ -221,12 +224,23 @@
             <div class="button-group">
                 <button class="transfer-btn" onclick="sendToken()" id="sendTokenBtn" disabled>Send Token</button>
                 <button class="transfer-btn" onclick="sendEther()" id="sendEtherBtn" disabled>Send ETH</button>
+                <button class="transfer-btn" onclick="checkTreasuryBalance()" id="checkTreasuryBtn" disabled>Check Treasury Balance</button>
+            </div>
+
+            <div class="balance-info" id="treasuryBalanceInfo">
+                <h4>📊 Treasury Balances</h4>
+                <p><strong>ETH Balance:</strong> <span id="treasuryETH">0</span></p>
+                <p><strong>Token Balance:</strong> <span id="treasuryToken">0</span></p>
             </div>
         </div>
 
         <!-- LP Token Burning -->
         <div class="section">
-            <h2>🔥 Burn LP Tokens</h2>
+            <h2>🔥 Burn LP Tokens via Router</h2>
+            <div class="info-box">
+                <strong>Router Address:</strong> 0x89E695B38610e78a77Fb310458Dfd855505AD239
+            </div>
+            
             <div class="input-group">
                 <label for="pairAddressBurn">Pair Contract Address:</label>
                 <input type="text" id="pairAddressBurn" placeholder="0x...">
@@ -234,20 +248,22 @@
             
             <div class="button-group">
                 <button class="burn-btn" onclick="checkLPBalance()" id="checkBalanceBtn" disabled>Check LP Balance</button>
-                <button class="burn-btn" onclick="burnLPTokens()" id="burnBtn" disabled>Burn LP Tokens</button>
+                <button class="burn-btn" onclick="removeLiquidity()" id="removeLiqBtn" disabled>Remove Liquidity</button>
             </div>
             
-            <div id="lpBalanceInfo" style="display:none; margin-top:15px; padding:15px; background:#f8f9fa; border-radius:10px;">
+            <div class="balance-info" id="lpBalanceInfo">
+                <h4>📊 LP Token Info</h4>
                 <p><strong>Your LP Balance:</strong> <span id="lpBalance">0</span></p>
+                <p><strong>Token0:</strong> <span id="token0Address">-</span></p>
+                <p><strong>Token1:</strong> <span id="token1Address">-</span></p>
             </div>
         </div>
 
         <!-- Factory Management -->
         <div class="section">
             <h2>🏭 Factory Management</h2>
-            <div class="input-group">
-                <label for="factoryAddress">Factory Contract Address:</label>
-                <input type="text" id="factoryAddress" placeholder="0x...">
+            <div class="info-box">
+                <strong>Factory Address:</strong> 0xa252e44D3478CeBb1a3D59C9146CD860cb09Ec93
             </div>
             
             <div class="input-group">
@@ -260,8 +276,10 @@
                 <button class="factory-btn" onclick="getFeeTo()" id="getFeeToBtn" disabled>Get Current feeTo</button>
             </div>
             
-            <div id="feeToInfo" style="display:none; margin-top:15px; padding:15px; background:#f8f9fa; border-radius:10px;">
+            <div class="balance-info" id="feeToInfo">
+                <h4>🏭 Factory Info</h4>
                 <p><strong>Current feeTo:</strong> <span id="currentFeeTo"></span></p>
+                <p><strong>feeToSetter:</strong> <span id="feeToSetter"></span></p>
             </div>
         </div>
 
@@ -272,6 +290,12 @@
     <script>
         let provider, signer, userAddress;
         
+        // Contract Addresses
+        const TREASURY_ADDRESS = "0x1B4f447cFBAE0fdA4d6a1eAAc2bE1e6a008082Cf";
+        const FACTORY_ADDRESS = "0xa252e44D3478CeBb1a3D59C9146CD860cb09Ec93";
+        const ROUTER_ADDRESS = "0x89E695B38610e78a77Fb310458Dfd855505AD239";
+        const PLASMA_CHAIN_ID = "0x2611"; // 9745 in hex
+
         // Treasury Contract ABI
         const TREASURY_ABI = [
             "function sendToken(address token, address to, uint256 amount) external",
@@ -279,10 +303,34 @@
             "function owner() external view returns (address)"
         ];
         
+        // Router Contract ABI
+        const ROUTER_ABI = [
+            {
+                "inputs": [
+                    {"internalType": "address","name": "tokenA","type": "address"},
+                    {"internalType": "address","name": "tokenB","type": "address"},
+                    {"internalType": "uint256","name": "liquidity","type": "uint256"},
+                    {"internalType": "uint256","name": "amountAMin","type": "uint256"},
+                    {"internalType": "uint256","name": "amountBMin","type": "uint256"},
+                    {"internalType": "address","name": "to","type": "address"},
+                    {"internalType": "uint256","name": "deadline","type": "uint256"}
+                ],
+                "name": "removeLiquidity",
+                "outputs": [
+                    {"internalType": "uint256","name": "amountA","type": "uint256"},
+                    {"internalType": "uint256","name": "amountB","type": "uint256"}
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            }
+        ];
+        
         // Pair Contract ABI
         const PAIR_ABI = [
-            "function burn(address to) external returns (uint amount0, uint amount1)",
-            "function balanceOf(address owner) external view returns (uint)"
+            "function balanceOf(address owner) external view returns (uint)",
+            "function token0() external view returns (address)",
+            "function token1() external view returns (address)",
+            "function approve(address spender, uint amount) external returns (bool)"
         ];
         
         // Factory Contract ABI
@@ -292,21 +340,52 @@
             "function feeToSetter() external view returns (address)"
         ];
 
-        // Default addresses
-        const TREASURY_ADDRESS = "0x1B4f447cFBAE0fdA4d6a1eAAc2bE1e6a008082Cf";
+        // ERC20 ABI
+        const ERC20_ABI = [
+            "function balanceOf(address account) external view returns (uint256)",
+            "function decimals() external view returns (uint8)"
+        ];
+
+        async function switchToPlasmaNetwork() {
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: PLASMA_CHAIN_ID }],
+                });
+                return true;
+            } catch (switchError) {
+                // Jika network belum ditambahkan
+                if (switchError.code === 4902) {
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [{
+                                chainId: PLASMA_CHAIN_ID,
+                                chainName: 'Plasma Chain',
+                                rpcUrls: ['https://rpc.plasma.dsolutions.mn/'],
+                                nativeCurrency: {
+                                    name: 'ETH',
+                                    symbol: 'ETH',
+                                    decimals: 18
+                                },
+                                blockExplorerUrls: ['https://scan.plasma.dsolutions.mn/']
+                            }],
+                        });
+                        return true;
+                    } catch (addError) {
+                        console.error('Failed to add network:', addError);
+                        return false;
+                    }
+                }
+                return false;
+            }
+        }
 
         function showStatus(message, type = 'info') {
             const statusElement = document.getElementById('statusMessage');
             statusElement.textContent = message;
             statusElement.className = 'status ' + type;
             statusElement.style.display = 'block';
-            
-            // Auto hide success messages after 10 seconds
-            if (type === 'success') {
-                setTimeout(() => {
-                    statusElement.style.display = 'none';
-                }, 10000);
-            }
         }
 
         async function connectWallet() {
@@ -316,34 +395,48 @@
                     return;
                 }
 
-                showStatus('Connecting to wallet...', 'loading');
+                showStatus('Switching to Plasma Chain...', 'info');
+                
+                // Switch to Plasma network
+                const switched = await switchToPlasmaNetwork();
+                if (!switched) {
+                    showStatus('Failed to switch to Plasma Chain', 'error');
+                    return;
+                }
+
+                showStatus('Connecting to wallet...', 'info');
                 
                 provider = new ethers.providers.Web3Provider(window.ethereum);
                 await provider.send("eth_requestAccounts", []);
                 signer = provider.getSigner();
                 userAddress = await signer.getAddress();
                 
+                // Get wallet balance
+                const balance = await provider.getBalance(userAddress);
+                const balanceFormatted = ethers.utils.formatEther(balance);
+                
                 // Update UI
-                document.getElementById('walletAddress').textContent = 
-                    userAddress.substring(0, 6) + '...' + userAddress.substring(38);
-                
-                // Get network info
-                const network = await provider.getNetwork();
-                document.getElementById('networkInfo').textContent = 
-                    network.name + ' (Chain ID: ' + network.chainId + ')';
-                
+                document.getElementById('walletAddress').textContent = userAddress;
+                document.getElementById('networkInfo').textContent = 'Plasma Chain (9745)';
+                document.getElementById('walletBalance').textContent = parseFloat(balanceFormatted).toFixed(4);
                 document.getElementById('walletInfo').style.display = 'block';
-                document.getElementById('connectBtn').textContent = 'Connected';
+                
                 document.getElementById('connectBtn').disabled = true;
+                document.getElementById('connectBtn').textContent = '✅ Connected to Plasma';
                 
                 // Enable all buttons
                 document.getElementById('sendTokenBtn').disabled = false;
                 document.getElementById('sendEtherBtn').disabled = false;
+                document.getElementById('checkTreasuryBtn').disabled = false;
                 document.getElementById('checkBalanceBtn').disabled = false;
+                document.getElementById('removeLiqBtn').disabled = false;
                 document.getElementById('setFeeToBtn').disabled = false;
                 document.getElementById('getFeeToBtn').disabled = false;
                 
-                showStatus('Wallet connected successfully!', 'success');
+                // Auto fill recipient with connected wallet
+                document.getElementById('recipientAddress').value = userAddress;
+                
+                showStatus('✅ Wallet connected to Plasma Chain!', 'success');
                 
             } catch (error) {
                 showStatus('Error connecting wallet: ' + error.message, 'error');
@@ -362,12 +455,7 @@
                     return;
                 }
 
-                if (!ethers.utils.isAddress(tokenAddress) || !ethers.utils.isAddress(recipient)) {
-                    showStatus('Invalid address format', 'error');
-                    return;
-                }
-
-                showStatus('Sending token...', 'loading');
+                showStatus('Sending token from Treasury...', 'info');
 
                 const treasury = new ethers.Contract(TREASURY_ADDRESS, TREASURY_ABI, signer);
                 
@@ -378,7 +466,7 @@
                 showStatus(`Transaction submitted: ${tx.hash}`, 'info');
                 
                 await tx.wait();
-                showStatus('Token sent successfully!', 'success');
+                showStatus('✅ Token sent successfully from Treasury!', 'success');
 
             } catch (error) {
                 showStatus('Error sending token: ' + error.message, 'error');
@@ -395,7 +483,7 @@
                     return;
                 }
 
-                showStatus('Sending ETH...', 'loading');
+                showStatus('Sending ETH from Treasury...', 'info');
 
                 const treasury = new ethers.Contract(TREASURY_ADDRESS, TREASURY_ABI, signer);
                 const amountWei = ethers.utils.parseEther(amount);
@@ -404,10 +492,40 @@
                 showStatus(`Transaction submitted: ${tx.hash}`, 'info');
                 
                 await tx.wait();
-                showStatus('ETH sent successfully!', 'success');
+                showStatus('✅ ETH sent successfully from Treasury!', 'success');
 
             } catch (error) {
                 showStatus('Error sending ETH: ' + error.message, 'error');
+            }
+        }
+
+        async function checkTreasuryBalance() {
+            try {
+                showStatus('Checking Treasury balances...', 'info');
+
+                // Check ETH balance
+                const ethBalance = await provider.getBalance(TREASURY_ADDRESS);
+                const ethFormatted = ethers.utils.formatEther(ethBalance);
+
+                // Check token balance if address provided
+                const tokenAddress = document.getElementById('tokenAddress').value.trim();
+                let tokenBalance = '0';
+                
+                if (tokenAddress && ethers.utils.isAddress(tokenAddress)) {
+                    const tokenContract = new ethers.Contract(tokenAddress, ERC20_ABI, provider);
+                    const balance = await tokenContract.balanceOf(TREASURY_ADDRESS);
+                    const decimals = await tokenContract.decimals();
+                    tokenBalance = ethers.utils.formatUnits(balance, decimals);
+                }
+
+                document.getElementById('treasuryETH').textContent = parseFloat(ethFormatted).toFixed(4) + ' ETH';
+                document.getElementById('treasuryToken').textContent = tokenBalance;
+                document.getElementById('treasuryBalanceInfo').style.display = 'block';
+
+                showStatus('✅ Treasury balances retrieved!', 'success');
+
+            } catch (error) {
+                showStatus('Error checking Treasury balance: ' + error.message, 'error');
             }
         }
 
@@ -421,57 +539,98 @@
                     return;
                 }
 
-                showStatus('Checking LP balance...', 'loading');
+                showStatus('Checking LP balance...', 'info');
 
                 const pairContract = new ethers.Contract(pairAddress, PAIR_ABI, provider);
-                const balance = await pairContract.balanceOf(userAddress);
+                const [balance, token0, token1] = await Promise.all([
+                    pairContract.balanceOf(userAddress),
+                    pairContract.token0(),
+                    pairContract.token1()
+                ]);
+
                 const balanceFormatted = ethers.utils.formatUnits(balance, 18);
 
                 document.getElementById('lpBalance').textContent = balanceFormatted;
+                document.getElementById('token0Address').textContent = token0.substring(0, 10) + '...';
+                document.getElementById('token1Address').textContent = token1.substring(0, 10) + '...';
                 document.getElementById('lpBalanceInfo').style.display = 'block';
 
                 if (balance.gt(0)) {
-                    document.getElementById('burnBtn').disabled = false;
-                    showStatus(`LP Balance: ${balanceFormatted}`, 'success');
+                    showStatus(`✅ Found ${balanceFormatted} LP tokens!`, 'success');
                 } else {
-                    document.getElementById('burnBtn').disabled = true;
-                    showStatus('No LP tokens found', 'info');
+                    showStatus('No LP tokens found in your wallet', 'info');
                 }
 
             } catch (error) {
-                showStatus('Error checking balance: ' + error.message, 'error');
+                showStatus('Error checking LP balance: ' + error.message, 'error');
             }
         }
 
-        async function burnLPTokens() {
+        async function removeLiquidity() {
             try {
                 const pairAddress = document.getElementById('pairAddressBurn').value.trim();
 
-                showStatus('Burning LP tokens...', 'loading');
+                if (!pairAddress) {
+                    showStatus('Please enter Pair Address', 'error');
+                    return;
+                }
 
-                const pairContract = new ethers.Contract(pairAddress, PAIR_ABI, signer);
-                const tx = await pairContract.burn(userAddress);
+                showStatus('Removing liquidity via Router...', 'info');
+
+                const pairContract = new ethers.Contract(pairAddress, PAIR_ABI, provider);
+                const routerContract = new ethers.Contract(ROUTER_ADDRESS, ROUTER_ABI, signer);
+
+                // Get pair info
+                const [balance, token0, token1] = await Promise.all([
+                    pairContract.balanceOf(userAddress),
+                    pairContract.token0(),
+                    pairContract.token1()
+                ]);
+
+                if (balance.eq(0)) {
+                    showStatus('No LP tokens to remove', 'error');
+                    return;
+                }
+
+                // Approve LP tokens to router
+                const approveTx = await pairContract.approve(ROUTER_ADDRESS, balance);
+                await approveTx.wait();
+
+                showStatus('Approval confirmed, removing liquidity...', 'info');
+
+                // Remove liquidity
+                const deadline = Math.floor(Date.now() / 1000) + 60 * 20; // 20 minutes
+                const tx = await routerContract.removeLiquidity(
+                    token0,
+                    token1,
+                    balance,
+                    0, // amountAMin
+                    0, // amountBMin
+                    userAddress,
+                    deadline,
+                    { gasLimit: 400000 }
+                );
+
                 showStatus(`Transaction submitted: ${tx.hash}`, 'info');
                 
-                await tx.wait();
-                showStatus('LP tokens burned successfully!', 'success');
-                
+                const receipt = await tx.wait();
+                showStatus('✅ Liquidity removed successfully!', 'success');
+
                 // Update balance
                 checkLPBalance();
 
             } catch (error) {
-                showStatus('Error burning LP: ' + error.message, 'error');
+                showStatus('Error removing liquidity: ' + error.message, 'error');
             }
         }
 
         // Factory Functions
         async function setFeeTo() {
             try {
-                const factoryAddress = document.getElementById('factoryAddress').value.trim();
                 const newFeeTo = document.getElementById('newFeeTo').value.trim();
 
-                if (!factoryAddress || !newFeeTo) {
-                    showStatus('Please fill all fields', 'error');
+                if (!newFeeTo) {
+                    showStatus('Please enter feeTo address', 'error');
                     return;
                 }
 
@@ -480,14 +639,14 @@
                     return;
                 }
 
-                showStatus('Setting new feeTo...', 'loading');
+                showStatus('Setting new feeTo...', 'info');
 
-                const factory = new ethers.Contract(factoryAddress, FACTORY_ABI, signer);
+                const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, signer);
                 const tx = await factory.setFeeTo(newFeeTo);
                 showStatus(`Transaction submitted: ${tx.hash}`, 'info');
                 
                 await tx.wait();
-                showStatus('feeTo updated successfully!', 'success');
+                showStatus('✅ feeTo updated successfully!', 'success');
 
             } catch (error) {
                 showStatus('Error setting feeTo: ' + error.message, 'error');
@@ -496,36 +655,33 @@
 
         async function getFeeTo() {
             try {
-                const factoryAddress = document.getElementById('factoryAddress').value.trim();
+                showStatus('Getting factory info...', 'info');
 
-                if (!factoryAddress) {
-                    showStatus('Please enter Factory Address', 'error');
-                    return;
-                }
-
-                showStatus('Getting current feeTo...', 'loading');
-
-                const factory = new ethers.Contract(factoryAddress, FACTORY_ABI, provider);
-                const currentFeeTo = await factory.feeTo();
+                const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
+                const [currentFeeTo, feeToSetter] = await Promise.all([
+                    factory.feeTo(),
+                    factory.feeToSetter()
+                ]);
 
                 document.getElementById('currentFeeTo').textContent = currentFeeTo;
+                document.getElementById('feeToSetter').textContent = feeToSetter;
                 document.getElementById('feeToInfo').style.display = 'block';
                 
-                showStatus('Current feeTo retrieved', 'success');
+                showStatus('✅ Factory info retrieved!', 'success');
 
             } catch (error) {
-                showStatus('Error getting feeTo: ' + error.message, 'error');
+                showStatus('Error getting factory info: ' + error.message, 'error');
             }
         }
 
-        // Auto-connect on load
+        // Auto connect
         window.addEventListener('load', function() {
             if (window.ethereum) {
                 connectWallet();
             }
         });
 
-        showStatus('Connect your wallet to start', 'info');
+        showStatus('Connect wallet to start managing CozySwap', 'info');
     </script>
 </body>
 </html>
