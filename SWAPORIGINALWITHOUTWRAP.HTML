@@ -1,0 +1,1119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+<meta name="google-site-verification" content="7XULKztiphXCS0nzBXi2P6mK-F8-hqAVSxmkxZKqb-E" />
+
+
+<meta name="google-site-verification" content="6FBjhdnCVOh9PjkZPa-6C3jJ9ZvGNdwF6zCgJRsc6Ik" />
+
+  <!-- ✅ SEO META TAGS FOR COZYSWAP -->
+  <title>Cozyswap - Plasma Swap DEX | Swap, Liquidity, and Earn COZY</title>
+  <meta name="title" content="Cozyswap - The Fastest Plasma Swap DEX" />
+  <meta name="description" content="Cozyswap is a decentralized exchange (DEX) built on Plasma Chain. Swap tokens instantly, add liquidity, and earn rewards in COZY Token — fast, secure, and user-friendly." />
+  <meta name="keywords" content="cozyswap, plasma swap, plasma chain, cozy token, dex, decentralized exchange, crypto swap, add liquidity, earn rewards, staking, defi, blockchain, exchange" />
+  <meta name="robots" content="index, follow" />
+  <meta name="language" content="English" />
+  <meta name="author" content="Cozyswap Team" />
+  <meta name="copyright" content="© 2025 Cozyswap" />
+
+  <!-- 🌐 Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://cozyswap.net/" />
+  <meta property="og:title" content="Cozyswap - Plasma Swap DEX on Plasma Chain" />
+  <meta property="og:description" content="Trade, add liquidity, and earn rewards on Cozyswap — a next-gen Plasma Swap DEX powered by Plasma Chain." />
+  <meta property="og:image" content="https://cozyswap.net/assets/cozy.png" />
+  <meta property="og:site_name" content="Cozyswap" />
+
+  <!-- 🐦 Twitter META TAGS -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://cozyswap.net/" />
+  <meta name="twitter:title" content="Cozyswap - Plasma Swap DEX" />
+  <meta name="twitter:description" content="Swap, earn, and provide liquidity easily on Cozyswap — built for Plasma Chain and COZY Token." />
+  <meta name="twitter:image" content="https://cozyswap.net/assets/cozy.png" />
+
+  <!-- 🔹 FAVICON -->
+  <link rel="icon" type="image/png" sizes="96x96" href="https://cozyswap.net/assets/cozy.png">
+  <link rel="icon" type="image/svg+xml" href="https://cozyswap.net/assets/favicon.svg">
+  <link rel="shortcut icon" href="https://cozyswap.net/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://cozyswap.net/assets/apple-touch-icon.png">
+
+  <!-- 🔹 CANONICAL URL -->
+  <link rel="canonical" href="https://cozyswap.net/" />
+
+  <!-- 🔹 EXTRA SEO BOOST -->
+  <meta name="theme-color" content="#7a00ff" />
+  <meta name="application-name" content="Cozyswap" />
+  <meta name="apple-mobile-web-app-title" content="Cozyswap" />
+  <meta name="format-detection" content="telephone=no" />
+
+  <!-- 🔹 JSON-LD STRUCTURED DATA (Google Rich Snippet) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Cozyswap",
+    "url": "https://cozyswap.net/",
+    "description": "Cozyswap is a Plasma Swap DEX for COZY Token — trade, add liquidity, and earn rewards easily.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Cozyswap",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://cozyswap.net/assets/cozy.png"
+      }
+    },
+    "sameAs": [
+      "https://twitter.com/CozySwap_net",
+      "https://t.me/CozySwap_net",
+      "https://github.com/cozyswap1"
+    ]
+  }
+  </script>
+
+  <link rel="icon" href="https://photos.pinksale.finance/file/pinksale-logo-upload/1760207026339-3c980e075709984d5362d951f45695a5.png" />
+  <style>
+    /* Tombol aktif gradien nyala */
+    .active-btn {
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 8px 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+    }
+
+    /* Efek hover glowing */
+    .active-btn:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 16px rgba(59, 130, 246, 0.8);
+    }
+
+    /* Tombol ghost (tetap gelap untuk yg lain, misal Staking) */
+    .ghost {
+      background: rgba(255, 255, 255, 0.08);
+      color: #ccc;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 8px 16px;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+    }
+
+    .ghost:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    :root{--bg:#0b0b0f;--card:#111216;--muted:#9aa0a6;--accent1:#6c63ff;--accent2:#00c6ff}
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:var(--bg);color:#e6eef8;font-family:Inter,system-ui,Arial}
+    .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:20px}
+    .app{width:100%;max-width:980px}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:48px;height:48px;border-radius:50%;object-fit:cover}
+    .actions{display:flex;gap:10px;align-items:center}
+    .btn{background:linear-gradient(90deg,var(--accent1),var(--accent2));border:0;color:#fff;padding:10px 14px;border-radius:10px;cursor:pointer}
+    .ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 12px;border-radius:10px;color:var(--muted)}
+    .container{display:grid;grid-template-columns:1fr;gap:16px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:14px;padding:18px;border:1px solid rgba(255,255,255,0.03)}
+    label{font-size:13px;color:var(--muted);display:block;margin-bottom:8px}
+    .row{display:flex;gap:10px}
+    input[type=text], input[type=number], select{background:transparent;border:1px solid rgba(255,255,255,0.06);color:#e6eef8;padding:10px;border-radius:10px;width:100%}
+    .amount{font-size:20px;color:#fff;padding:6px 0}
+    .muted{color:var(--muted);font-size:13px}
+    .footer{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+    .small{font-size:12px;color:var(--muted)}
+    .link{color:var(--accent2);text-decoration:none}
+    .status{font-size:13px;color:var(--muted);margin-left:8px}
+    .green{color:#6ee7b7}
+    .yellow{color:#fbbf24}
+    .red{color:#fb7185}
+    @media(min-width:900px){.container{grid-template-columns:480px 1fr}}
+    .maxbtn{background:transparent;border:1px dashed rgba(255,255,255,0.08);padding:6px 8px;border-radius:8px;color:var(--muted);cursor:pointer}
+    .smallbtn{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:6px 8px;border-radius:8px;color:var(--muted);cursor:pointer}
+    .txhash{word-break:break-all;color:var(--muted);margin-top:8px}
+
+ /* Token Selector Styles */
+.token-select-container {
+  position: relative;
+  width: 100%;
+}
+
+.selected-token {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  cursor: pointer;
+  background: transparent;
+  transition: all 0.2s;
+  min-height: 40px;
+}
+
+.selected-token:hover {
+  border-color: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.02);
+}
+
+.token-logo-sm {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-right: 8px;
+  object-fit: cover;
+}
+
+.token-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #111216;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+  display: none;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  margin-top: 5px;
+}
+
+.token-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* tombol copy di kanan */
+  padding: 10px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  transition: background 0.2s ease;
+}
+
+.token-option:last-child {
+  border-bottom: none;
+}
+
+.token-option:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+.token-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  margin-left: 8px;
+}
+
+.token-symbol {
+  font-weight: 500;
+  display: block;
+  font-size: 14px;
+}
+
+.token-name {
+  font-size: 11px;
+  color: #9aa0a6;
+  display: block;
+}
+
+.copy-btn {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 16px;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.1s ease;
+  margin-left: auto;
+}
+
+.copy-btn:hover {
+  color: #fff;
+  transform: scale(1.1);
+}
+
+.copy-btn:active {
+  transform: scale(0.95);
+}
+
+.dropdown-arrow {
+  margin-left: auto;
+  font-size: 10px;
+  color: #9aa0a6;
+}
+
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="app">
+      <header>
+        <div class="brand">
+          <img id="logoImg" class="logo" src="https://photos.pinksale.finance/file/pinksale-logo-upload/1760207026339-3c980e075709984d5362d951f45695a5.png" alt="Cozy" />
+          <div>
+            <h1 style="margin:0">CozySwap</h1>
+            <div class="small">Plasma Chain (9745)</div>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="small">@CozySwap</div>
+          <button id="connectBtn" class="btn">Connect Wallet</button>
+          <span id="status" class="status">init</span>
+        </div>
+      </header>
+
+      <div class="container">
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><strong>Swap</strong><div class="small">Token to token</div></div>
+            <div style="text-align:right"><button id="toLiquidity" class="active-btn">Add Liquidity</button> <button id="toStaking" class="active-btn">Staking</button></div>
+          </div>
+
+          <div style="margin-top:12px">
+            <label>From</label>
+            <div class="row">
+              <div style="flex:1">
+                <input id="fromAmount" type="text" placeholder="0.0" />
+                <div class="muted amount" id="fromReadable">—</div>
+                <div class="small">Balance: <span id="fromBalance">—</span> <button id="maxFrom" class="maxbtn">Max</button></div>
+              </div>
+              <div style="width:220px;display:flex;gap:8px">
+                <!-- FROM TOKEN SELECTOR -->
+                <div class="token-select-container">
+                  <div class="selected-token" onclick="toggleDropdown('from')">
+                    <img id="selectedFromLogo" src="" class="token-logo-sm">
+                    <span id="selectedFromSymbol">XPL</span>
+                    <span class="dropdown-arrow">▼</span>
+                  </div>
+                  <div id="fromDropdown" class="token-dropdown">
+                    <!-- Token list akan diisi JavaScript -->
+                  </div>
+                </div>
+                <button id="addTokenBtn" class="smallbtn" title="Add custom token">＋</button>
+              </div>
+            </div>
+
+            <div style="height:8px"></div>
+            <div style="text-align:center"><button id="flip" class="ghost">⇅</button></div>
+
+            <div style="height:8px"></div>
+            <label>To</label>
+            <div class="row">
+              <div style="flex:1">
+                <div class="muted amount" id="toReadable">—</div>
+                <div class="small">Balance: <span id="toBalance">—</span></div>
+              </div>
+              <div style="width:220px">
+                <!-- TO TOKEN SELECTOR -->
+                <div class="token-select-container">
+                  <div class="selected-token" onclick="toggleDropdown('to')">
+                    <img id="selectedToLogo" src="" class="token-logo-sm">
+                    <span id="selectedToSymbol">COZY</span>
+                    <span class="dropdown-arrow">▼</span>
+                  </div>
+                  <div id="toDropdown" class="token-dropdown">
+                    <!-- Token list akan diisi JavaScript -->
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:12px;display:flex;gap:10px;align-items:center">
+              <div style="flex:1">
+                <label>Slippage tolerance (%)</label>
+                <input id="slippage" type="text" value="0.5" />
+              </div>
+              <div style="width:160px">
+                <label>Deadline (min)</label>
+                <input id="deadline" type="number" value="10" />
+              </div>
+            </div>
+
+            <div style="margin-top:12px">
+              <div class="muted small" id="priceImpact">Price impact: —</div>
+              <div class="muted small" id="liquidityInfo">Pool: —</div>
+            </div>
+
+            <div style="margin-top:14px">
+              <button id="approveOrSwap" class="btn">Swap</button>
+              <div id="txHash" class="txhash"></div>
+            </div>
+
+            <div class="footer">
+              <div class="small">Estimated output updates live</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div><strong>About</strong><div class="small">CozySwap — Decentralized Exchange<br>Powered by Plasma • @CozySwap</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer style="background-color:#0d1117; color:#ccc; text-align:center; padding:25px 10px; font-family:'Inter',sans-serif; font-size:14px;">
+    <p>
+      © 2025 CozySwap &nbsp;|&nbsp;
+      <a href="terms.html" style="color:#58a6ff; text-decoration:none;">Terms of Use</a> &nbsp;|&nbsp;
+      <a href="disclaimer.html" style="color:#58a6ff; text-decoration:none;">Disclaimer</a> &nbsp;|&nbsp;
+      <a href="privacy.html" style="color:#58a6ff; text-decoration:none;">Privacy Policy</a>
+    </p>
+  </footer>
+
+  <!-- ✅ FIX: FUNGSI GLOBAL UNTUK DROPDOWN -->
+  <script>
+  // Fungsi global untuk toggle dropdown - HARUS DI LUAR IIFE
+  function toggleDropdown(type) {
+    const dropdown = document.getElementById(`${type}Dropdown`);
+    const allDropdowns = document.querySelectorAll('.token-dropdown');
+
+    // Tutup semua dropdown lain
+    allDropdowns.forEach(dd => {
+      if (dd.id !== `${type}Dropdown`) {
+        dd.style.display = 'none';
+      }
+    });
+
+    // Toggle dropdown saat ini
+    if (dropdown.style.display === 'block') {
+      dropdown.style.display = 'none';
+    } else {
+      dropdown.style.display = 'block';
+    }
+  }
+
+  // Tutup dropdown saat klik di luar
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.token-select-container')) {
+      document.querySelectorAll('.token-dropdown').forEach(dd => {
+        dd.style.display = 'none';
+      });
+    }
+  });
+  </script>
+
+  <script>
+  (async ()=>{
+    // Load ethers dari CDN
+    const CDNS = [
+      'https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.1/ethers.umd.min.js'
+    ];
+
+    async function loadEthers() {
+      if (window.ethers) return window.ethers;
+      for (const url of CDNS) {
+        try {
+          await new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = url;
+            script.async = true;
+            script.crossOrigin = 'anonymous';
+            script.onload = () => resolve(window.ethers);
+            script.onerror = reject;
+            document.head.appendChild(script);
+          });
+          if (window.ethers) return window.ethers;
+        } catch (e) {
+          console.warn('Failed to load from', url, e);
+        }
+      }
+      throw new Error('Could not load ethers.js');
+    }
+
+    // Load ethers
+    const ethers = await loadEthers();
+    const { utils, BigNumber, providers, Contract } = ethers;
+
+    const RPC = 'https://plasma-mainnet.g.alchemy.com/v2/MuLXFm60Tsz3ntyrSC1O4';
+    const CHAIN_ID = 9745;
+    const CHAIN_ID_HEX = '0x2611';
+    const ROUTER = '0x89E695B38610e78a77Fb310458Dfd855505AD239';
+    const FACTORY = '0xa252e44D3478CeBb1a3D59C9146CD860cb09Ec93';
+    const WXPL = '0x6100E367285b01F48D07953803A2d8dCA5D19873';
+
+    const ERC20 = [
+      'function decimals() view returns (uint8)',
+      'function symbol() view returns (string)',
+      'function balanceOf(address) view returns (uint256)',
+      'function approve(address spender,uint256 amount) returns (bool)',
+      'function allowance(address owner,address spender) view returns (uint256)'
+    ];
+
+    const ROUTER_ABI = [
+      'function getAmountsOut(uint256,address[]) view returns (uint256[])',
+      'function swapExactTokensForTokens(uint256,uint256,address[],address,uint256)',
+      'function swapExactETHForTokens(uint256,address[],address,uint256) payable',
+      'function swapExactTokensForETH(uint256,uint256,address[],address,uint256)'
+    ];
+
+    const FACTORY_ABI = [
+      'function getPair(address,address) view returns (address)'
+    ];
+
+    const PAIR_ABI = [
+      'function getReserves() view returns (uint112,uint112,uint32)',
+      'function token0() view returns (address)',
+      'function token1() view returns (address)'
+    ];
+
+    // Elements
+    const connectBtn = document.getElementById('connectBtn');
+    const statusEl = document.getElementById('status');
+    const fromAmountEl = document.getElementById('fromAmount');
+    const fromReadable = document.getElementById('fromReadable');
+    const toReadable = document.getElementById('toReadable');
+    const priceImpactEl = document.getElementById('priceImpact');
+    const liquidityInfoEl = document.getElementById('liquidityInfo');
+    const approveOrSwapBtn = document.getElementById('approveOrSwap');
+    const txHashEl = document.getElementById('txHash');
+    const maxFromBtn = document.getElementById('maxFrom');
+    const addTokenBtn = document.getElementById('addTokenBtn');
+    const flipBtn = document.getElementById('flip');
+    const fromBalanceEl = document.getElementById('fromBalance');
+    const toBalanceEl = document.getElementById('toBalance');
+
+    let provider = null;
+    let signer = null;
+    let account = null;
+    let router = null;
+    let factory = null;
+
+    // Default tokens dengan logoURI
+    const DEFAULTS = [
+      {symbol: 'XPL', address: 'XPL_NATIVE', logoURI: 'https://cozyswap1.github.io/Cozyswap/assets/xpl.png'},
+      {symbol: 'WXPL', address: WXPL, logoURI: 'https://cozyswap1.github.io/Cozyswap/assets/xpl.png'},
+      {symbol: 'COZY', address: '0x06e2ef46662834f4e42dbf9ff9222b077c57df5c', logoURI: 'https://photos.pinksale.finance/file/pinksale-logo-upload/1760207026339-3c980e075709984d5362d951f45695a5.png'},
+      {symbol: 'WETH', address: '0x9895D81bB462A195b4922ED7De0e3ACD007c32CB', logoURI: 'https://cozyswap1.github.io/Cozyswap/assets/weth.png'},
+      {symbol: 'USDT0', address: '0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb', logoURI: 'https://cozyswap1.github.io/Cozyswap/assets/USDT0.png'},
+      {symbol: 'CRY', address: '0x59cdd876f3b8a4e81ecb467078ea009f80052fa2', logoURI: 'https://cozyswap1.github.io/Cozyswap/assets/crybaby.png'}
+    ];
+
+    // Token management
+    const TOKENS_KEY = 'cozy_tokens_v2';
+    function loadTokens() {
+      try {
+        const raw = localStorage.getItem(TOKENS_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+      return DEFAULTS.slice();
+    }
+
+    function saveTokens(list) {
+      localStorage.setItem(TOKENS_KEY, JSON.stringify(list));
+    }
+
+    let tokens = loadTokens();
+    let selectedFromToken = tokens[0];
+    let selectedToToken = tokens[1];
+
+    // Helper function untuk default logo
+    function getDefaultLogo(symbol) {
+      const defaultLogos = {
+        'XPL': 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMCIgY3k9IjEwIiByPSIxMCIgZmlsbD0iIzZjNjNmZiIvPjwvc3ZnPg==',
+        'WXPL': 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMCIgY3k9IjEwIiByPSIxMCIgZmlsbD0iIzAwYzZmZiIvPjwvc3ZnPg==',
+        'COZY': 'https://photos.pinksale.finance/file/pinksale-logo-upload/1760207026339-3c980e075709984d5362d951f45695a5.png'
+      };
+      return defaultLogos[symbol] || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMCIgY3k9IjEwIiByPSIxMCIgZmlsbD0iIzlmOWY5ZiIvPjwvc3ZnPg==';
+    }
+
+    function refreshSelectors() {
+      const fromDropdown = document.getElementById('fromDropdown');
+      const toDropdown = document.getElementById('toDropdown');
+
+      // Clear existing options
+      fromDropdown.innerHTML = '';
+      toDropdown.innerHTML = '';
+
+      // ======================================================
+// ✅ Membuat token options untuk kedua dropdown + tombol salin
+// ======================================================
+tokens.forEach(token => {
+  // Untuk FROM dropdown
+  const fromOption = document.createElement('div');
+  fromOption.className = 'token-option';
+  fromOption.innerHTML = `
+    <img src="${token.logoURI || getDefaultLogo(token.symbol)}" 
+         alt="${token.symbol}" 
+         class="token-logo-sm"
+         onerror="this.src='${getDefaultLogo(token.symbol)}'">
+    <div class="token-info">
+      <span class="token-symbol">${token.symbol}</span>
+      <span class="token-name">${token.name || token.symbol} Token</span>
+    </div>
+    <button class="copy-btn" title="Salin alamat token" onclick="event.stopPropagation(); copyAddress('${token.address}')">📋</button>
+  `;
+  fromOption.onclick = (e) => {
+    // Hanya pilih token kalau yang diklik bukan tombol salin
+    if (!e.target.classList.contains("copy-btn")) {
+      e.stopPropagation();
+      selectToken('from', token);
+    }
+  };
+  fromDropdown.appendChild(fromOption);
+
+  // Untuk TO dropdown
+  const toOption = document.createElement('div');
+  toOption.className = 'token-option';
+  toOption.innerHTML = `
+    <img src="${token.logoURI || getDefaultLogo(token.symbol)}" 
+         alt="${token.symbol}" 
+         class="token-logo-sm"
+         onerror="this.src='${getDefaultLogo(token.symbol)}'">
+    <div class="token-info">
+      <span class="token-symbol">${token.symbol}</span>
+      <span class="token-name">${token.name || token.symbol} Token</span>
+    </div>
+    <button class="copy-btn" title="Salin alamat token" onclick="event.stopPropagation(); copyAddress('${token.address}')">📋</button>
+  `;
+  toOption.onclick = (e) => {
+    if (!e.target.classList.contains("copy-btn")) {
+      e.stopPropagation();
+      selectToken('to', token);
+    }
+  };
+  toDropdown.appendChild(toOption);
+});
+
+
+      // Set default tokens
+      selectToken('from', selectedFromToken);
+      selectToken('to', selectedToToken);
+    }
+
+    function selectToken(type, token) {
+      const logoEl = document.getElementById(`selected${type.charAt(0).toUpperCase() + type.slice(1)}Logo`);
+      const symbolEl = document.getElementById(`selected${type.charAt(0).toUpperCase() + type.slice(1)}Symbol`);
+      const dropdownEl = document.getElementById(`${type}Dropdown`);
+
+      // Update selected token display
+      logoEl.src = token.logoURI || getDefaultLogo(token.symbol);
+      logoEl.onerror = function() {
+        this.src = getDefaultLogo(token.symbol);
+      };
+      symbolEl.textContent = token.symbol;
+
+      // Close dropdown
+      dropdownEl.style.display = 'none';
+
+      // Store selected tokens
+      if (type === 'from') {
+        selectedFromToken = token;
+      } else {
+        selectedToToken = token;
+      }
+
+      // Update balances dan compute output
+      updateBalances();
+      computeOutput();
+    }
+
+    function setStatus(s) {
+      if (statusEl) statusEl.innerText = s;
+    }
+
+    // FIXED WALLET CONNECTION
+    async function ensureProvider() {
+      if (window.ethereum) {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: CHAIN_ID_HEX }]
+          });
+        } catch (switchError) {
+          if (switchError.code === 4902) {
+            try {
+              await window.ethereum.request({
+                method: 'wallet_addEthereumChain',
+                params: [{
+                  chainId: CHAIN_ID_HEX,
+                  chainName: 'Plasma Chain',
+                  rpcUrls: [RPC],
+                  nativeCurrency: {
+                    name: 'XPL',
+                    symbol: 'XPL',
+                    decimals: 18
+                  },
+                  blockExplorerUrls: ['https://plasmascan.to/']
+                }]
+              });
+            } catch (addError) {
+              console.warn('Failed to add chain:', addError);
+            }
+          }
+        }
+
+        provider = new providers.Web3Provider(window.ethereum);
+        signer = provider.getSigner();
+        router = new Contract(ROUTER, ROUTER_ABI, provider);
+        factory = new Contract(FACTORY, FACTORY_ABI, provider);
+
+        try {
+          const accounts = await provider.listAccounts();
+          if (accounts && accounts.length > 0) {
+            account = accounts[0];
+            connectBtn.innerText = account.substring(0, 6) + '...' + account.substring(38);
+            setStatus('Connected');
+            await updateBalances();
+          } else {
+            setStatus('Ready to connect');
+          }
+        } catch (e) {
+          console.warn('Account check failed:', e);
+          setStatus('Ready to connect');
+        }
+      } else {
+        provider = new providers.JsonRpcProvider(RPC);
+        router = new Contract(ROUTER, ROUTER_ABI, provider);
+        factory = new Contract(FACTORY, FACTORY_ABI, provider);
+        setStatus('Read-only mode');
+      }
+    }
+
+    // FIXED CONNECT BUTTON
+    connectBtn.onclick = async () => {
+      if (!window.ethereum) {
+        alert('MetaMask not detected. Please install MetaMask to connect your wallet.');
+        return;
+      }
+
+      try {
+        const accounts = await window.ethereum.request({
+          method: 'eth_requestAccounts'
+        });
+
+        if (accounts && accounts.length > 0) {
+          account = accounts[0];
+          provider = new providers.Web3Provider(window.ethereum);
+          signer = provider.getSigner();
+          router = router.connect(signer);
+
+          connectBtn.innerText = account.substring(0, 6) + '...' + account.substring(38);
+          setStatus('Connected');
+
+          await updateBalances();
+          await computeOutput();
+
+          console.log('Wallet connected successfully:', account);
+        }
+      } catch (error) {
+        console.error('Connection failed:', error);
+        if (error.code === 4001) {
+          setStatus('Connection rejected');
+          alert('Please connect your wallet to use CozySwap.');
+        } else {
+          setStatus('Connection failed');
+          alert('Connection failed: ' + (error.message || error));
+        }
+      }
+    };
+
+    addTokenBtn.onclick = async () => {
+      const addr = prompt('Paste custom token address'); 
+      if (!addr) return; 
+      if (!utils.isAddress(addr)) return alert('Invalid address');
+
+      const c = new Contract(addr, ERC20, provider || new providers.JsonRpcProvider(RPC));
+      let sym = 'TOKEN'; 
+      try { 
+        sym = await c.symbol(); 
+      } catch (e) {}
+
+      if (!confirm('Add custom token ' + sym + '\nAddress: ' + addr + '\nWarning: adding custom tokens can be risky. Proceed?')) return;
+
+      tokens.push({symbol: sym, address: addr, logoURI: ''}); 
+      saveTokens(tokens); 
+      refreshSelectors(); 
+      alert('Token added: ' + sym);
+    };
+
+    async function updateBalances() {
+      try {
+        if (!provider) return;
+        if (!account) {
+          if (provider.listAccounts) {
+            const accts = await provider.listAccounts();
+            account = accts && accts[0];
+          }
+        }
+
+        if (!account) {
+          fromBalanceEl.innerText = '-';
+          toBalanceEl.innerText = '-';
+          return;
+        }
+
+        // From balance
+        const f = selectedFromToken.address;
+        if (f === 'XPL_NATIVE') {
+          const bal = await provider.getBalance(account);
+          fromBalanceEl.innerText = utils.formatUnits(bal, 18);
+        } else {
+          const c = new Contract(f, ERC20, provider);
+          const dec = await c.decimals();
+          const bal = await c.balanceOf(account);
+          fromBalanceEl.innerText = utils.formatUnits(bal, dec);
+        }
+
+        // To balance
+        const t = selectedToToken.address;
+        if (t === 'XPL_NATIVE') {
+          const bal = await provider.getBalance(account);
+          toBalanceEl.innerText = utils.formatUnits(bal, 18);
+        } else {
+          const c2 = new Contract(t, ERC20, provider);
+          const dec2 = await c2.decimals();
+          const bal2 = await c2.balanceOf(account);
+          toBalanceEl.innerText = utils.formatUnits(bal2, dec2);
+        }
+      } catch (e) {
+        console.warn('Balance error', e);
+        fromBalanceEl.innerText = '-';
+        toBalanceEl.innerText = '-';
+      }
+    }
+
+    maxFromBtn.onclick = async () => {
+      try {
+        if (!account) return alert('Connect wallet');
+        const f = selectedFromToken.address;
+        if (f === 'XPL_NATIVE') {
+          const bal = await provider.getBalance(account);
+          fromAmountEl.value = utils.formatUnits(bal, 18);
+        } else {
+          const c = new Contract(f, ERC20, provider);
+          const bal = await c.balanceOf(account);
+          const dec = await c.decimals();
+          fromAmountEl.value = utils.formatUnits(bal, dec);
+        }
+        computeOutput();
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    async function getPairReserves(tokenA, tokenB) {
+      try {
+        const a = tokenA === 'XPL_NATIVE' ? WXPL : tokenA;
+        const b = tokenB === 'XPL_NATIVE' ? WXPL : tokenB;
+        const pairAddr = await factory.getPair(a, b);
+        if (!pairAddr || pairAddr === '0x0000000000000000000000000000000000000000') return null;
+
+        const pair = new Contract(pairAddr, PAIR_ABI, provider);
+        const reserves = await pair.getReserves();
+        const t0 = await pair.token0();
+        const t1 = await pair.token1();
+        return { reserves, token0: t0, token1: t1 };
+      } catch (e) {
+        console.warn(e);
+        return null;
+      }
+    }
+
+    async function computeOutput() {
+      try {
+        const amtStr = (fromAmountEl.value || '').trim();
+        if (!amtStr) {
+          toReadable.innerText = '—';
+          priceImpactEl.innerText = 'Price impact: —';
+          return;
+        }
+
+        const from = selectedFromToken.address;
+        const to = selectedToToken.address;
+
+        const decFrom = from === 'XPL_NATIVE' ? 18 : await (new Contract(from, ERC20, provider)).decimals();
+        const decTo = to === 'XPL_NATIVE' ? 18 : await (new Contract(to, ERC20, provider)).decimals();
+
+        const amountIn = utils.parseUnits(amtStr, decFrom);
+        const path = [from === 'XPL_NATIVE' ? WXPL : from, to === 'XPL_NATIVE' ? WXPL : to];
+
+        let amounts;
+        try {
+          amounts = await router.getAmountsOut(amountIn, path);
+        } catch (e) {
+          toReadable.innerText = '—';
+          liquidityInfoEl.innerText = 'Pool: insufficient liquidity or pair missing';
+          priceImpactEl.innerText = 'Price impact: —';
+          return;
+        }
+
+        const out = amounts[amounts.length - 1];
+        toReadable.innerText = utils.formatUnits(out, decTo);
+
+        const pair = await getPairReserves(from, to);
+        if (!pair) {
+          priceImpactEl.innerText = 'Price impact: —';
+          liquidityInfoEl.innerText = 'Pool not found';
+          return;
+        }
+
+        const { reserves, token0 } = pair;
+        let reserveIn = reserves[0], reserveOut = reserves[1];
+        if (token0.toLowerCase() !== (from === 'XPL_NATIVE' ? WXPL : from).toLowerCase()) {
+          reserveIn = reserves[1];
+          reserveOut = reserves[0];
+        }
+
+        const reserveInFloat = Number(utils.formatUnits(reserveIn, decFrom));
+        const reserveOutFloat = Number(utils.formatUnits(reserveOut, decTo));
+        if (reserveInFloat === 0 || reserveOutFloat === 0) {
+          priceImpactEl.innerText = 'Price impact: —';
+          return;
+        }
+
+        const ideal = reserveOutFloat / reserveInFloat;
+        const real = Number(utils.formatUnits(out, decTo)) / Number(utils.formatUnits(amountIn, decFrom));
+        const impact = Math.abs((ideal - real) / ideal) * 100;
+        const impactFixed = impact.toFixed(2) + '%';
+
+        if (impact < 1) priceImpactEl.innerHTML = `Price impact: <span class="green">${impactFixed}</span>`;
+        else if (impact < 5) priceImpactEl.innerHTML = `Price impact: <span class="yellow">${impactFixed}</span>`;
+        else priceImpactEl.innerHTML = `Price impact: <span class="red">${impactFixed}</span>`;
+
+        liquidityInfoEl.innerText = 'Pool: reserves OK';
+      } catch (e) {
+        console.error('computeOutput', e);
+      }
+    }
+
+    fromAmountEl.addEventListener('input', debounce(computeOutput, 400));
+
+    flipBtn && (flipBtn.onclick = () => {
+      const temp = selectedFromToken;
+      selectedFromToken = selectedToToken;
+      selectedToToken = temp;
+      selectToken('from', selectedFromToken);
+      selectToken('to', selectedToToken);
+    });
+
+    async function hasAllowance(tokenAddr, owner, amount) {
+      try {
+        if (tokenAddr === 'XPL_NATIVE') return true;
+        const c = new Contract(tokenAddr, ERC20, provider);
+        const al = await c.allowance(owner, ROUTER);
+        return al.gte(amount);
+      } catch (e) {
+        console.warn('Allowance check failed', e);
+        return false;
+      }
+    }
+
+    async function approveToken(tokenAddr) {
+      try {
+        if (!signer) throw new Error('Wallet not connected');
+        const c = new Contract(tokenAddr, ERC20, signer);
+        const tx = await c.approve(ROUTER, ethers.constants.MaxUint256);
+        setStatus('Approving...');
+        await tx.wait();
+        setStatus('Approved');
+        return true;
+      } catch (e) {
+        console.error('Approve error', e);
+        alert('Approve failed: ' + (e.message || e));
+        return false;
+      }
+    }
+
+    approveOrSwapBtn.addEventListener('click', async () => {
+      try {
+        if (!provider) return alert('Provider missing');
+        if (!window.ethereum) return alert('Connect wallet first');
+        if (!signer) signer = new providers.Web3Provider(window.ethereum).getSigner();
+
+        const owner = await signer.getAddress();
+        const from = selectedFromToken.address;
+        const to = selectedToToken.address;
+        const amtStr = (fromAmountEl.value || '').trim();
+
+        if (!amtStr) return alert('Enter amount');
+
+        const decFrom = from === 'XPL_NATIVE' ? 18 : await (new Contract(from, ERC20, provider)).decimals();
+        const amountIn = utils.parseUnits(amtStr, decFrom);
+
+        const allowanceOk = await hasAllowance(from, owner, amountIn);
+        if (!allowanceOk) {
+          const ok = confirm('Token not approved. Approve unlimited to router?');
+          if (!ok) return;
+          const res = await approveToken(from);
+          if (!res) return;
+        }
+
+        const path = [from === 'XPL_NATIVE' ? WXPL : from, to === 'XPL_NATIVE' ? WXPL : to];
+        const routerSigner = router.connect(signer);
+
+        if (from === 'XPL_NATIVE') {
+          const amounts = await router.getAmountsOut(amountIn, path);
+          const out = amounts[amounts.length - 1];
+          const sl = parseFloat(document.getElementById('slippage').value || 0.5);
+          const slBps = Math.floor(sl * 100);
+          const amountOutMin = out.mul(10000 - slBps).div(10000);
+          const deadline = (await provider.getBlock('latest')).timestamp + (parseInt(document.getElementById('deadline').value || 10) * 60);
+
+          setStatus('Sending swap (ETH) ...');
+          const tx = await routerSigner.swapExactETHForTokens(amountOutMin, path, owner, deadline, { value: amountIn, gasLimit: 1500000 });
+          txHashEl.innerText = 'Tx: ' + tx.hash;
+          await tx.wait();
+          setStatus('Swap confirmed');
+          alert('Swap complete: ' + tx.hash);
+          txHashEl.innerText = 'Tx: ' + tx.hash;
+          updateBalances();
+          computeOutput();
+          return;
+        }
+
+        const amounts = await router.getAmountsOut(amountIn, path);
+        const out = amounts[amounts.length - 1];
+        const sl = parseFloat(document.getElementById('slippage').value || 0.5);
+        const slBps = Math.floor(sl * 100);
+        const amountOutMin = out.mul(10000 - slBps).div(10000);
+        const deadline = (await provider.getBlock('latest')).timestamp + (parseInt(document.getElementById('deadline').value || 10) * 60);
+
+        setStatus('Sending swap...');
+        let tx;
+
+        if (to === 'XPL_NATIVE') {
+          tx = await routerSigner.swapExactTokensForETH(amountIn, amountOutMin, path, owner, deadline, { gasLimit: 1500000 });
+        } else {
+          tx = await routerSigner.swapExactTokensForTokens(amountIn, amountOutMin, path, owner, deadline, { gasLimit: 1500000 });
+        }
+
+        const scanUrl = `https://plasmascan.to/tx/${tx.hash}`;
+        txHashEl.innerHTML = `
+          <span class="text-gray-300 text-sm">Tx:</span>
+          <a href="${scanUrl}" target="_blank" class="text-blue-400 hover:underline">
+            ${tx.hash.slice(0, 10)}...${tx.hash.slice(-8)}
+          </a>
+        `;
+        await tx.wait();
+        setStatus('Swap confirmed');
+        alert('Swap complete!');
+        txHashEl.innerHTML = `
+          <span class="text-gray-300 text-sm">Tx:</span>
+          <a href="${scanUrl}" target="_blank" class="text-blue-400 hover:underline">
+            ${tx.hash.slice(0, 10)}...${tx.hash.slice(-8)}
+          </a>
+        `;
+
+        updateBalances();
+        computeOutput();
+      } catch (e) {
+        console.error('Swap error', e);
+        alert('Swap failed: ' + (e.message || e));
+        setStatus('Swap failed');
+      }
+    });
+
+    async function refreshButtonState() {
+      try {
+        if (!provider) return;
+        if (!window.ethereum) {
+          approveOrSwapBtn.innerText = 'Swap (connect)';
+          return;
+        }
+
+        if (!signer) signer = new providers.Web3Provider(window.ethereum).getSigner();
+        const owner = await signer.getAddress();
+        const from = selectedFromToken.address;
+        const amtStr = (fromAmountEl.value || '').trim();
+
+        if (!amtStr) {
+          approveOrSwapBtn.innerText = 'Swap';
+          return;
+        }
+
+        const decFrom = from === 'XPL_NATIVE' ? 18 : await (new Contract(from, ERC20, provider)).decimals();
+        const amountIn = utils.parseUnits(amtStr, decFrom);
+        const ok = await hasAllowance(from, owner, amountIn);
+
+        approveOrSwapBtn.innerText = ok ? 'Swap' : 'Approve';
+      } catch (e) {
+        console.warn('Refresh button', e);
+        approveOrSwapBtn.innerText = 'Swap';
+      }
+    }
+
+    setInterval(() => {
+      if (window.ethers || window.ethereum) refreshButtonState();
+    }, 1500);
+
+    // Initialize
+    await ensureProvider();
+    refreshSelectors();
+    await updateBalances();
+    computeOutput();
+
+    // === Custom Navigation URLs ===
+    const addLiquidityUrl = 'https://cozyswap.net/liquidity';
+    const stakingUrl = 'https://cozyswap.net/staking';
+
+    document.getElementById('toLiquidity').onclick = () => {
+      if (!addLiquidityUrl.startsWith('https')) {
+        alert('Add Liquidity link invalid.');
+      } else {
+        window.location.href = addLiquidityUrl;
+      }
+    };
+
+    document.getElementById('toStaking').onclick = () => {
+      if (!stakingUrl.startsWith('http')) {
+        alert('Staking link invalid.');
+      } else {
+        window.location.href = stakingUrl;
+      }
+    };
+
+    function debounce(fn, ms) {
+      let t;
+      return (...a) => {
+        clearTimeout(t);
+        t = setTimeout(() => fn(...a), ms);
+      };
+    }
+
+  })();
+    function copyAddress(addr) {
+  if (!addr) return showToast("⚠️ Token address not found", true);
+  navigator.clipboard.writeText(addr)
+    .then(() => showToast("✅ Token address copied to clipboard"))
+    .catch(() => showToast("❌ Failed to copy address", true));
+}
+
+function showToast(message, isError = false) {
+  const toast = document.createElement("div");
+  toast.textContent = message;
+  toast.style.position = "fixed";
+  toast.style.bottom = "24px";
+  toast.style.left = "50%";
+  toast.style.transform = "translateX(-50%)";
+  toast.style.padding = "10px 18px";
+  toast.style.background = isError ? "rgba(220, 53, 69, 0.9)" : "rgba(40, 167, 69, 0.9)";
+  toast.style.color = "#fff";
+  toast.style.fontSize = "14px";
+  toast.style.borderRadius = "8px";
+  toast.style.boxShadow = "0 2px 6px rgba(0,0,0,0.3)";
+  toast.style.zIndex = "9999";
+  toast.style.opacity = "0";
+  toast.style.transition = "opacity 0.3s ease";
+
+  document.body.appendChild(toast);
+  setTimeout(() => toast.style.opacity = "1", 10);
+
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    setTimeout(() => toast.remove(), 400);
+  }, 2500);
+}
+
+  </script>
+  <script src="appkit.bundle.js"></script>
+</body>
+</html>
