@@ -1,0 +1,1286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>CozySwap — Liquidity</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root{--bg:#0b0b0f;--card:#111216;--muted:#9aa0a6;--accent1:#6c63ff;--accent2:#00c6ff}
+  body{background:var(--bg);color:#e6eef8;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;margin:0}
+  .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:14px;padding:16px;border:1px solid rgba(255,255,255,0.03)}
+  .muted{color:var(--muted)}
+  .small{font-size:13px}
+  .btn-grad{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:white}
+  .rounded-full-img{width:48px;height:48px;border-radius:50%;object-fit:cover}
+  a.tx-link{color:#66b2ff;text-decoration:underline;cursor:pointer}
+  .token-logo{width:36px;height:36px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:10px;border:1px solid rgba(255,255,255,0.04)}
+  .token-logo-small{width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px;border:1px solid rgba(255,255,255,0.04)}
+  .pair-symbol{font-weight:600;margin-left:8px}
+  /* Toast */
+  #toast-wrap{position:fixed;right:20px;bottom:22px;z-index:9999;}
+  .toast{min-width:220px;padding:12px 16px;border-radius:10px;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,0.4);display:flex;align-items:center;gap:10px}
+  .toast.success{background:#2fa84f}
+  .toast.error{background:#b33a3a}
+  .toast .ico{font-size:18px}
+
+  /* Modal token list */
+  .tk-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9998;display:flex;align-items:flex-end;justify-content:center;padding:12px}
+  .tk-modal{width:100%;max-width:520px;background:linear-gradient(180deg, #0f1113, #0b0b0d);border-radius:18px;padding:10px 8px;box-shadow:0 10px 30px rgba(0,0,0,0.6);max-height:85vh;overflow:auto}
+  .tk-header{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.03);margin-bottom:8px}
+  .tk-search{width:100%;padding:8px 10px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:inherit}
+  .tk-item{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:10px;margin:6px 4px;cursor:pointer}
+  .tk-item:hover{background:rgba(255,255,255,0.02)}
+  .tk-left{display:flex;align-items:center;gap:8px}
+  .copy-btn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:6px 8px;border-radius:8px;cursor:pointer}
+  /* desktop center modal */
+  @media(min-width:768px){
+    .tk-overlay{align-items:center}
+    .tk-modal{border-radius:12px}
+  }
+
+  /* small ui helpers */
+  .select-btn{display:flex;align-items:center;justify-content:space-between;padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.06);background:transparent;width:100%}
+  .select-label{display:flex;align-items:center;gap:8px}
+</style>
+</head>
+<body class="p-4">
+  <div class="max-w-3xl mx-auto">
+    <header class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-4">
+        <img src="https://photos.pinksale.finance/file/pinksale-logo-upload/1759992605150-e3175ba3ea1d9672e44128a60a685807.JPG" class="rounded-full-img" alt="Cozy"/>
+        <div>
+          <div class="text-2xl font-semibold">CozySwap — Liquidity</div>
+          <div class="muted small">Plasma (9745) • @CozySwap</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div id="walletAddress" class="muted small">Not connected</div>
+        <button id="connectBtn" class="px-3 py-2 rounded-lg btn-grad">Connect Wallet</button>
+      </div>
+    </header>
+
+    <nav class="flex gap-2 mb-4">
+      <button id="tabMy" class="px-4 py-2 text-blue-400 border-b-2 border-blue-400">My Pools</button>
+      <button id="tabExplore" class="px-4 py-2 text-gray-300">Explore</button>
+      <button id="tabCreate" class="px-4 py-2 text-gray-300">Create</button>
+    </nav>
+
+    <!-- My Pools -->
+    <section id="viewMy">
+      <div class="card mb-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="font-semibold">Your Liquidity Positions</div>
+            <div class="muted small">Import, create, or manage your pools</div>
+          </div>
+          <div class="flex gap-2">
+            <button id="btnCreateQuick" class="px-3 py-2 rounded-lg bg-green-600 small">+ Create Pool</button>
+            <button id="btnImportQuick" class="px-3 py-2 rounded-lg border small muted">↻ Import Pool</button>
+          </div>
+        </div>
+
+        <div id="positionsList" class="mt-4 space-y-3"></div>
+        <div id="noPositionsMsg" class="mt-3 muted small">No existing liquidity positions found.</div>
+
+        <div id="importBoxQuick" class="hidden mt-3">
+          <input id="importAddrQuick" placeholder="Paste token address to import" class="w-full bg-transparent border rounded-lg px-3 py-2 mb-2"/>
+          <div class="flex gap-2">
+            <button id="doImportQuick" class="btn-grad px-3 py-2 rounded-lg">Import</button>
+            <button id="cancelImportQuick" class="border px-3 py-2 rounded-lg muted">Cancel</button>
+          </div>
+          <div id="importQuickMsg" class="mt-2 muted small"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Explore -->
+    <section id="viewExplore" class="hidden">
+      <div class="card mb-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="font-semibold">Popular Pools</div>
+            <div class="muted small">Select a pool to add liquidity</div>
+          </div>
+        </div>
+        <div id="popularList" class="mt-4 space-y-3"></div>
+      </div>
+    </section>
+
+    <!-- Create -->
+    <section id="viewCreate" class="hidden">
+      <div class="card mb-4">
+        <div class="font-semibold">Create / Add Liquidity</div>
+        <div class="muted small">Warning: Anyone can create ERC20 tokens. Verify before adding liquidity.</div>
+
+        <div class="mt-4 grid grid-cols-1 gap-3">
+          <div>
+            <label class="small muted">Token A</label>
+            <div class="flex gap-2 mt-2">
+              <!-- Hidden select kept for compatibility with existing logic -->
+              <select id="createTokenA" class="hidden"></select>
+              <input type="hidden" id="createTokenAVal" />
+              <button id="createTokenAbtn" class="select-btn" aria-haspopup="dialog" aria-controls="tokenModal">
+                <div class="select-label"><img id="createTokenAlogo" src="assets/default.png" class="token-logo-small"/><div id="createTokenAlabel">Select token</div></div>
+                <div>▾</div>
+              </button>
+              <button id="addCustomA" class="px-3 py-2 border rounded-lg muted">＋</button>
+            </div>
+            <div id="balCreateA" class="muted small mt-1">Balance: —</div>
+          </div>
+
+          <div class="text-center muted">⇅</div>
+
+          <div>
+            <label class="small muted">Token B</label>
+            <div class="flex gap-2 mt-2">
+              <select id="createTokenB" class="hidden"></select>
+              <input type="hidden" id="createTokenBVal" />
+              <button id="createTokenBbtn" class="select-btn" aria-haspopup="dialog" aria-controls="tokenModal">
+                <div class="select-label"><img id="createTokenBlogo" src="assets/default.png" class="token-logo-small"/><div id="createTokenBlabel">Select token</div></div>
+                <div>▾</div>
+              </button>
+              <button id="addCustomB" class="px-3 py-2 border rounded-lg muted">＋</button>
+            </div>
+            <div id="balCreateB" class="muted small mt-1">Balance: —</div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <input id="createAmountA" placeholder="Amount A" class="bg-transparent border rounded-lg px-3 py-2"/>
+            <input id="createAmountB" placeholder="Amount B" class="bg-transparent border rounded-lg px-3 py-2"/>
+          </div>
+
+          <div class="flex gap-2">
+            <button id="btnApproveCreate" class="flex-1 px-3 py-2 rounded-lg border muted">Approve (auto)</button>
+            <button id="btnCreatePool" class="flex-1 px-3 py-2 rounded-lg btn-grad">Create Pool</button>
+          </div>
+
+          <div id="createMsg" class="muted small mt-2"></div>
+        </div>
+      </div>
+    </section>
+
+    <div id="managerSpot"></div>
+
+    <div id="txHistoryBox" class="card mt-4">
+      <div class="font-semibold">Recent transactions (24h)</div>
+      <div id="txHistoryList" class="mt-2 small muted"></div>
+    </div>
+
+    <footer class="mt-6 muted small text-center">CozySwap • Powered by Plasma • @CozySwap</footer>
+  </div>
+
+<footer style="background-color:#0d1117; color:#ccc; text-align:center; padding:25px 10px; font-family:'Inter',sans-serif; font-size:14px;">
+  <p>
+    © 2025 CozySwap &nbsp;|&nbsp;
+    <a href="terms.html" style="color:#58a6ff; text-decoration:none;">Terms of Use</a> &nbsp;|&nbsp;
+    <a href="disclaimer.html" style="color:#58a6ff; text-decoration:none;">Disclaimer</a> &nbsp;|&nbsp;
+    <a href="privacy.html" style="color:#58a6ff; text-decoration:none;">Privacy Policy</a>
+  </p>
+</footer>
+
+<!-- Toast wrapper -->
+<div id="toast-wrap"></div>
+
+<!-- Token modal (hidden by default) -->
+<div id="tokenModal" style="display:none" aria-hidden="true">
+  <div class="tk-overlay" id="tkOverlay">
+    <div class="tk-modal" role="dialog" aria-modal="true" aria-labelledby="tkTitle">
+      <div class="tk-header">
+        <div style="font-weight:600" id="tkTitle">Select a token</div>
+        <button id="tkClose" class="px-3 py-1 border rounded">Close</button>
+      </div>
+      <div style="padding:8px">
+        <input id="tkSearch" class="tk-search" placeholder="Search token symbol or address"/>
+      </div>
+      <div id="tokenList" style="padding:8px"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const TOKEN_LIST_KEY = "cozy_token_v2";
+let tokenList = [];
+
+// 🔄 Ambil tokens.json dengan cache busting agar auto-refresh saat file update
+async function loadTokenList() {
+  try {
+    const ts = Date.now(); // mencegah cache browser
+    const res = await fetch(`tokens.json?ver=${ts}`);
+    const data = await res.json();
+    localStorage.setItem(TOKEN_LIST_KEY, JSON.stringify(data));
+    tokenList = data;
+  } catch (e) {
+    console.error("Failed to load tokens.json, using cached list", e);
+    const cached = localStorage.getItem(TOKEN_LIST_KEY);
+    if (cached) tokenList = JSON.parse(cached);
+  }
+}
+
+// 📦 Ambil token detail berdasarkan symbol
+function getTokenInfo(symbol) {
+  return tokenList.find(t => t.symbol === symbol) || null;
+}
+
+// 🔧 Utility untuk ambil logo
+function getTokenLogo(symbol) {
+  const info = getTokenInfo(symbol);
+  return info?.logoURI || `assets/${symbol.toLowerCase()}.png`;
+}
+
+// Jalankan saat halaman load
+loadTokenList();
+
+/* ============================
+  Config & dependencies
+   ============================ */
+const RPC = 'https://plasma-mainnet.g.alchemy.com/v2/MuLXFm60Tsz3ntyrSC1O4';
+const CHAIN_ID_HEX = '0x2611';
+const ROUTER = '0x89E695B38610e78a77Fb310458Dfd855505AD239';
+const FACTORY = '0xa252e44D3478CeBb1a3D59C9146CD860cb09Ec93';
+const WXPL = '0x6100E367285b01F48D07953803A2d8dCA5D19873';
+const SCAN_BASE = 'https://plasmascan.to/tx/';
+
+const DEFAULT_TOKENS = [
+  { symbol: 'XPL', address: 'XPL_NATIVE', decimals: 18 },
+  { symbol: 'COZY', address: '0x06e2ef46662834f4e42dbf9ff9222b077c57df5c', decimals: 18 },
+  { symbol: 'USDT0', address: '0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb', decimals: 6 },
+  { symbol: 'WETH', address: '0x9895D81bB462A195b4922ED7De0e3ACD007c32CB', decimals: 18 },
+  { symbol: 'CRY', address: '0x59cdd876f3b8a4e81ecb467078ea009f80052fa2', decimals: 18 }
+];
+
+const POPULAR_PAIRS = [
+  ['XPL_NATIVE','0x06e2ef46662834f4e42dbf9ff9222b077c57df5c'],
+  ['XPL_NATIVE','0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb']
+];
+
+const ERC20_ABI = [
+  'function decimals() view returns (uint8)',
+  'function symbol() view returns (string)',
+  'function balanceOf(address) view returns (uint256)',
+  'function approve(address spender,uint256 amount) returns (bool)',
+  'function allowance(address owner,address spender) view returns (uint256)'
+];
+const FACTORY_ABI = ['function getPair(address,address) view returns (address)','function createPair(address,address) returns (address)'];
+const ROUTER_ABI = [
+  'function addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256) returns (uint256,uint256,uint256)',
+  'function addLiquidityETH(address token,uint amountTokenDesired,uint amountTokenMin,uint amountETHMin,address to,uint deadline) payable returns (uint256,uint256,uint256)',
+  'function removeLiquidity(address,address,uint256,uint256,uint256,address,uint256) returns (uint256,uint256)'
+];
+const PAIR_ABI = ['function getReserves() view returns (uint112,uint112,uint32)','function token0() view returns (address)','function token1() view returns (address)','function balanceOf(address) view returns (uint256)','function totalSupply() view returns (uint256)'];
+
+/* ============================
+  Ethers loader (try CDN)
+   ============================ */
+const ETHER_CDNS = [
+  'https://cdn.jsdelivr.net/npm/ethers@5.7.1/dist/ethers.umd.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.1/ethers.umd.min.js'
+];
+async function loadEthers(){
+  if(window.ethers) return window.ethers;
+  for(const u of ETHER_CDNS){
+    try{
+      await new Promise((res,rej)=>{
+        const s=document.createElement('script'); s.src=u; s.async=true; s.onload=res; s.onerror=rej; document.head.appendChild(s);
+      });
+      if(window.ethers) return window.ethers;
+    }catch(e){ console.warn('cd fail', u); }
+  }
+  throw new Error('ethers not available');
+}
+
+/* ============================
+  State & DOM
+   ============================ */
+let ethersLib, provider, signer, account;
+let factoryContract, routerContract;
+const LS_CUSTOM = 'cozy_custom_tokens_vfinal';
+const LS_IMPORTED = 'cozy_imported_pairs_vfinal';
+const LS_TXS = 'cozy_tx_history_vfinal';
+
+let customTokens = loadLS(LS_CUSTOM, []);
+let importedPairs = loadLS(LS_IMPORTED, []);
+let txHistory = loadLS(LS_TXS, []);
+
+const connectBtn = document.getElementById('connectBtn');
+const walletAddress = document.getElementById('walletAddress');
+const tabMy = document.getElementById('tabMy'), tabExplore = document.getElementById('tabExplore'), tabCreate = document.getElementById('tabCreate');
+const viewMy = document.getElementById('viewMy'), viewExplore = document.getElementById('viewExplore'), viewCreate = document.getElementById('viewCreate');
+const positionsList = document.getElementById('positionsList'), noPositionsMsg = document.getElementById('noPositionsMsg');
+const importBoxQuick = document.getElementById('importBoxQuick'), importAddrQuick = document.getElementById('importAddrQuick'), doImportQuick = document.getElementById('doImportQuick'), importQuickMsg = document.getElementById('importQuickMsg'), cancelImportQuick = document.getElementById('cancelImportQuick');
+const popularList = document.getElementById('popularList');
+const btnCreateQuick = document.getElementById('btnCreateQuick'), btnImportQuick = document.getElementById('btnImportQuick');
+
+const createTokenA = document.getElementById('createTokenA'); // hidden select (kept for compatibility)
+const createTokenB = document.getElementById('createTokenB'); // hidden select
+const createTokenAVal = document.getElementById('createTokenAVal'); // visible value holder
+const createTokenBVal = document.getElementById('createTokenBVal');
+const createTokenAbtn = document.getElementById('createTokenAbtn');
+const createTokenBbtn = document.getElementById('createTokenBbtn');
+const createTokenAlogo = document.getElementById('createTokenAlogo');
+const createTokenBlogo = document.getElementById('createTokenBlogo');
+const createTokenAlabel = document.getElementById('createTokenAlabel');
+const createTokenBlabel = document.getElementById('createTokenBlabel');
+
+const balCreateA = document.getElementById('balCreateA'), balCreateB = document.getElementById('balCreateB');
+const createAmountA = document.getElementById('createAmountA'), createAmountB = document.getElementById('createAmountB');
+const btnCreatePool = document.getElementById('btnCreatePool'), btnApproveCreate = document.getElementById('btnApproveCreate');
+const managerSpot = document.getElementById('managerSpot');
+const txHistoryList = document.getElementById('txHistoryList');
+
+/* ============================
+  Helpers
+   ============================ */
+function loadLS(k,d){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):d;}catch(e){return d} }
+function saveLS(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+function shortAddr(a){ if(!a) return '-'; return a.slice(0,6)+'...'+a.slice(-4); }
+function nowSec(){ return Math.floor(Date.now()/1000); }
+function addTxToHistory(hash, label){
+  if(!hash) return;
+  txHistory.unshift({ hash, label, ts: nowSec() });
+  // keep only 100 items max and then persist
+  txHistory = txHistory.filter(t => (nowSec() - t.ts) < 24*3600).slice(0,100);
+  saveLS(LS_TXS, txHistory);
+  renderTxHistory();
+}
+function renderTxHistory(){
+  // purge older than 24h
+  txHistory = txHistory.filter(t => (nowSec() - t.ts) < 24*3600);
+  saveLS(LS_TXS, txHistory);
+  if(txHistory.length === 0){ txHistoryList.innerHTML = '<div class="muted small">No recent tx.</div>'; return; }
+  txHistoryList.innerHTML = '';
+  txHistory.forEach(t=>{
+    const el = document.createElement('div');
+    el.innerHTML = `<div><a class="tx-link" data-h="${t.hash}">${shortAddr(t.hash)} · ${t.label || 'tx'}</a> <span class="muted small">(${new Date(t.ts*1000).toLocaleTimeString()})</span></div>`;
+    el.querySelector('a').onclick = (e)=>{ const h=e.currentTarget.getAttribute('data-h'); if(h) location.href = SCAN_BASE + h; };
+    txHistoryList.appendChild(el);
+  });
+}
+
+/* ============================
+  Toast & copy helpers (like swap.html)
+   ============================ */
+function showToast(msg, isErr=false, ttl=3800){
+  const wrap = document.getElementById('toast-wrap');
+  if(!wrap) return;
+  const el = document.createElement('div');
+  el.className = 'toast ' + (isErr? 'error':'success');
+  el.innerHTML = `<div class="ico">${isErr? '❌':'✅'}</div><div style="flex:1">${msg}</div>`;
+  wrap.appendChild(el);
+  setTimeout(()=> {
+    el.style.transition = 'opacity 250ms';
+    el.style.opacity = '0';
+    setTimeout(()=> el.remove(), 300);
+  }, ttl);
+}
+function copyAddress(addr) {
+  if (!addr) return showToast("⚠️ Token address not found", true);
+  navigator.clipboard.writeText(addr)
+    .then(() => showToast("✅ Token address copied to clipboard"))
+    .catch(() => showToast("❌ Failed to copy address", true));
+}
+
+/* ============================
+  Ethers + init
+   ============================ */
+(async function init(){
+  try{ ethersLib = await loadEthers(); } catch(e){ alert('Failed load ethers.js — ensure CDN allowed'); return; }
+  provider = new ethersLib.providers.JsonRpcProvider(RPC);
+  factoryContract = new ethersLib.Contract(FACTORY, FACTORY_ABI, provider);
+  routerContract = new ethersLib.Contract(ROUTER, ROUTER_ABI, provider);
+  bindUI();
+  await populateTokenSelectors();
+  await renderPopular();
+  await renderMyPools();
+  renderTxHistory();
+})();
+
+/* ============================
+  UI Bindings
+   ============================ */
+function bindUI(){
+  connectBtn.onclick = connectWallet;
+  tabMy.onclick = ()=>switchTab('my');
+  tabExplore.onclick = ()=>switchTab('explore');
+  tabCreate.onclick = ()=>switchTab('create');
+  btnCreateQuick.onclick = ()=>switchTab('create');
+  btnImportQuick.onclick = ()=>{ importBoxQuick.classList.toggle('hidden'); };
+  cancelImportQuick.onclick = ()=>{ importBoxQuick.classList.add('hidden'); importQuickMsg.innerText=''; importAddrQuick.value=''; };
+  doImportQuick.onclick = ()=>importSingle(importAddrQuick.value.trim(), importQuickMsg);
+
+  addCustomA.onclick = ()=>promptAddCustom();
+  addCustomB.onclick = ()=>promptAddCustom();
+
+  // open token modal for create token A/B
+  createTokenAbtn.onclick = ()=> openTokenModal('A');
+  createTokenBbtn.onclick = ()=> openTokenModal('B');
+
+  createTokenA.onchange = ()=>updateCreateBalances();
+  createTokenB.onchange = ()=>updateCreateBalances();
+
+  // Prevent recursive syncing
+  let syncing = false;
+  createAmountA.addEventListener('input', debounce(()=>{
+    if (!syncing) {
+      syncing = true;
+      syncCreateBFromA();
+      setTimeout(() => { syncing = false; }, 100);
+    }
+  },300));
+
+  createAmountB.addEventListener('input', debounce(()=>{
+    if (!syncing) {
+      syncing = true;
+      syncCreateAFromB();
+      setTimeout(() => { syncing = false; }, 100);
+    }
+  },300));
+
+  btnCreatePool.onclick = ()=>createPoolFlow();
+  btnApproveCreate.onclick = ()=>approveBothForCreate();
+
+  // modal controls
+  document.getElementById('tkClose').onclick = closeTokenModal;
+  document.getElementById('tkOverlay').onclick = (e)=>{ if(e.target.id === 'tkOverlay') closeTokenModal(); };
+  document.getElementById('tkSearch').addEventListener('input', debounce(renderTokenList, 150));
+}
+
+/* ============================
+  Connect wallet
+   ============================ */
+async function connectWallet(){
+  try{
+    if(!window.ethereum) return alert('MetaMask/injected wallet required');
+    await window.ethereum.request({ method: 'eth_requestAccounts' });
+    try{ await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: CHAIN_ID_HEX }] }); } catch(e){ console.warn('switch chain failed', e); }
+    provider = new ethersLib.providers.Web3Provider(window.ethereum);
+    signer = provider.getSigner();
+    account = await signer.getAddress();
+    walletAddress.innerText = account.slice(0,6) + '...' + account.slice(-4);
+    connectBtn.innerText = 'Connected';
+    factoryContract = new ethersLib.Contract(FACTORY, FACTORY_ABI, provider);
+    routerContract = new ethersLib.Contract(ROUTER, ROUTER_ABI, provider);
+    await populateTokenSelectors();
+    await renderMyPools();
+    updateCreateBalances();
+  }catch(e){ alert(e.message || e); }
+}
+
+/* ============================
+  Tab switch
+   ============================ */
+function switchTab(name){
+  viewMy.style.display='none'; viewExplore.style.display='none'; viewCreate.style.display='none';
+  tabMy.classList.remove('text-blue-400','border-b-2'); tabExplore.classList.remove('text-blue-400','border-b-2'); tabCreate.classList.remove('text-blue-400','border-b-2');
+  if(name==='my'){ viewMy.style.display='block'; tabMy.classList.add('text-blue-400','border-b-2'); }
+  if(name==='explore'){ viewExplore.style.display='block'; tabExplore.classList.add('text-blue-400','border-b-2'); }
+  if(name==='create'){ viewCreate.style.display='block'; tabCreate.classList.add('text-blue-400','border-b-2'); }
+}
+
+/* ============================
+  Tokens & selectors (populate hidden selects + visible labels)
+============================ */
+function getMergedTokens(){
+  const map = new Map();
+  DEFAULT_TOKENS.concat(customTokens).forEach(t=> map.set((t.address||'').toLowerCase(), t));
+  importedPairs.forEach(p=>{
+    map.set((p.tokenA||'').toLowerCase(), {symbol: p.tokenASym||shortAddr(p.tokenA), address: p.tokenA});
+    map.set((p.tokenB||'').toLowerCase(), {symbol: p.tokenBSym||shortAddr(p.tokenB), address: p.tokenB});
+  });
+  return Array.from(map.values());
+}
+
+async function populateTokenSelectors(){
+  if (!tokenList.length) await loadTokenList(); // pastikan JSON sudah siap
+
+  const tokens = getMergedTokens();
+  createTokenA.innerHTML=''; 
+  createTokenB.innerHTML='';
+
+  tokens.forEach(t=>{
+    const o1 = document.createElement('option'); 
+    o1.value = t.address; 
+    o1.text = t.symbol; 
+    createTokenA.appendChild(o1);
+
+    const o2 = document.createElement('option'); 
+    o2.value = t.address; 
+    o2.text = t.symbol; 
+    createTokenB.appendChild(o2);
+  });
+
+  // set defaults
+  if(!createTokenA.value) createTokenA.value = 'XPL_NATIVE';
+  if(!createTokenB.value) createTokenB.value = tokens[1] ? tokens[1].address : 'XPL_NATIVE';
+
+  await refreshCreateVisibleFromSelect();
+}
+
+/* ============================
+  Refresh visible logos & labels
+============================ */
+async function refreshCreateVisibleFromSelect(){
+  try {
+    // Token A
+    const aAddr = createTokenA.value || createTokenAVal.value;
+    const aSym  = aAddr === 'XPL_NATIVE' ? 'XPL' : await safeSymbol(aAddr);
+    createTokenAVal.value = aAddr;
+    createTokenAlabel.innerText = aSym;
+    createTokenAlogo.src = getTokenLogo(aSym);
+    createTokenAlogo.onerror = function(){ this.onerror=null; this.src='assets/default.png'; };
+
+    // Token B
+    const bAddr = createTokenB.value || createTokenBVal.value;
+    const bSym  = bAddr === 'XPL_NATIVE' ? 'XPL' : await safeSymbol(bAddr);
+    createTokenBVal.value = bAddr;
+    createTokenBlabel.innerText = bSym;
+    createTokenBlogo.src = getTokenLogo(bSym);
+    createTokenBlogo.onerror = function(){ this.onerror=null; this.src='assets/default.png'; };
+  } catch(e) {
+    console.warn('refreshCreateVisibleFromSelect', e);
+  }
+}
+
+/* ============================
+  Token modal handling (open, render list, select)
+============================ */
+let activeTokenTarget = null; // 'A' or 'B'
+function openTokenModal(target){
+  activeTokenTarget = target;
+  document.getElementById('tokenModal').style.display = 'block';
+  document.getElementById('tokenModal').setAttribute('aria-hidden','false');
+  document.getElementById('tkSearch').value = '';
+  renderTokenList();
+  setTimeout(()=> document.getElementById('tkSearch').focus(), 50);
+}
+function closeTokenModal(){
+  activeTokenTarget = null;
+  document.getElementById('tokenModal').style.display = 'none';
+  document.getElementById('tokenModal').setAttribute('aria-hidden','true');
+}
+
+/* ============================
+  Render token list (logos from tokens.json)
+============================ */
+async function renderTokenList(){
+  const wrap = document.getElementById('tokenList');
+  wrap.innerHTML = '';
+  const q = (document.getElementById('tkSearch').value || '').trim().toLowerCase();
+  const tokens = getMergedTokens();
+
+  // Prioritaskan XPL dulu
+  const sorted = tokens.slice().sort((a,b)=>{
+    if(a.symbol === 'XPL') return -1;
+    if(b.symbol === 'XPL') return 1;
+    return a.symbol.localeCompare(b.symbol);
+  });
+
+  for(const t of sorted){
+    const sym = t.symbol || shortAddr(t.address);
+    const addr = t.address;
+    if(q){
+      if(!(sym.toLowerCase().includes(q) || (addr||'').toLowerCase().includes(q))) continue;
+    }
+
+    // ✅ ambil logo dari tokens.json
+    const logoSrc = getTokenLogo(sym);
+
+    const row = document.createElement('div');
+    row.className = 'tk-item';
+    row.innerHTML = `
+      <div class="tk-left">
+        <img src="${logoSrc}" onerror="this.onerror=null;this.src='assets/default.png';" class="token-logo-small" />
+        <div>
+          <div style="font-weight:600">${sym}</div>
+          <div class="muted small">${addr==='XPL_NATIVE' ? sym + ' Token' : (addr ? shortAddr(addr) : '')}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="copy-btn" data-addr="${addr}">📋</button>
+      </div>
+    `;
+
+    // klik baris token
+    row.addEventListener('click', (e)=>{
+      if(e.target && (e.target.closest('.copy-btn') || e.target.classList.contains('copy-btn'))) return;
+      if(activeTokenTarget === 'A'){
+        createTokenA.value = addr;
+        createTokenAVal.value = addr;
+        refreshCreateVisibleFromSelect();
+        createTokenA.dispatchEvent(new Event('change'));
+      } else {
+        createTokenB.value = addr;
+        createTokenBVal.value = addr;
+        refreshCreateVisibleFromSelect();
+        createTokenB.dispatchEvent(new Event('change'));
+      }
+      closeTokenModal();
+    });
+
+    // ✅ tombol copy dengan optional text tetap dipertahankan
+    row.querySelector('.copy-btn').addEventListener('click', (ev)=>{
+      ev.stopPropagation();
+      const a = ev.currentTarget.getAttribute('data-addr');
+      if(a === 'XPL_NATIVE') return copyAddress('native XPL'); // ✅ optional text masih ada
+      copyAddress(a);
+    });
+
+    wrap.appendChild(row);
+  }
+
+  if(wrap.childElementCount === 0){
+    wrap.innerHTML = '<div class="muted small" style="padding:12px">No tokens found.</div>';
+  }
+}
+
+
+/* ============================
+  Balances for create tab
+   ============================ */
+async function updateCreateBalances(){
+  try{
+    const a = createTokenA.value || createTokenAVal.value, b = createTokenB.value || createTokenBVal.value;
+    if(!account){ balCreateA.innerText='Balance: —'; balCreateB.innerText='Balance: —'; return; }
+    if(a==='XPL_NATIVE'){ const bal=await provider.getBalance(account); balCreateA.innerText='Balance: '+ethersLib.utils.formatUnits(bal,18)+' XPL'; }
+    else { const c=new ethersLib.Contract(a, ERC20_ABI, provider); const dec=await c.decimals(); const bal=await c.balanceOf(account); balCreateA.innerText='Balance: '+ethersLib.utils.formatUnits(bal,dec)+' '+await safeSymbol(a); }
+    if(b==='XPL_NATIVE'){ const bal=await provider.getBalance(account); balCreateB.innerText='Balance: '+ethersLib.utils.formatUnits(bal,18)+' XPL'; }
+    else { const c2=new ethersLib.Contract(b, ERC20_ABI, provider); const dec2=await c2.decimals(); const bal2=await c2.balanceOf(account); balCreateB.innerText='Balance: '+ethersLib.utils.formatUnits(bal2,dec2)+' '+await safeSymbol(b); }
+  }catch(e){ console.warn('updateCreateBalances', e); }
+}
+async function safeSymbol(address){
+  if(address==='XPL_NATIVE') return 'XPL';
+  try{ const c=new ethersLib.Contract(address, ERC20_ABI, provider); return await c.symbol(); }catch(e){ return shortAddr(address); }
+}
+
+/* ============================
+  Sync amounts (use pair reserves) - FIXED VERSION
+   ============================ */
+async function syncCreateBFromA(){
+  try{
+    const aAddr=createTokenA.value || createTokenAVal.value, bAddr=createTokenB.value || createTokenBVal.value;
+    if(!createAmountA.value){ return; } // Don't clear B when A is empty
+
+    const onA = aAddr==='XPL_NATIVE'?WXPL:aAddr, onB = bAddr==='XPL_NATIVE'?WXPL:bAddr;
+    const pairAddr = await factoryContract.getPair(onA, onB);
+    if(!pairAddr || pairAddr===ethersLib.constants.AddressZero){ return; } // Don't clear B if no pair
+
+    const pair=new ethersLib.Contract(pairAddr, PAIR_ABI, provider);
+    const reserves=await pair.getReserves(); 
+    const token0 = await pair.token0();
+    let reserveA=reserves[0], reserveB=reserves[1];
+    if(token0.toLowerCase() !== onA.toLowerCase()){ reserveA=reserves[1]; reserveB=reserves[0]; }
+
+    const decA = aAddr==='XPL_NATIVE'?18: await (new ethersLib.Contract(aAddr, ERC20_ABI, provider)).decimals();
+    const decB = bAddr==='XPL_NATIVE'?18: await (new ethersLib.Contract(bAddr, ERC20_ABI, provider)).decimals();
+
+    const inA = ethersLib.utils.parseUnits(createAmountA.value||'0', decA);
+    if(reserveA.isZero()) return;
+
+    const outB = reserveB.mul(inA).div(reserveA);
+    createAmountB.value = ethersLib.utils.formatUnits(outB, decB);
+  }catch(e){ console.warn('syncCreateBFromA', e); }
+}
+
+async function syncCreateAFromB(){
+  try{
+    const aAddr=createTokenA.value || createTokenAVal.value, bAddr=createTokenB.value || createTokenBVal.value;
+    if(!createAmountB.value){ return; } // Don't clear A when B is empty
+
+    const onA = aAddr==='XPL_NATIVE'?WXPL:aAddr, onB = bAddr==='XPL_NATIVE'?WXPL:bAddr;
+    const pairAddr = await factoryContract.getPair(onA, onB);
+    if(!pairAddr || pairAddr===ethersLib.constants.AddressZero){ return; } // Don't clear A if no pair
+
+    const pair=new ethersLib.Contract(pairAddr, PAIR_ABI, provider);
+    const reserves=await pair.getReserves(); 
+    const token0 = await pair.token0();
+    let reserveA=reserves[0], reserveB=reserves[1];
+    if(token0.toLowerCase() !== onA.toLowerCase()){ reserveA=reserves[1]; reserveB=reserves[0]; }
+
+    const decA = aAddr==='XPL_NATIVE'?18: await (new ethersLib.Contract(aAddr, ERC20_ABI, provider)).decimals();
+    const decB = bAddr==='XPL_NATIVE'?18: await (new ethersLib.Contract(bAddr, ERC20_ABI, provider)).decimals();
+
+    const inB = ethersLib.utils.parseUnits(createAmountB.value||'0', decB);
+    if(reserveB.isZero()) return;
+
+    const outA = reserveA.mul(inB).div(reserveB);
+    createAmountA.value = ethersLib.utils.formatUnits(outA, decA);
+  }catch(e){ console.warn('syncCreateAFromB', e); }
+}
+
+/* ============================
+  Approve & create pool
+   ============================ */
+async function approveBothForCreate(){
+  try{
+    if(!window.ethereum) return alert('Connect wallet first');
+    if(!signer) { provider = new ethersLib.providers.Web3Provider(window.ethereum); signer = provider.getSigner(); }
+    const owner = await signer.getAddress();
+    const a = createTokenA.value || createTokenAVal.value, b = createTokenB.value || createTokenBVal.value;
+    if(a !== 'XPL_NATIVE'){
+      const ca = new ethersLib.Contract(a, ERC20_ABI, provider);
+      const allowance = await ca.allowance(owner, ROUTER);
+      if(allowance.lt(ethersLib.constants.MaxUint256.div(2))){
+        createMsg.innerText = 'Approving ' + await safeSymbol(a) + '...';
+        const tx = await ca.connect(signer).approve(ROUTER, ethersLib.constants.MaxUint256);
+        await tx.wait();
+      }
+    }
+    if(b !== 'XPL_NATIVE'){
+      const cb = new ethersLib.Contract(b, ERC20_ABI, provider);
+      const allowance2 = await cb.allowance(owner, ROUTER);
+      if(allowance2.lt(ethersLib.constants.MaxUint256.div(2))){
+        createMsg.innerText = 'Approving ' + await safeSymbol(b) + '...';
+        const tx2 = await cb.connect(signer).approve(ROUTER, ethersLib.constants.MaxUint256);
+        await tx2.wait();
+      }
+    }
+    createMsg.innerText = 'Approved';
+  }catch(e){ alert('Approve failed: '+(e.message||e)); createMsg.innerText='Approve failed'; }
+}
+
+/* ============================
+  Create pool flow
+   (uses createTokenA.value/createTokenB.value fallback)
+   ============================ */
+async function createPoolFlow(){
+  try{
+    if(!window.ethereum) return alert('Connect wallet first');
+    if(!signer){ provider = new ethersLib.providers.Web3Provider(window.ethereum); signer = provider.getSigner(); }
+    const owner = await signer.getAddress();
+    const a = createTokenA.value || createTokenAVal.value, b = createTokenB.value || createTokenBVal.value;
+    if(!a||!b) return alert('Select tokens');
+    if(a===b) return alert('Tokens must be different');
+    const amountAS = createAmountA.value, amountBS = createAmountB.value;
+    if(!amountAS||!amountBS) return alert('Enter amounts for both tokens');
+    createMsg.innerText = 'Processing...';
+    const onA = a==='XPL_NATIVE'?WXPL:a, onB = b==='XPL_NATIVE'?WXPL:b;
+    let pairAddr = await factoryContract.getPair(onA, onB);
+    if(!pairAddr || pairAddr===ethersLib.constants.AddressZero){
+      const facS = factoryContract.connect(signer);
+      const tx = await facS.createPair(onA, onB);
+      addTxToHistory(tx.hash, 'createPair');
+      await tx.wait();
+      pairAddr = await factoryContract.getPair(onA, onB);
+      if(!pairAddr || pairAddr===ethersLib.constants.AddressZero) throw new Error('Pair creation failed');
+    }
+    await approveBothForCreate();
+    const decA = a==='XPL_NATIVE'?18: await (new ethersLib.Contract(a, ERC20_ABI, provider)).decimals();
+    const decB = b==='XPL_NATIVE'?18: await (new ethersLib.Contract(b, ERC20_ABI, provider)).decimals();
+    const amountA = ethersLib.utils.parseUnits(amountAS, decA);
+    const amountB = ethersLib.utils.parseUnits(amountBS, decB);
+    const routerS = routerContract.connect(signer);
+    const deadline = (await provider.getBlock('latest')).timestamp + 60*10;
+    let tx;
+    if(a==='XPL_NATIVE' || b==='XPL_NATIVE'){
+      if(a==='XPL_NATIVE'){
+        tx = await routerS.addLiquidityETH(onB, amountB, 0, 0, owner, deadline, { value: amountA });
+      } else {
+        tx = await routerS.addLiquidityETH(onA, amountA, 0, 0, owner, deadline, { value: amountB });
+      }
+    } else {
+      tx = await routerS.addLiquidity(onA, onB, amountA, amountB, 0, 0, owner, deadline);
+    }
+    addTxToHistory(tx.hash, 'addLiquidity');
+    createMsg.innerText = 'Tx sent: ' + tx.hash;
+    await tx.wait();
+    createMsg.innerText = 'Liquidity added: ' + tx.hash;
+    importedPairs.push({ tokenA: a, tokenB: b, tokenASym: await safeSymbol(a), tokenBSym: await safeSymbol(b), pair: pairAddr });
+    saveLS(LS_IMPORTED, importedPairs);
+    populateTokenSelectors();
+    await renderPopular();
+    await renderMyPools();
+  }catch(e){ console.error('createFlow', e); createMsg.innerText = 'Create/Add failed: '+(e.message||e); alert('Create/Add failed: '+(e.message||e)); }
+}
+
+/* ============================
+  Import single-token
+   ============================ */
+async function importSingle(addr, msgEl){
+  try{
+    if(!addr) return msgEl.innerText='Provide token address';
+    if(!ethersLib.utils.isAddress(addr)) return msgEl.innerText='Invalid address';
+    msgEl.innerText='Searching pairs...';
+    const candidates = getMergedTokensForImport().map(t=>t.address);
+    let found=0;
+    for(const other of candidates){
+      if(other.toLowerCase()===addr.toLowerCase()) continue;
+      try{
+        const onA = addr==='XPL_NATIVE'?WXPL:addr, onB = other==='XPL_NATIVE'?WXPL:other;
+        const pairAddr = await factoryContract.getPair(onA, onB);
+        if(pairAddr && pairAddr !== ethersLib.constants.AddressZero){
+          const symA = await safeSymbol(addr); const symB = await safeSymbol(other);
+          importedPairs.push({ tokenA: addr, tokenB: other, tokenASym: symA, tokenBSym: symB, pair: pairAddr });
+          addCustomIfMissing(addr); addCustomIfMissing(other);
+          found++;
+        }
+      }catch(e){}
+    }
+    if(found===0) msgEl.innerText='No pairs found for that token.';
+    else { saveLS(LS_IMPORTED, importedPairs); msgEl.innerText = `Imported ${found} pair(s).`; populateTokenSelectors(); await renderPopular(); await renderMyPools(); }
+  }catch(e){ console.error('importSingle', e); msgEl.innerText='Import failed'; }
+}
+
+/* ============================
+  Render popular pairs (with logos)
+============================ */
+async function renderPopular() {
+  popularList.innerHTML = '';
+  for (const p of POPULAR_PAIRS) {
+    const a = p[0], b = p[1];
+    const symA = a === 'XPL_NATIVE' ? 'XPL' : await safeSymbol(a);
+    const symB = b === 'XPL_NATIVE' ? 'XPL' : await safeSymbol(b);
+
+    try {
+      const pairAddr = await factoryContract.getPair(
+        a === 'XPL_NATIVE' ? WXPL : a,
+        b === 'XPL_NATIVE' ? WXPL : b
+      );
+      const available = pairAddr && pairAddr !== ethersLib.constants.AddressZero;
+
+      const card = document.createElement('div');
+      card.className = 'p-3 card rounded-lg mb-2 flex justify-between items-center';
+
+      // ✅ ambil logo dari tokens.json (atau fallback ke /assets)
+      const logoAPath = getTokenLogo(symA);
+      const logoBPath = getTokenLogo(symB);
+
+      card.innerHTML = `
+        <div class="flex items-center gap-3">
+          <div class="flex items-center">
+            <img src="${logoAPath}" 
+                 onerror="this.onerror=null;this.src='assets/default.png';" 
+                 class="token-logo" />
+            <img src="${logoBPath}" 
+                 onerror="this.onerror=null;this.src='assets/default.png';" 
+                 class="token-logo" 
+                 style="margin-left:-8px;margin-right:10px" />
+          </div>
+          <div>
+            <div class="font-semibold">${symA} / ${symB}</div>
+            <div class="muted small">${available ? 'Pool exists' : 'Pair missing'}</div>
+          </div>
+        </div>
+        <div>
+          <button class="px-3 py-1 rounded-lg ${available ? 'btn-grad' : 'border muted'}" 
+                  ${available ? '' : 'disabled'}>
+            ${available ? 'Add Liquidity' : 'Unavailable'}
+          </button>
+        </div>
+      `;
+
+      if (available) {
+        card.querySelector('button').addEventListener('click', () =>
+          onSelectPool(
+            { symbol: symA, address: a },
+            { symbol: symB, address: b },
+            pairAddr,
+            card,
+            false
+          )
+        );
+      }
+
+      popularList.appendChild(card);
+    } catch (e) {
+      console.warn('renderPopular err', e);
+    }
+  }
+}
+
+
+/* ============================
+  Render My Pools (dedupe by pair) + logos
+============================ */
+async function renderMyPools() {
+  positionsList.innerHTML = '';
+  noPositionsMsg.style.display = 'none';
+  const candidates = [];
+  POPULAR_PAIRS.forEach(p => candidates.push({ a: p[0], b: p[1] }));
+  importedPairs.forEach(p => candidates.push({ a: p.tokenA, b: p.tokenB }));
+  const seenPairs = new Set();
+  let foundAny = false;
+
+  for (const c of candidates) {
+    try {
+      const onA = c.a === 'XPL_NATIVE' ? WXPL : c.a;
+      const onB = c.b === 'XPL_NATIVE' ? WXPL : c.b;
+      const pairAddr = await factoryContract.getPair(onA, onB);
+      if (!pairAddr || pairAddr === ethersLib.constants.AddressZero) continue;
+      if (seenPairs.has(pairAddr.toLowerCase())) continue; // dedupe
+      seenPairs.add(pairAddr.toLowerCase());
+
+      const pair = new ethersLib.Contract(pairAddr, PAIR_ABI, provider);
+
+      // ✅ Case: belum connect wallet
+      if (!account) {
+        const symA = c.a === 'XPL_NATIVE' ? 'XPL' : await safeSymbol(c.a);
+        const symB = c.b === 'XPL_NATIVE' ? 'XPL' : await safeSymbol(c.b);
+        const card = document.createElement('div');
+        card.className = 'p-3 card rounded-lg mb-2 flex justify-between items-center';
+
+        // ✅ ambil logo dari tokens.json (fallback ke assets)
+        const logoAPath = getTokenLogo(symA);
+        const logoBPath = getTokenLogo(symB);
+
+        card.innerHTML = `
+          <div class="flex items-center gap-3">
+            <img src="${logoAPath}" onerror="this.onerror=null;this.src='assets/default.png';" class="token-logo" />
+            <img src="${logoBPath}" onerror="this.onerror=null;this.src='assets/default.png';" class="token-logo" style="margin-left:-8px;margin-right:10px" />
+            <div>
+              <div class="font-semibold">${symA} / ${symB}</div>
+              <div class="muted small">Imported / existing</div>
+            </div>
+          </div>
+          <div><button class="px-3 py-1 rounded-lg btn-grad">Select</button></div>
+        `;
+        card.querySelector('button').onclick = () => onSelectPool(
+          { symbol: symA, address: c.a },
+          { symbol: symB, address: c.b },
+          pairAddr,
+          card,
+          false
+        );
+        positionsList.appendChild(card);
+        foundAny = true;
+        continue;
+      }
+
+      // ✅ Case: user has liquidity
+      const lpBal = await pair.balanceOf(account);
+      if (lpBal && !lpBal.isZero()) {
+        const reserves = await pair.getReserves();
+        const token0 = await pair.token0();
+        let reserveA = reserves[0], reserveB = reserves[1];
+        if (token0.toLowerCase() !== onA.toLowerCase()) {
+          reserveA = reserves[1];
+          reserveB = reserves[0];
+        }
+
+        const totalSupply = await pair.totalSupply();
+        const userShareA = reserveA.mul(lpBal).div(totalSupply);
+        const userShareB = reserveB.mul(lpBal).div(totalSupply);
+
+        const metaA = await resolveMeta(c.a);
+        const metaB = await resolveMeta(c.b);
+        const amtA = ethersLib.utils.formatUnits(userShareA, metaA.decimals);
+        const amtB = ethersLib.utils.formatUnits(userShareB, metaB.decimals);
+
+        // ✅ ambil logo dari tokens.json (bukan assets langsung)
+        const logoAPath = getTokenLogo(metaA.symbol);
+        const logoBPath = getTokenLogo(metaB.symbol);
+
+        const card = document.createElement('div');
+        card.className = 'p-3 card rounded-lg mb-2 flex justify-between items-start';
+        card.innerHTML = `
+          <div class="flex items-center gap-3">
+            <img src="${logoAPath}" onerror="this.onerror=null;this.src='assets/default.png';" class="token-logo" />
+            <img src="${logoBPath}" onerror="this.onerror=null;this.src='assets/default.png';" class="token-logo" style="margin-left:-8px;margin-right:10px" />
+            <div>
+              <div class="font-semibold">${metaA.symbol} / ${metaB.symbol}</div>
+              <div class="muted small">Your liquidity: ${amtA} ${metaA.symbol} • ${amtB} ${metaB.symbol}</div>
+            </div>
+          </div>
+          <div><button class="px-3 py-1 rounded-lg bg-blue-600">Manage</button></div>
+        `;
+        card.querySelector('button').onclick = () => onSelectPool(metaA, metaB, pairAddr, card, true);
+        positionsList.appendChild(card);
+        foundAny = true;
+      }
+    } catch (e) {
+      console.warn('renderMyPools err', e);
+    }
+  }
+
+  if (!foundAny) noPositionsMsg.style.display = 'block';
+}
+
+
+/* ============================
+  Pool Manager injection (with logos + copy)
+   ============================ */
+async function onSelectPool(metaA, metaB, pairAddr, originEl=null, isOwner=false){
+  try{
+    const prev = document.getElementById('activeManager'); if(prev) prev.remove();
+    const onA = metaA.address==='XPL_NATIVE'?WXPL:metaA.address;
+    const onB = metaB.address==='XPL_NATIVE'?WXPL:metaB.address;
+    const pair = new ethersLib.Contract(pairAddr, PAIR_ABI, provider);
+    const reserves = await pair.getReserves();
+    const token0 = await pair.token0();
+    let reserveA = reserves[0], reserveB = reserves[1];
+    if(token0.toLowerCase() !== onA.toLowerCase()){ reserveA = reserves[1]; reserveB = reserves[0]; }
+    const metaAf = await resolveMeta(metaA.address), metaBf = await resolveMeta(metaB.address);
+
+    const logoAPath = `assets/${metaAf.symbol.toLowerCase()}.png`;
+    const logoBPath = `assets/${metaBf.symbol.toLowerCase()}.png`;
+
+    const manager = document.createElement('div');
+    manager.id = 'activeManager';
+    manager.className = 'card mt-3 p-4 rounded-lg';
+    manager.innerHTML = `
+      <div class="flex justify-between items-center mb-3 pool-header">
+        <div class="flex items-center">
+          <img src="${logoAPath}" onerror="this.onerror=null;this.src='assets/default.png';" class="token-logo" />
+          <img src="${logoBPath}" onerror="this.onerror=null;this.src='assets/default.png';" class="token-logo" style="margin-left:-8px"/>
+          <div class="pair-symbol">${metaAf.symbol} / ${metaBf.symbol}</div>
+        </div>
+        <div class="muted small">Pair: <span id="pmPairAddr">${pairAddr}</span> <button id="copyPairBtn" class="px-2 py-1 rounded ml-2 border muted small">Copy</button></div>
+      </div>
+
+      <div id="pmBody">
+        <div class="mb-3">
+          <label class="muted small">Token A — ${metaAf.symbol}</label>
+          <div class="muted small">Address: ${metaAf.address==='XPL_NATIVE'?'native (XPL)':shortAddr(metaAf.address)}</div>
+          <input id="pmA" class="w-full bg-transparent border rounded-lg px-3 py-2 mt-1" placeholder="0.0"/>
+          <div class="muted small mt-1" id="pmBalA">Balance: —</div>
+          <div class="flex gap-2 mt-2">
+            <button data-pct="0" class="pct small muted border px-2 py-1 rounded">0%</button>
+            <button data-pct="25" class="pct small muted border px-2 py-1 rounded">25%</button>
+            <button data-pct="50" class="pct small muted border px-2 py-1 rounded">50%</button>
+            <button data-pct="75" class="pct small muted border px-2 py-1 rounded">75%</button>
+            <button data-pct="100" class="pct small muted border px-2 py-1 rounded">100%</button>
+          </div>
+        </div>
+
+        <div class="text-center muted my-2"><button id="swapAB" class="muted small border rounded px-3 py-1">⇅</button></div>
+
+        <div class="mb-3">
+          <label class="muted small">Token B — ${metaBf.symbol}</label>
+          <div class="muted small">Address: ${metaBf.address==='XPL_NATIVE'?'native (XPL)':shortAddr(metaBf.address)}</div>
+          <input id="pmB" class="w-full bg-transparent border rounded-lg px-3 py-2 mt-1" placeholder="0.0"/>
+          <div class="muted small mt-1" id="pmBalB">Balance: —</div>
+          <div class="flex gap-2 mt-2">
+            <button data-pct="0" class="pctB small muted border px-2 py-1 rounded">0%</button>
+            <button data-pct="25" class="pctB small muted border px-2 py-1 rounded">25%</button>
+            <button data-pct="50" class="pctB small muted border px-2 py-1 rounded">50%</button>
+            <button data-pct="75" class="pctB small muted border px-2 py-1 rounded">75%</button>
+            <button data-pct="100" class="pctB small muted border px-2 py-1 rounded">100%</button>
+          </div>
+        </div>
+
+        <div class="flex gap-2 mt-3">
+          <button id="pmAdd" class="flex-1 px-3 py-2 rounded-lg btn-grad">Add Liquidity</button>
+          ${isOwner?'<button id="pmRemove" class="flex-1 px-3 py-2 rounded-lg bg-red-600">Remove Liquidity</button>':''}
+        </div>
+
+        <div id="pmMsg" class="muted small mt-2"></div>
+      </div>
+    `;
+    if(originEl && originEl.parentNode) originEl.insertAdjacentElement('afterend', manager); else managerSpot.appendChild(manager);
+
+    // hook copy button
+    const copyPairBtn = document.getElementById('copyPairBtn');
+    copyPairBtn.addEventListener('click', ()=> copyAddress(pairAddr) );
+
+    const pmA = document.getElementById('pmA'), pmB = document.getElementById('pmB');
+    const pmBalA = document.getElementById('pmBalA'), pmBalB = document.getElementById('pmBalB');
+    const pmAdd = document.getElementById('pmAdd'), pmRemove = document.getElementById('pmRemove'), pmMsg = document.getElementById('pmMsg');
+    const swapAB = document.getElementById('swapAB');
+
+    async function refreshBalances(){
+      try{
+        if(!account){ pmBalA.innerText='Balance: —'; pmBalB.innerText='Balance: —'; return; }
+        if(metaAf.address==='XPL_NATIVE'){ const bal=await provider.getBalance(account); pmBalA.innerText='Balance: '+ethersLib.utils.formatUnits(bal,metaAf.decimals||18)+' '+metaAf.symbol;} else { const ca=new ethersLib.Contract(metaAf.address, ERC20_ABI, provider); const dec=await ca.decimals(); const bal=await ca.balanceOf(account); pmBalA.innerText='Balance: '+ethersLib.utils.formatUnits(bal,dec)+' '+metaAf.symbol; }
+        if(metaBf.address==='XPL_NATIVE'){ const bal=await provider.getBalance(account); pmBalB.innerText='Balance: '+ethersLib.utils.formatUnits(bal,metaBf.decimals||18)+' '+metaBf.symbol;} else { const cb=new ethersLib.Contract(metaBf.address, ERC20_ABI, provider); const dec2=await cb.decimals(); const bal2=await cb.balanceOf(account); pmBalB.innerText='Balance: '+ethersLib.utils.formatUnits(bal2,dec2)+' '+metaBf.symbol; }
+      }catch(e){ console.warn('refreshBalances', e); }
+    }
+    await refreshBalances();
+
+    // autofill sync (prevent recursive)
+    let pmSyncing = false;
+    pmA.addEventListener('input', debounce(async ()=>{
+      try{
+        if (pmSyncing) return;
+        pmSyncing = true;
+        const v = pmA.value || '0';
+        if(!v || Number(v) === 0){ pmB.value = ''; pmSyncing = false; return; }
+        const decA = metaAf.address==='XPL_NATIVE'?18: await (new ethersLib.Contract(metaAf.address, ERC20_ABI, provider)).decimals();
+        const decB = metaBf.address==='XPL_NATIVE'?18: await (new ethersLib.Contract(metaBf.address, ERC20_ABI, provider)).decimals();
+        const inA = ethersLib.utils.parseUnits(v||'0', decA);
+        if(reserveA.isZero()) { pmSyncing = false; return; }
+        const outB = reserveB.mul(inA).div(reserveA);
+        pmB.value = ethersLib.utils.formatUnits(outB, decB);
+        setTimeout(() => { pmSyncing = false; }, 100);
+      }catch(e){ console.warn('pm autofill A->B', e); pmSyncing = false; }
+    }, 300));
+
+    pmB.addEventListener('input', debounce(async ()=>{
+      try{
+        if (pmSyncing) return;
+        pmSyncing = true;
+        const v = pmB.value || '0';
+        if(!v || Number(v) === 0){ pmA.value = ''; pmSyncing = false; return; }
+        const decA = metaAf.address==='XPL_NATIVE'?18: await (new ethersLib.Contract(metaAf.address, ERC20_ABI, provider)).decimals();
+        const decB = metaBf.address==='XPL_NATIVE'?18: await (new ethersLib.Contract(metaBf.address, ERC20_ABI, provider)).decimals();
+        const inB = ethersLib.utils.parseUnits(v||'0', decB);
+        if(reserveB.isZero()) { pmSyncing = false; return; }
+        const outA = reserveA.mul(inB).div(reserveB);
+        pmA.value = ethersLib.utils.formatUnits(outA, decA);
+        setTimeout(() => { pmSyncing = false; }, 100);
+      }catch(e){ console.warn('pm autofill B->A', e); pmSyncing = false; }
+    }, 300));
+
+    // percent buttons
+    manager.querySelectorAll('.pct').forEach(btn=>btn.addEventListener('click', async ()=>{
+      const pct = Number(btn.getAttribute('data-pct'))/100;
+      if(!account) return alert('Connect wallet');
+      try{
+        if(metaAf.address==='XPL_NATIVE'){ const bal=await provider.getBalance(account); pmA.value = ethersLib.utils.formatUnits(bal.mul(Math.floor(pct*100)).div(100), metaAf.decimals||18); } else { const ca=new ethersLib.Contract(metaAf.address, ERC20_ABI, provider); const dec=await ca.decimals(); const bal=await ca.balanceOf(account); pmA.value = ethersLib.utils.formatUnits(bal.mul(Math.floor(pct*100)).div(100), dec); }
+        pmA.dispatchEvent(new Event('input'));
+      }catch(e){ console.warn('pctA', e); }
+    }));
+    manager.querySelectorAll('.pctB').forEach(btn=>btn.addEventListener('click', async ()=>{
+      const pct = Number(btn.getAttribute('data-pct'))/100;
+      if(!account) return alert('Connect wallet');
+      try{
+        if(metaBf.address==='XPL_NATIVE'){ const bal=await provider.getBalance(account); pmB.value = ethersLib.utils.formatUnits(bal.mul(Math.floor(pct*100)).div(100), metaBf.decimals||18); } else { const cb=new ethersLib.Contract(metaBf.address, ERC20_ABI, provider); const dec=await cb.decimals(); const bal=await cb.balanceOf(account); pmB.value = ethersLib.utils.formatUnits(bal.mul(Math.floor(pct*100)).div(100), dec); }
+        pmB.dispatchEvent(new Event('input'));
+      }catch(e){ console.warn('pctB', e); }
+    }));
+
+    // swap A/B button
+    swapAB.addEventListener('click', async ()=>{
+      const tmpVal = pmA.value; pmA.value = pmB.value; pmB.value = tmpVal;
+      const tmpBal = pmBalA.innerText; pmBalA.innerText = pmBalB.innerText; pmBalB.innerText = tmpBal;
+    });
+
+    // Add liquidity
+    pmAdd.addEventListener('click', async ()=>{
+      try{
+        if(!window.ethereum) return alert('Connect wallet first');
+        if(!signer){ provider = new ethersLib.providers.Web3Provider(window.ethereum); signer = provider.getSigner(); }
+        const owner = await signer.getAddress();
+        const valA = pmA.value, valB = pmB.value;
+        if(!valA || !valB) return alert('Enter amounts');
+        const decA = metaAf.address==='XPL_NATIVE'?18: await (new ethersLib.Contract(metaAf.address, ERC20_ABI, provider)).decimals();
+        const decB = metaBf.address==='XPL_NATIVE'?18: await (new ethersLib.Contract(metaBf.address, ERC20_ABI, provider)).decimals();
+        const amountA = ethersLib.utils.parseUnits(valA, decA);
+        const amountB = ethersLib.utils.parseUnits(valB, decB);
+        const pairCheck = await factoryContract.getPair(onA, onB);
+        if(!pairCheck || pairCheck===ethersLib.constants.AddressZero) return alert('Pair missing. Create pool first.');
+        if(metaAf.address !== 'XPL_NATIVE'){
+          const ca = new ethersLib.Contract(metaAf.address, ERC20_ABI, provider);
+          const allowance = await ca.allowance(owner, ROUTER);
+          if(allowance.lt(amountA)){ pmMsg.innerText = 'Approving ' + metaAf.symbol + '...'; const tx = await ca.connect(signer).approve(ROUTER, ethersLib.constants.MaxUint256); await tx.wait(); }
+        }
+        if(metaBf.address !== 'XPL_NATIVE'){
+          const cb = new ethersLib.Contract(metaBf.address, ERC20_ABI, provider);
+          const allowance2 = await cb.allowance(owner, ROUTER);
+          if(allowance2.lt(amountB)){ pmMsg.innerText = 'Approving ' + metaBf.symbol + '...'; const tx2 = await cb.connect(signer).approve(ROUTER, ethersLib.constants.MaxUint256); await tx2.wait(); }
+        }
+        const routerS = routerContract.connect(signer);
+        const deadline = (await provider.getBlock('latest')).timestamp + 60*10;
+        pmMsg.innerText = 'Sending addLiquidity tx...';
+        let tx;
+        if(metaAf.address === 'XPL_NATIVE' || metaBf.address === 'XPL_NATIVE'){
+          if(metaAf.address === 'XPL_NATIVE'){
+            tx = await routerS.addLiquidityETH(onB, amountB, 0, 0, owner, deadline, { value: amountA });
+          } else {
+            tx = await routerS.addLiquidityETH(onA, amountA, 0, 0, owner, deadline, { value: amountB });
+          }
+        } else {
+          tx = await routerS.addLiquidity(onA, onB, amountA, amountB, 0, 0, owner, deadline);
+        }
+        pmMsg.innerHTML = `Tx sent: <a class="tx-link" data-h="${tx.hash}">${shortAddr(tx.hash)}</a>`;
+        pmMsg.querySelector('a.tx-link').onclick = (e)=>{ const h=e.currentTarget.getAttribute('data-h'); if(h) location.href = SCAN_BASE + h; };
+        addTxToHistory(tx.hash, 'addLiquidity');
+        await tx.wait();
+        pmMsg.innerText = 'Liquidity added: ' + tx.hash;
+        await renderMyPools();
+      }catch(e){ console.error('pmAdd err', e); alert('Add failed: ' + (e.message||e)); pmMsg.innerText = 'Add failed'; }
+    });
+
+    // Remove liquidity if owner
+    if(isOwner && pmRemove){
+      pmRemove.addEventListener('click', async ()=>{
+        try{
+          if(!window.ethereum) return alert('Connect wallet first');
+          if(!signer){ provider = new ethersLib.providers.Web3Provider(window.ethereum); signer = provider.getSigner(); }
+          const ownerAddr = await signer.getAddress();
+          const pairC = new ethersLib.Contract(pairAddr, PAIR_ABI, provider);
+          const lpBal = await pairC.balanceOf(ownerAddr);
+          if(lpBal.isZero()) return alert('No LP tokens to remove');
+          const pctS = prompt('Percent to remove (0-100)', '25'); if(!pctS) return;
+          const pct = Math.max(0, Math.min(100, Number(pctS)));
+          const removeLP = lpBal.mul(pct).div(100);
+          try{
+            const lpToken = new ethersLib.Contract(pairAddr, ERC20_ABI, provider);
+            const allow = await lpToken.allowance(ownerAddr, ROUTER);
+            if(allow.lt(removeLP)){ const txa = await lpToken.connect(signer).approve(ROUTER, ethersLib.constants.MaxUint256); await txa.wait(); }
+          }catch(e){ console.warn('lp approve skip', e); }
+          const routerS = routerContract.connect(signer);
+          const deadline = (await provider.getBlock('latest')).timestamp + 60*10;
+          pmMsg.innerText = 'Removing liquidity...';
+          const tx = await routerS.removeLiquidity(onA, onB, removeLP, 0, 0, ownerAddr, deadline);
+          pmMsg.innerHTML = `Tx sent: <a class="tx-link" data-h="${tx.hash}">${shortAddr(tx.hash)}</a>`;
+          pmMsg.querySelector('a.tx-link').onclick = (e)=>{ const h=e.currentTarget.getAttribute('data-h'); if(h) location.href = SCAN_BASE + h; };
+          addTxToHistory(tx.hash, 'removeLiquidity');
+          await tx.wait();
+          pmMsg.innerText = 'Removed: ' + tx.hash;
+          await renderMyPools();
+        }catch(e){ console.error('pmRemove err', e); alert('Remove failed: ' + (e.message||e)); }
+      });
+    }
+
+  }catch(e){ console.error('onSelectPool err', e); alert('Load manager failed: ' + (e.message||e)); }
+}
+
+/* ============================
+  resolve meta
+   ============================ */
+async function resolveMeta(addr){
+  if(!addr) return { symbol: shortAddr(addr), decimals: 18, address: addr };
+  if(addr==='XPL_NATIVE') return { symbol:'XPL', decimals:18, address:addr };
+  try{ const c=new ethersLib.Contract(addr, ERC20_ABI, provider); const [sym,dec]=await Promise.all([c.symbol(), c.decimals()]); return { symbol: sym, decimals: dec, address: addr }; }catch(e){ return { symbol: shortAddr(addr), decimals: 18, address: addr }; }
+}
+
+/* ============================
+  custom token helpers
+   ============================ */
+function promptAddCustom(){
+  const addr = prompt('Paste token contract address (ERC20):');
+  if(!addr) return;
+  if(!ethersLib.utils.isAddress(addr)) return alert('Invalid address');
+  if(customTokens.some(t=>t.address && t.address.toLowerCase()===addr.toLowerCase())) return alert('Token already added');
+  customTokens.push({ symbol: shortAddr(addr), address: addr });
+  saveLS(LS_CUSTOM, customTokens);
+  populateTokenSelectors();
+  (async ()=>{ try{ const meta = await resolveMeta(addr); const idx = customTokens.findIndex(t=>t.address.toLowerCase()===addr.toLowerCase()); if(idx>=0){ customTokens[idx].symbol = meta.symbol; saveLS(LS_CUSTOM, customTokens); populateTokenSelectors(); } }catch(e){} })();
+  alert('Token added. Warning: Anyone can create tokens — verify before adding liquidity.');
+}
+function addCustomIfMissing(address){
+  if(!address || address==='XPL_NATIVE') return;
+  if(customTokens.some(t=>t.address && t.address.toLowerCase()===address.toLowerCase())) return;
+  customTokens.push({ symbol: shortAddr(address), address: address });
+  saveLS(LS_CUSTOM, customTokens);
+}
+
+/* ============================
+  helpers for import
+   ============================ */
+function getMergedTokensForImport(){
+  const arr = DEFAULT_TOKENS.concat(customTokens);
+  importedPairs.forEach(p=>{ arr.push({ symbol: p.tokenASym || shortAddr(p.tokenA), address: p.tokenA }); arr.push({ symbol: p.tokenBSym || shortAddr(p.tokenB), address: p.tokenB }); });
+  const map = new Map(); arr.forEach(x=>{ if(x && x.address) map.set(x.address.toLowerCase(), x); }); return Array.from(map.values());
+}
+
+/* ============================
+  small utility
+   ============================ */
+function debounce(fn, ms=250){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); } }
+
+/* ============================
+  Tx history initial load & render
+   ============================ */
+(function loadTxs(){
+  txHistory = loadLS(LS_TXS, txHistory || []);
+  // purge >24h
+  txHistory = txHistory.filter(t => (nowSec() - t.ts) < 24*3600);
+  saveLS(LS_TXS, txHistory);
+})();
+
+renderTxHistory();
+
+</script>
+<script src="appkit.bundle.js"></script>
+</body>
+</html>
