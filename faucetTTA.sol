@@ -2,7 +2,7 @@
 pragma solidity ^0.8.19;
 
 contract TTAFaucet {
-    IERC20 public constant TTA_TOKEN = IERC20(0x742641b0c71e855a86eadc4978699c9d215ded5a);
+    IERC20 public constant TTA_TOKEN = IERC20(0x742641b0C71E855A86eADC4978699c9d215DED5a);
     
     uint256 public constant CLAIM_AMOUNT = 1000 * 10**18; // 1000 TTA
     uint256 public constant COOLDOWN_PERIOD = 24 hours;
