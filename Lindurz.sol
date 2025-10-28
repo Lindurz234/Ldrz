@@ -47,10 +47,10 @@ contract CryBaby is ERC20Interface, SafeMath {
      * Initializes contract with initial supply tokens to the creator of the contract
      */
     constructor() public {
-        name = "Cry Baby";
-        symbol = "CRY";
+        name = "Test Coin A";
+        symbol = "TCA";
         decimals = 18;
-        _totalSupply = 7200000000 * 10 ** 18;
+        _totalSupply = 100000000 * 10 ** 18;
 
         balances[msg.sender] = _totalSupply;
         emit Transfer(address(0), msg.sender, _totalSupply);
