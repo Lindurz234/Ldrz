@@ -4,12 +4,12 @@ pragma solidity ^0.8.19;
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./SimpleTokenv2.sol";
+import "./simpletokenv2.sol";
 
 /**
  * @title UniversalTokenFactory
  * @dev Factory untuk membuat token ERC20 dengan fee flexible.
- * Support native currency fee (ETH, BNB, MATIC, XPL, dll).
+ * Tanpa constructor - fee default 0 dan disabled.
  */
 contract UniversalTokenFactory is Ownable, ReentrancyGuard {
     uint256 public createFee;
@@ -32,10 +32,8 @@ contract UniversalTokenFactory is Ownable, ReentrancyGuard {
     event FeesWithdrawn(address indexed owner, uint256 amount);
     event EmergencyWithdraw(address indexed token, uint256 amount);
 
-    constructor(uint256 _initialFee, bool _feeEnabled) Ownable(msg.sender) {
-        createFee = _initialFee;
-        isFeeEnabled = _feeEnabled;
-    }
+    // Tanpa constructor - fee default 0 dan disabled
+    // constructor() Ownable(msg.sender) {}
 
     /**
      * @dev Membuat token baru dengan fee flexible
@@ -86,59 +84,12 @@ contract UniversalTokenFactory is Ownable, ReentrancyGuard {
         return tokenAddress;
     }
 
-    /**
-     * @dev Create token dengan custom fee validation (untuk UI)
-     */
-    function createTokenWithFee(
-        string memory name,
-        string memory symbol,
-        uint8 decimals,
-        uint256 initialSupply,
-        uint256 expectedFee
-    ) external payable nonReentrant returns (address) {
-        // Validate expected fee
-        if (isFeeEnabled) {
-            require(msg.value == expectedFee, "Fee mismatch");
-            require(expectedFee == createFee, "Invalid fee amount");
-        } else {
-            require(expectedFee == 0, "Fee should be zero when disabled");
-        }
-        
-        require(bytes(name).length > 0, "Name cannot be empty");
-        require(bytes(symbol).length > 0, "Symbol cannot be empty");
-        require(initialSupply > 0, "Initial supply must be greater than 0");
-        require(decimals <= 18, "Decimals cannot exceed 18");
-
-        // Deploy token
-        SimpleTokenv2 newToken = new SimpleTokenv2(
-            msg.sender,
-            name,
-            symbol, 
-            decimals,
-            initialSupply
-        );
-
-        address tokenAddress = address(newToken);
-        allTokens.push(tokenAddress);
-        userTokens[msg.sender].push(tokenAddress);
-
-        emit TokenCreated(
-            msg.sender,
-            tokenAddress,
-            name,
-            symbol,
-            decimals,
-            initialSupply
-        );
-
-        return tokenAddress;
-    }
-
     // ==== Management Functions ====
 
     function updateFee(uint256 newFee) external onlyOwner {
+        uint256 oldFee = createFee;
         createFee = newFee;
-        emit FeeUpdated(createFee, newFee);
+        emit FeeUpdated(oldFee, newFee);
     }
 
     function toggleFee(bool enable) external onlyOwner {
