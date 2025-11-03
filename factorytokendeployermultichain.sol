@@ -4,17 +4,15 @@ pragma solidity ^0.8.19;
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./SimpleTokenv2.sol";
+import "./simpletokenv2.sol";
 
 /**
- * @title UniversalTokenFactory
- * @dev Factory untuk membuat token ERC20 dengan fee flexible.
- * Tanpa constructor parameters - fee default 0 dan disabled.
+ * @title SimpleTokenFactory
+ * @dev Factory untuk membuat token ERC20 normal.
+ * User langsung menjadi pemilik token contract.
  */
-contract UniversalTokenFactory is Ownable, ReentrancyGuard {
-    uint256 public createFee;
-    bool public isFeeEnabled;
-    
+contract SimpleTokenFactory is Ownable, ReentrancyGuard {
+    uint256 public createFee = 25 ether;
     address[] public allTokens;
     mapping(address => address[]) public userTokens;
 
@@ -28,21 +26,13 @@ contract UniversalTokenFactory is Ownable, ReentrancyGuard {
     );
 
     event FeeUpdated(uint256 oldFee, uint256 newFee);
-    event FeeToggled(bool enabled);
     event FeesWithdrawn(address indexed owner, uint256 amount);
     event EmergencyWithdraw(address indexed token, uint256 amount);
 
-    /**
-     * @dev Constructor sederhana - set msg.sender sebagai owner
-     */
-    constructor() Ownable(msg.sender) {
-        // Fee default 0 dan disabled
-        createFee = 0;
-        isFeeEnabled = false;
-    }
+    constructor() Ownable(msg.sender) {}
 
     /**
-     * @dev Membuat token baru dengan fee flexible
+     * @dev Membuat token baru - user langsung jadi owner
      */
     function createToken(
         string memory name,
@@ -50,16 +40,7 @@ contract UniversalTokenFactory is Ownable, ReentrancyGuard {
         uint8 decimals,
         uint256 initialSupply
     ) external payable nonReentrant returns (address) {
-        // Check fee jika enabled
-        if (isFeeEnabled) {
-            require(msg.value == createFee, "Incorrect fee amount");
-        } else {
-            // Jika fee disabled, refund any ETH sent
-            if (msg.value > 0) {
-                payable(msg.sender).transfer(msg.value);
-            }
-        }
-        
+        require(msg.value == createFee, "Incorrect XPL fee");
         require(bytes(name).length > 0, "Name cannot be empty");
         require(bytes(symbol).length > 0, "Symbol cannot be empty");
         require(initialSupply > 0, "Initial supply must be greater than 0");
@@ -93,19 +74,15 @@ contract UniversalTokenFactory is Ownable, ReentrancyGuard {
     // ==== Management Functions ====
 
     function updateFee(uint256 newFee) external onlyOwner {
+        require(newFee > 0, "Fee must be greater than 0");
         uint256 oldFee = createFee;
         createFee = newFee;
         emit FeeUpdated(oldFee, newFee);
     }
 
-    function toggleFee(bool enable) external onlyOwner {
-        isFeeEnabled = enable;
-        emit FeeToggled(enable);
-    }
-
     function withdrawFees() external onlyOwner nonReentrant {
         uint256 balance = address(this).balance;
-        require(balance > 0, "No fees to withdraw");
+        require(balance > 0, "No VANA fees to withdraw");
         payable(owner()).transfer(balance);
         emit FeesWithdrawn(owner(), balance);
     }
@@ -116,10 +93,6 @@ contract UniversalTokenFactory is Ownable, ReentrancyGuard {
         require(balance > 0, "No balance to withdraw");
         IERC20(tokenAddress).transfer(owner(), balance);
         emit EmergencyWithdraw(tokenAddress, balance);
-    }
-
-    function getFeeInfo() external view returns (uint256 fee, bool enabled) {
-        return (createFee, isFeeEnabled);
     }
 
     function getTotalTokens() external view returns (uint256) {
