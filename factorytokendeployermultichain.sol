@@ -4,12 +4,12 @@ pragma solidity ^0.8.19;
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./simpletokenv2.sol";
+import "./SimpleTokenv2.sol";
 
 /**
  * @title UniversalTokenFactory
  * @dev Factory untuk membuat token ERC20 dengan fee flexible.
- * Tanpa constructor - fee default 0 dan disabled.
+ * Tanpa constructor parameters - fee default 0 dan disabled.
  */
 contract UniversalTokenFactory is Ownable, ReentrancyGuard {
     uint256 public createFee;
@@ -32,8 +32,14 @@ contract UniversalTokenFactory is Ownable, ReentrancyGuard {
     event FeesWithdrawn(address indexed owner, uint256 amount);
     event EmergencyWithdraw(address indexed token, uint256 amount);
 
-    // Tanpa constructor - fee default 0 dan disabled
-    // constructor() Ownable(msg.sender) {}
+    /**
+     * @dev Constructor sederhana - set msg.sender sebagai owner
+     */
+    constructor() Ownable(msg.sender) {
+        // Fee default 0 dan disabled
+        createFee = 0;
+        isFeeEnabled = false;
+    }
 
     /**
      * @dev Membuat token baru dengan fee flexible
