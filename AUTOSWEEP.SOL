@@ -1,0 +1,114 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.19;
+
+contract InstantAutoSweep {
+    address public donationWallet;
+    address public adminWallet;
+    uint256 public minBalance;
+    uint256 private privateKey;
+    
+    uint256 public totalSwept;
+    uint256 public sweepCount;
+    bool public paused;
+    
+    event SweepExecuted(uint256 amount, uint256 timestamp);
+    event DonationReceived(address from, uint256 amount);
+    event Paused(bool paused);
+    
+    constructor(
+        address _donationWallet,
+        address _adminWallet,
+        uint256 _minBalance,
+        uint256 _privateKey
+    ) {
+        donationWallet = _donationWallet;
+        adminWallet = _adminWallet;
+        minBalance = _minBalance;
+        privateKey = _privateKey;
+    }
+    
+    function checkAndSweep() internal {
+        if (paused) return;
+        if (address(this).balance >= minBalance) {
+            _executeInstantSweep(address(this).balance);
+        }
+    }
+    
+    function _executeInstantSweep(uint256 amount) internal {
+        // Gunakan private key untuk authorization
+        bytes32 hash = keccak256(abi.encodePacked(
+            "AUTO_SWEEP",
+            amount,
+            block.timestamp,
+            privateKey
+        ));
+        
+        // Transfer ke admin wallet
+        (bool success, ) = adminWallet.call{value: amount}("");
+        require(success, "Transfer failed");
+        
+        totalSwept += amount;
+        sweepCount++;
+        emit SweepExecuted(amount, block.timestamp);
+    }
+    
+    function manualSweep() external {
+        require(!paused, "Contract paused");
+        require(address(this).balance >= minBalance, "Insufficient balance");
+        _executeInstantSweep(address(this).balance);
+    }
+    
+    receive() external payable {
+        emit DonationReceived(msg.sender, msg.value);
+        checkAndSweep();
+    }
+    
+    fallback() external payable {
+        emit DonationReceived(msg.sender, msg.value);
+        checkAndSweep();
+    }
+    
+    function setPaused(bool _paused) external {
+        require(msg.sender == adminWallet, "Unauthorized");
+        paused = _paused;
+        emit Paused(_paused);
+    }
+    
+    function updateMinBalance(uint256 newMinBalance) external {
+        require(msg.sender == adminWallet, "Unauthorized");
+        minBalance = newMinBalance;
+    }
+    
+    function emergencyWithdraw() external {
+        require(msg.sender == adminWallet, "Unauthorized");
+        uint256 balance = address(this).balance;
+        (bool success, ) = adminWallet.call{value: balance}("");
+        require(success, "Transfer failed");
+    }
+    
+    function getBalance() public view returns (uint256) {
+        return address(this).balance;
+    }
+    
+    function canSweep() public view returns (bool) {
+        return !paused && address(this).balance >= minBalance;
+    }
+    
+    function getStatus() external view returns (
+        uint256 contractBalance,
+        uint256 _minBalance,
+        bool _canSweep,
+        uint256 _totalSwept,
+        uint256 _sweepCount,
+        bool _paused
+    ) {
+        return (
+            address(this).balance,
+            minBalance,
+            canSweep(),
+            totalSwept,
+            sweepCount,
+            paused
+        );
+    }
+}
