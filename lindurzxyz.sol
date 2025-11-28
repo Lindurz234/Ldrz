@@ -9,7 +9,7 @@ contract LindurzXYZ is ReentrancyGuard {
     string public constant symbol = "xyz";
     uint8 public constant decimals = 18;
     uint256 public constant totalSupply = 234000 * 10**18;
-    string public logoURI = "lindurzxyz.png";
+    string public logoURI = "https://aquamarine-rear-fowl-342.mypinata.cloud/ipfs/bafybeiegh4onmrbmjqhndyzxsnv225nf5y3t3alaqtmp26nmnovapjyewu";
     
     mapping(address => uint256) private _balances;
     mapping(address => mapping(address => uint256)) private _allowances;
